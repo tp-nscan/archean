@@ -124,8 +124,23 @@ type PermutationFixture () =
 
     [<TestMethod>]
     member this.TestMakeSwitchSet() =
+        let res = Domain.SwitchSet.ForOrder 5
+        Assert.IsTrue (res.order = 5)
+        Assert.IsTrue (res.switches.Length = 10)
 
-        Assert.IsTrue (true)
+    
+    
+    [<TestMethod>]
+    member this.TestMakeRandomSorter() =
+        let length = 29
+        let order = 5
+        
+        let switchSet = Domain.SwitchSet.ForOrder 5
+        let rnd = new Random(123)
+
+        let res = Domain.Sorter.CreateRandom rnd switchSet length
+        Assert.IsTrue (res.order = order)
+        Assert.IsTrue (res.switches.Length = length)
 
 
 

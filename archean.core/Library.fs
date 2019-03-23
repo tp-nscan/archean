@@ -178,6 +178,7 @@ module Domain =
                     |> Seq.toArray
                 }
 
+
     module Sorter =
         let CreateRandom (rnd : Random) (switchSet:SwitchSet) (len: int) =
                 {
