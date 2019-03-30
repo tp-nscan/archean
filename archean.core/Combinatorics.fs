@@ -1,10 +1,5 @@
 namespace archean.core
-
 open System
-
-module Say =
-    let hello name =
-        printfn "Hello %s" name
 
 
 module Combinatorics =
@@ -17,16 +12,22 @@ module Combinatorics =
             let index =                                                 // Index in original deck
                 availableFlags                                          // Go through available array
                 |> Seq.filter (fun (ndx,f) -> f)                        // and pick out only the available tuples
-                |> Seq.nth nItem                                        // Get the one at our chosen index
+                |> Seq.item nItem                                        // Get the one at our chosen index
                 |> fst                                                  // and retrieve it's index into the original array
             availableFlags.[index] <- (index, false)                    // Mark that index as unavailable
             initialList.[index]                                         // and return the original item
         seq {(initialList.Length) .. -1 .. 1}                           // Going from the length of the list down to 1
         |> Seq.map (fun i -> nextItem i)                                // yield the next item
-
+    
 
     let FisherYatesShuffleFromSeed (seed : int) =                                                  
         FisherYatesShuffle (new Random(seed))
+
+
+    let ToIntArray (len:int) (intVers:int) =
+        let bitLoc (loc:int) (intBits:int) =
+            if (((1 <<< loc) &&& (intBits)) <> 0) then 1 else 0
+        Array.init len (fun i -> bitLoc i intVers)
 
 
     let RandomIntPermutations (rnd : Random) (len: int) (count:int) =
@@ -70,7 +71,7 @@ module Combinatorics =
         let ref = [|0 .. (a.Length - 1)|]
         DistanceSquared a ref
 
-
+    // will do conventional sority if the stage array is all 1 or 2 cycles
     let SortIntArray (sortable: array<int>) (stage: array<int>) (counter: array<int>) =
         for i = 0 to stage.Length - 1 do
             let j = stage.[i]
@@ -115,75 +116,50 @@ module Combinatorics =
         seq {1 .. count} |> Seq.map (fun i -> MakeRandomFullTwoCycleIntArray rnd arraysize)
 
 
-
- 
-module Domain =
+module Combinatorics_Types =
 
     type Permutation = private Permutation of int[]
 
     module Permutation =
 
-        let Identity (len: int) = Permutation [|0 .. len-1|]
+        let Identity (order: int) = Permutation [|0 .. order-1|]
         let apply f (Permutation p) = f p
         let value p = apply id p
-
-        let CreateRandom (rnd : Random) (len: int) (count: int) =
-            let initialList = (Identity len) |> value                             
+ 
+        let CreateRandom (rnd : Random) (order: int) (count: int) =
+            let initialList = (Identity order) |> value                             
             let permuter = (Combinatorics.FisherYatesShuffle rnd)
             Seq.init count (fun _ -> Permutation ((permuter initialList) |> Seq.toArray))
-
+ 
         let Inverse (p: Permutation) =
             Permutation (Combinatorics.InverseMapArray (p |> value))
-
+ 
         let Product (pA: Permutation) (pB: Permutation) =
             Permutation (Combinatorics.ComposeMapIntArrays (pA |> value) (pB |> value))
-    
-    
+ 
     type TwoCycleIntArray = private TwoCycleIntArray of int[]
 
     module TwoCycleIntArray =
 
-        let Identity (len: int) = TwoCycleIntArray [|0 .. len-1|]
+        let Identity (order: int) = TwoCycleIntArray [|0 .. order-1|]
         let apply f (TwoCycleIntArray p) = f p
         let value p = apply id p
 
-        let MakeMonoCycleFromHiLow (len: int) (hi: int) (low: int) =
-            TwoCycleIntArray (Combinatorics.MakeTwoCycleIntArray len low hi)
+        let MakeMonoCycleFromHiLow (order: int) (hi: int) (low: int) =
+            TwoCycleIntArray (Combinatorics.MakeTwoCycleIntArray order low hi)
 
-        let MakeAllMonoCycleOfLength (len: int) =
-            (Combinatorics.MakeAllTwoCycleIntArrays len) 
+        let MakeAllMonoCycleOfLength (order: int) =
+            (Combinatorics.MakeAllTwoCycleIntArrays order) 
             |> Seq.map (fun s -> TwoCycleIntArray s)
 
-        let MakeRandomPolyCycle (rnd : Random) (len: int) (count: int) =
-            Seq.init count (fun _ -> Combinatorics.MakeRandomFullTwoCycleIntArray rnd len)
+        let MakeRandomPolyCycle (rnd : Random) (order: int) (count: int) =
+            Seq.init count (fun _ -> Combinatorics.MakeRandomFullTwoCycleIntArray rnd order)
             |> Seq.map (fun s -> TwoCycleIntArray s)
+         
 
+    type BitArray = {order:int; items: array<bool>}
+    module BitArray =
 
+        let Zero (order: int) =  { order=order; items=Array.init order (fun i -> false) }
 
-    type Switch = {low:int; hi:int}
-    
-    type Stage = {switches:Switch list}
-
-    type Sorter = {order:int; switches: array<Switch>}
-
-    type SwitchSet = {order:int; switches: array<Switch>}
-
-    module SwitchSet =
-        let ForOrder (order:int) =
-                {
-                    order=order;
-                    switches=seq {for i = 0 to order - 1 do
-                                    for j = 0 to i - 1 do
-                                        yield { low=j; hi=i; } }
-                    |> Seq.toArray
-                }
-
-
-    module Sorter =
-        let CreateRandom (rnd : Random) (switchSet:SwitchSet) (len: int) =
-                {
-                    Sorter.order=switchSet.order;
-                    switches = seq { for i = 0 to len - 1 do
-                                       yield switchSet.switches.[rnd.Next(0, switchSet.order)] }
-                    |> Seq.toArray
-                }
+        let Next (bits: BitArray) =  { order=bits.order; items=bits.items }

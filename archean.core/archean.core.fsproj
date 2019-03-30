@@ -6,7 +6,9 @@
 
   <ItemGroup>
     <Compile Include="Rop.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="Combinatorics.fs" />
+    <Compile Include="Sorting.fs" />
+    <Compile Include="GeneratedSortables.fs" />
   </ItemGroup>
 
 </Project>

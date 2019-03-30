@@ -3,9 +3,34 @@ namespace archean.core.test
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open archean.core
+open archean.core.Combinatorics
+open archean.core.Combinatorics_Types
 
 [<TestClass>]
-type PermutationFixture () =
+type CombinatoricsFixture () =
+
+    [<TestMethod>]
+    member this.TestFisherYatesShuffleFromSeed() =
+      let starting = [|2; 4; 6; 8; 10; 12; 14 |]
+      let seededFY = Combinatorics.FisherYatesShuffleFromSeed 5 
+      let actual =  seededFY [|2; 4; 6; 8; 10; 12; 14 |] |> Seq.toArray
+      Assert.AreEqual(starting.Length, actual.Length)
+ 
+
+    [<TestMethod>]
+    member this.TestToIntArray() =
+      let len = 6
+      let expectedArray = [|1; 0; 1; 0; 1; 0|]
+      let converted = Combinatorics.ToIntArray len 21
+      Assert.IsTrue (Combinatorics.CompareArrays expectedArray converted)
+
+ 
+    [<TestMethod>]
+    member this.TestRandomIntPermutations() =
+      let expectedCount = 9
+      let permutes = Combinatorics.RandomIntPermutations (new Random(123)) 16 expectedCount |> Seq.toArray
+      Assert.AreEqual(expectedCount, permutes.Length)
+ 
 
     [<TestMethod>]
     member this.TestCompareArrays() =
@@ -18,35 +43,20 @@ type PermutationFixture () =
  
 
     [<TestMethod>]
-    member this.TestFisherYatesShuffleFromSeed() =
-      let starting = [|2; 4; 6; 8; 10; 12; 14 |]
-      let seededFY = Combinatorics.FisherYatesShuffleFromSeed 5 
-      let actual =  seededFY [|2; 4; 6; 8; 10; 12; 14 |] |> Seq.toArray
-      Assert.AreEqual(starting.Length, actual.Length)
- 
- 
-    [<TestMethod>]
-    member this.TestRandomIntPermutations() =
-      let expectedCount = 9
-      let permutes = Combinatorics.RandomIntPermutations (new Random(123)) 16 expectedCount |> Seq.toArray
-      Assert.AreEqual(expectedCount, permutes.Length)
- 
- 
-    [<TestMethod>]
     member this.TestIdentityPermutation() =
       let expectedLen = 9
       let expectedSum = ( expectedLen * (expectedLen - 1)) / 2
-      let permutes = Domain.Permutation.Identity expectedLen
-      Assert.AreEqual(expectedLen, permutes |> Domain.Permutation.value |> Array.length)
-      Assert.AreEqual(expectedSum, permutes |> Domain.Permutation.value |> Array.sum)
+      let permutes = Permutation.Identity expectedLen
+      Assert.AreEqual(expectedLen, permutes |> Permutation.value |> Array.length)
+      Assert.AreEqual(expectedSum, permutes |> Permutation.value |> Array.sum)
  
 
     [<TestMethod>]
     member this.TestComposeMapIntArraysOnIdentity() =
         let orig = [|5; 4; 3; 2; 1; 0 |]
-        let prodR = Combinatorics.ComposeMapIntArrays orig ((Domain.Permutation.Identity 6) |> Domain.Permutation.value)
+        let prodR = Combinatorics.ComposeMapIntArrays orig ((Permutation.Identity 6) |> Permutation.value)
         Assert.IsTrue (Combinatorics.CompareArrays orig prodR)
-        let prodL = Combinatorics.ComposeMapIntArrays ((Domain.Permutation.Identity 6) |> Domain.Permutation.value) orig
+        let prodL = Combinatorics.ComposeMapIntArrays ((Permutation.Identity 6) |> Permutation.value) orig
         Assert.IsTrue (Combinatorics.CompareArrays orig prodL)
 
 
@@ -54,7 +64,7 @@ type PermutationFixture () =
     member this.TestInverseArray() =
        let length = 6
        let orig = Combinatorics.RandomIntPermutations (new Random(1823)) length 1 |> Seq.item 0
-       let id = Domain.Permutation.Identity length |> Domain.Permutation.value
+       let id = Permutation.Identity length |> Permutation.value
        let inv = Combinatorics.InverseMapArray orig
        let prod = Combinatorics.ComposeMapIntArrays orig inv
        Assert.IsTrue (Combinatorics.CompareArrays id prod)
@@ -63,7 +73,7 @@ type PermutationFixture () =
     [<TestMethod>]
     member this.TestPermutationCreateRandom() =
       let expectedCount = 9
-      let permutes = Domain.Permutation.CreateRandom (new Random(123)) 16 expectedCount |> Seq.toArray
+      let permutes = Permutation.CreateRandom (new Random(123)) 16 expectedCount |> Seq.toArray
       Assert.AreEqual(expectedCount, permutes.Length)
 
     
@@ -73,7 +83,7 @@ type PermutationFixture () =
         let lowBit = 1
         let hiBit = 11
 
-        let id = Domain.Permutation.Identity length |> Domain.Permutation.value
+        let id = Permutation.Identity length |> Permutation.value
         let tc = Combinatorics.MakeTwoCycleIntArray length lowBit hiBit
         let prod = Combinatorics.ComposeMapIntArrays tc tc
         Assert.IsTrue (Combinatorics.CompareArrays id prod)
@@ -90,7 +100,7 @@ type PermutationFixture () =
     member this.TestMakeRandomFullTwoCycleIntArray() =
         let length = 19
         let tc = Combinatorics.MakeRandomFullTwoCycleIntArray (new Random(123)) length
-        let id = Domain.Permutation.Identity length |> Domain.Permutation.value
+        let id = Permutation.Identity length |> Permutation.value
         let prod = Combinatorics.ComposeMapIntArrays tc tc
         Assert.IsTrue (Combinatorics.CompareArrays id prod)
  
@@ -119,29 +129,6 @@ type PermutationFixture () =
 
         let conj = Combinatorics.ConjugateIntArrays a b
         Assert.IsTrue (Combinatorics.CompareArrays conj c)
-
-
-
-    [<TestMethod>]
-    member this.TestMakeSwitchSet() =
-        let res = Domain.SwitchSet.ForOrder 5
-        Assert.IsTrue (res.order = 5)
-        Assert.IsTrue (res.switches.Length = 10)
-
-    
-    
-    [<TestMethod>]
-    member this.TestMakeRandomSorter() =
-        let length = 29
-        let order = 5
-        
-        let switchSet = Domain.SwitchSet.ForOrder 5
-        let rnd = new Random(123)
-
-        let res = Domain.Sorter.CreateRandom rnd switchSet length
-        Assert.IsTrue (res.order = order)
-        Assert.IsTrue (res.switches.Length = length)
-
 
 
     [<TestMethod>]
