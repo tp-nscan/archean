@@ -1,10 +1,11 @@
 ﻿namespace archean.core
 open System
 open Combinatorics_Types
+open Microsoft.FSharp.Collections
 
 module Sorting =
 
-    type Switch = {low:int; hi:int}
+    type Switch = {low:int;hi:int}
     type Stage = {switches:Switch list}
     module Switch =
 
@@ -60,13 +61,16 @@ module Sorting =
                                     yield switchSet.switches.[i] }
                 |> Seq.toArray
             }
+    
+    type SwitchResult = {switch:Switch; switchIndex:int; useCount:int}
 
+    type StageResult = {stageIndex:int; switchResults:SwitchResult list}
 
-    type Sorter<'T> = { order:int; switches: array<'T->'T*bool> }
+    type Sorter<'T> = { sorterDef:SorterDef; switches: array<'T->'T*bool> }
     module Sorter =
 
-        let MakeSorter<'T> (switchmap:Switch->('T->'T*bool)) (sorderDef:SorterDef) =
-            { Sorter.order=sorderDef.order; switches=sorderDef.switches |> Array.map(fun i-> (switchmap i)) }
+        let MakeSorter<'T> (switchmap:Switch->('T->'T*bool)) (sorterDef:SorterDef) =
+            { sorterDef=sorterDef; switches=sorterDef.switches |> Array.map(fun i-> (switchmap i)) }
         
 
         let Sort<'T> (sorter:Sorter<'T>) (sortable: 'T) =
@@ -115,21 +119,70 @@ module Sorting =
         //the checker fails to pass one of the outputs from the sorter
         let SortManyTrackSwitchesAndCheckResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (switchTracker:int[]) (sortables: seq<'T>) =
             let sorterWithTracker = SortOneAndTrackSwitches sorter switchTracker
-            let allGood = sortables |> Seq.map (fun i -> (sorterWithTracker i) ) |> Seq.forall(fun i -> checker (snd i))
+            let allGood = sortables |> Seq.map (fun i -> (sorterWithTracker i) ) 
+                                    |> Seq.forall(fun i -> checker (snd i))
             (allGood, switchTracker)
 
-        //Run the sortable through the sorter, and return the result with the record useage on each switch
-        let SortManyAndGetSwitchCount<'T> (sorter:Sorter<'T>) (sortables: seq<'T>) =
-            let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
-            SortManyAndTrackSwitches sorter switchTracker sortables |> Array.sumBy(fun i -> if (i>0) then 1 else 0)
+        //Run the sortables through the sorter, return the record usage on each switch, and return false if 
+        //the checker fails to pass one of the outputs from the sorter
+        let SortManyAndTrackSwitchesAndCheckResultsP<'T> (checker:'T->bool) (sorter:Sorter<'T>) 
+                                                         (switchTracker:int[]) (sortables: seq<'T>) =
+            let sorterWithTracker = SortOneAndTrackSwitches sorter switchTracker
+            let allGood = sortables |> Seq.toArray
+                                    |> Array.Parallel.map (fun i -> (sorterWithTracker i) ) 
+                                    |> Seq.forall (fun i -> checker (snd i))
+            (allGood, switchTracker)
             
         //Run the sortables through the sorter, return the number of switches used, and eturn false if 
         //the checker fails to pass one of the outputs from the sorter
         let SortManyGetSwitchCountAndCheckResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (sortables: seq<'T>) =
             let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
-            let res = SortManyTrackSwitchesAndCheckResults checker sorter switchTracker sortables
+            let res = SortManyAndTrackSwitchesAndCheckResultsP checker sorter switchTracker sortables
             (fst res, (snd res)|> Array.sumBy(fun i -> if (i>0) then 1 else 0))
             
+        let MergeTrackerResultsIntoSwitchResults (sorter:Sorter<'T>) (switchTracker:int[]) = 
+            seq { for i = 0 to switchTracker.Length - 1 do
+                    if (switchTracker.[i] > 0) then
+                        yield {switch=sorter.sorterDef.switches.[i]; switchIndex=i; useCount=switchTracker.[i] } }
+            |> Seq.toArray
+
+
+        let MergeSwitchResultsIntoStageResults (order:int) (switchResults:SwitchResult[]) =
+            let mutable stageTracker = Array.init order (fun i -> false)
+            let switchResultsForStage = new ResizeArray<SwitchResult>()
+            let mutable curStage = 0
+
+            seq { for i = 0 to switchResults.Length - 1 do
+                    let curSwitch = switchResults.[i].switch
+                    if (stageTracker.[curSwitch.hi] || stageTracker.[curSwitch.low] ) then
+                        yield { StageResult.stageIndex=curStage; 
+                                switchResults=switchResultsForStage |> Seq.toList }
+                        stageTracker <- Array.init order (fun i -> false)
+                        switchResultsForStage.Clear()
+                        curStage <- curStage + 1
+
+                    stageTracker.[curSwitch.hi] <- true
+                    stageTracker.[curSwitch.low] <- true
+                    switchResultsForStage.Add switchResults.[i]
+                    if (i = switchResults.Length - 1) then
+                        yield { StageResult.stageIndex=curStage; 
+                                switchResults=switchResultsForStage |> Seq.toList }
+                }
+            |> Seq.toArray
+
+
+        //Run the sortables through the sorter, return the number of switches used, and return false if 
+        //the checker fails to pass one of the outputs from the sorter
+        let SortManyAndGetSwitchResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (sortables: seq<'T>) =
+            let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
+            let res = SortManyAndTrackSwitchesAndCheckResultsP checker sorter switchTracker sortables
+            (fst res, (snd res)|> (MergeTrackerResultsIntoSwitchResults sorter))
+
+
+    type SorterResult = {sorterDef:SorterDef; stageResults:StageResult list}
+    module SorterResult =
+        let SorterResultKey (stageResults:StageResult list) =
+            (stageResults.Length, stageResults |> List.fold(fun s i -> s + i.switchResults.Length) 0)
 
 
     module SortableGen =
@@ -178,13 +231,13 @@ module Sorting =
 
         let IsSorted (n : int) =
             let falseCond (swN:int) =
-                sprintf "%selif (s.sw%d <> %d) then\n%sfalse\n" (tabN 3) swN swN (tabN 4)
+                sprintf "%selif (s.sw%d > s.sw%d) then\n%sfalse\n" (tabN 3) swN (swN+1) (tabN 4)
 
             myPrint "%slet IsSorted (s : %s) =\n" (tabN 2) (SgType n)
-            myPrint "%sif(s.sw0 <> 0) then\n %s false\n" (tabN 3) (tabN 4)
-            { 1 .. (n-1)} |> Seq.iter (fun i -> myPrint "%s" (falseCond i))
+            myPrint "%sif(s.sw0 > s.sw1) then\n%sfalse\n" (tabN 3) (tabN 4)
+            { 1 .. (n-2)} |> Seq.iter (fun i -> myPrint "%s" (falseCond i))
             myPrint "%selse\n%strue\n\n" (tabN 3) (tabN 4)
- 
+
         let CreateRandom (n : int) =
             myPrint "%slet CreateRandom (rnd : Random) =\n" (tabN 2)
             myPrint "%slet fil = Permutation.CreateRandom rnd %d 1 |> Seq.item 0 |> Permutation.value\n" (tabN 3) n
@@ -207,9 +260,14 @@ module Sorting =
             myPrint "%sSwitchFuncs.[sw.low + (sw.hi * (sw.hi - 1)) / 2]\n\n" (tabN 3)
 
         let GetSwitchCountForSorter (n : int) =
-            myPrint "%slet GetSwitchCountForSorter (sorter:Sorter<%s>)  =\n" (tabN 2) (SgType n)
-            myPrint "%slet checker t = IsSorted t" (tabN 3)
+            myPrint "%slet GetSwitchCountForSorter (sorter:Sorter<%s>) (sortables:seq<%s>) =\n" (tabN 2) (SgType n) (SgType n)
+            myPrint "%slet checker t = IsSorted t\n" (tabN 3)
             myPrint "%sSorter.SortManyGetSwitchCountAndCheckResults<%s> checker sorter AllBinaryTestCases\n\n" (tabN 3) (SgType n)
+
+        let GetSwitchResultsForSorter (n : int) =
+            myPrint "%slet GetSwitchResultsForSorter (sorter:Sorter<%s>) (sortables:seq<%s>) =\n" (tabN 2) (SgType n) (SgType n)
+            myPrint "%slet checker t = IsSorted t\n" (tabN 3)
+            myPrint "%sSorter.SortManyAndGetSwitchResults<%s> checker sorter AllBinaryTestCases\n\n" (tabN 3) (SgType n)
 
 
         let GenN (n:int) =
@@ -225,4 +283,5 @@ module Sorting =
             SwitchFuncs n
             SwitchFuncForSwitch n
             GetSwitchCountForSorter n
+            GetSwitchResultsForSorter n
             sb.ToString()

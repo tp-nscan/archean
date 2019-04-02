@@ -110,6 +110,7 @@ type SortingFixture () =
         let res = Sorter.SortOneAndTrackSwitches sorter switchTracker sortable
         Assert.IsTrue (true)
 
+
     [<TestMethod>]
     member this.TestSortManyAndTrackSwitches() =
         let sortable0 = Sortables.Sortable4.FromArray [|0; 1; 1; 0|]
@@ -127,20 +128,97 @@ type SortingFixture () =
         Assert.IsTrue (fst res)
 
     [<TestMethod>]
-    member this.TestGetSwitchCountForSorter() =
-        let rnd = new Random(123)
-        let order = 4
-        let len = 160
-        let sorterDef = SorterDef.CreateRandom order rnd len
-        let sorter = Sorter.MakeSorter Sortables.Sortable4.SwitchFuncForSwitch sorterDef
-        let res = Sortables.Sortable4.GetSwitchCountForSorter sorter
+    member this.TestMergeSwitchResultsIntoStageResults() =
+        let order = 5
+        let swrSet0 = [|
+                        {SwitchResult.switch={Switch.low = 1; hi = 2}; switchIndex=0; useCount=1};
+                        {SwitchResult.switch={Switch.low = 1; hi = 3}; switchIndex=1; useCount=1};
+                        {SwitchResult.switch={Switch.low = 2; hi = 4}; switchIndex=2; useCount=1};
+                        {SwitchResult.switch={Switch.low = 0; hi = 1}; switchIndex=3; useCount=1};
+                        {SwitchResult.switch={Switch.low = 0; hi = 1}; switchIndex=4; useCount=1};
+                        {SwitchResult.switch={Switch.low = 2; hi = 3}; switchIndex=5; useCount=1};
+                        {SwitchResult.switch={Switch.low = 3; hi = 4}; switchIndex=6; useCount=1};
+                        {SwitchResult.switch={Switch.low = 1; hi = 2}; switchIndex=7; useCount=1};
+                        {SwitchResult.switch={Switch.low = 0; hi = 3}; switchIndex=8; useCount=1};
+                     |]
+                    
+
+        let res0 = Sorting.Sorter.MergeSwitchResultsIntoStageResults order swrSet0
+
+        let swrSet1 = [|
+                        {SwitchResult.switch={Switch.low = 1; hi = 2}; switchIndex=0; useCount=1};
+                        {SwitchResult.switch={Switch.low = 1; hi = 3}; switchIndex=1; useCount=1};
+                        {SwitchResult.switch={Switch.low = 2; hi = 4}; switchIndex=2; useCount=1};
+                        {SwitchResult.switch={Switch.low = 0; hi = 1}; switchIndex=3; useCount=1};
+                        {SwitchResult.switch={Switch.low = 0; hi = 1}; switchIndex=4; useCount=1};
+                        {SwitchResult.switch={Switch.low = 2; hi = 3}; switchIndex=5; useCount=1};
+                        {SwitchResult.switch={Switch.low = 3; hi = 4}; switchIndex=6; useCount=1};
+                        {SwitchResult.switch={Switch.low = 0; hi = 2}; switchIndex=7; useCount=1};
+                     |]
+
+        let res1 = Sorting.Sorter.MergeSwitchResultsIntoStageResults order swrSet1
+
+
         Assert.IsTrue (true)
 
+    [<TestMethod>]
+    member this.TestGetSwitchCountForSorter() =
+        let rnd = new Random(123)
+        let order = 12
+        let len = 360
+        let sorterDef = SorterDef.CreateRandom order rnd len
+        let sorter = Sorter.MakeSorter Sortables.Sortable12.SwitchFuncForSwitch sorterDef
+        let res = Sortables.Sortable12.GetSwitchCountForSorter sorter
+        Assert.IsTrue (true)
+
+
+    [<TestMethod>]
+    member this.TestGetSorterResultForSorter10() =
+        let reps = 10
+        let rnd = new Random(2883)
+        let order = 10
+        let len = 500
+        let GetSorterWithResults (i:int) =
+            let sorterDef = SorterDef.CreateRandom order rnd len
+            let sorter = Sorter.MakeSorter Sortables.Sortable10.SwitchFuncForSwitch sorterDef
+            (Sortables.Sortable10.GetSwitchResultsForSorter sorter Sortables.Sortable10.AllBinaryTestCases, sorterDef)
+        
+        let counts = {1 .. reps} |> Seq.map(fun i -> GetSorterWithResults i)
+                                 |> Seq.filter(fun res -> fst (fst res))
+                                 |> Seq.map(fun i -> (Sorting.Sorter.MergeSwitchResultsIntoStageResults order (snd (fst i))))
+                                 |> Seq.toArray
+
+        //counts |> Array.iter(fun i -> Console.WriteLine("{0} {1}", (fst i), (snd i) ) )
+
+        Assert.IsTrue (true)
+    
+
+    [<TestMethod>]
+    member this.BenchGetSwitchCountForSorter10() =
+        let reps = 10
+        let rnd = new Random(2883)
+        let order = 10
+        let len = 700
+        let GetCount (i:int) =
+            let sorterDef = SorterDef.CreateRandom order rnd len
+            let sorter = Sorter.MakeSorter Sortables.Sortable10.SwitchFuncForSwitch sorterDef
+            Sortables.Sortable10.GetSwitchCountForSorter sorter Sortables.Sortable10.AllBinaryTestCases
+        
+        let counts = {1 .. reps} |> Seq.map(fun i -> GetCount i) 
+                                 |> Seq.filter(fun res -> fst res)
+                                 |> Seq.groupBy(fun res -> snd res)
+                                 |> Seq.map(fun gps -> (fst gps, (snd gps) |> Seq.length ))
+                                 |> Seq.toArray
+                                 |> Array.sortBy(fun tup -> fst tup)
+
+        counts |> Array.iter(fun i -> Console.WriteLine("{0} {1}", (fst i), (snd i) ) )
+
+        Assert.IsTrue (true)
 
 
     [<TestMethod>]
     member this.TestSortableGen() =
-        let order = 12
+        let order = 15
         Console.Write (SortableGen.GenN order)
         
         Assert.IsTrue (true)
