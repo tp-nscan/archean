@@ -71,12 +71,14 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.TestPermutationCreateRandom() =
+    member this.TestPermutationCreateRandom2() =
       let expectedCount = 9
-      let permutes = Permutation.CreateRandom (new Random(123)) 16 expectedCount |> Seq.toArray
+      let permutes = Permutation.CreateRandom (new Random(123)) 16 
+                      |> Seq.take expectedCount
+                      |> Seq.toArray
       Assert.AreEqual(expectedCount, permutes.Length)
-
     
+
     [<TestMethod>]
     member this.TestMakeTwoCycleIntArray() =
         let length = 19
@@ -129,6 +131,18 @@ type CombinatoricsFixture () =
 
         let conj = Combinatorics.ConjugateIntArrays a b
         Assert.IsTrue (Combinatorics.CompareArrays conj c)
+
+    [<TestMethod>]
+    member this.TestSorted_0_1_Sequence() =
+        let blockLen = 10
+        let block = Combinatorics_Types.IntBits.Sorted_O_1_Sequence blockLen 7 |> Seq.toArray
+        Assert.IsTrue (block.Length = blockLen)
+
+    [<TestMethod>]
+    member this.TestSorted_0_1_Sequences() =
+        let blockLen = 10
+        let block = Combinatorics_Types.IntBits.Sorted_0_1_Sequences blockLen
+        Assert.IsTrue (block.Length = blockLen + 1)
 
 
     [<TestMethod>]

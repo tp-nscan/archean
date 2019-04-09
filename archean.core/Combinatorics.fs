@@ -125,12 +125,12 @@ module Combinatorics_Types =
         let Identity (order: int) = Permutation [|0 .. order-1|]
         let apply f (Permutation p) = f p
         let value p = apply id p
- 
-        let CreateRandom (rnd : Random) (order: int) (count: int) =
+  
+        let CreateRandom (rnd : Random) (order: int) =
             let initialList = (Identity order) |> value                             
             let permuter = (Combinatorics.FisherYatesShuffle rnd)
-            Seq.init count (fun _ -> Permutation ((permuter initialList) |> Seq.toArray))
- 
+            seq { while true do yield Permutation ((permuter initialList) |> Seq.toArray)}
+
         let Inverse (p: Permutation) =
             Permutation (Combinatorics.InverseMapArray (p |> value))
  
@@ -151,11 +151,10 @@ module Combinatorics_Types =
         let MakeAllMonoCycleOfLength (order: int) =
             (Combinatorics.MakeAllTwoCycleIntArrays order) 
             |> Seq.map (fun s -> TwoCycleIntArray s)
-
-        let MakeRandomPolyCycle (rnd : Random) (order: int) (count: int) =
-            Seq.init count (fun _ -> Combinatorics.MakeRandomFullTwoCycleIntArray rnd order)
-            |> Seq.map (fun s -> TwoCycleIntArray s)
          
+        let MakeRandomPolyCycle (rnd : Random) (order: int) =
+            TwoCycleIntArray (Combinatorics.MakeRandomFullTwoCycleIntArray rnd order)
+
 
     type BitArray = {order:int; items: array<bool>}
     module BitArray =
@@ -163,3 +162,18 @@ module Combinatorics_Types =
         let Zero (order: int) =  { order=order; items=Array.init order (fun i -> false) }
 
         let Next (bits: BitArray) =  { order=bits.order; items=bits.items }
+
+    module IntBits =
+        let Sorted_O_1_Sequence (blockLen:int) (onesCount:int) =
+            seq {for i = 1 to blockLen - onesCount do yield 0; 
+                 for i = 1 to onesCount do yield 1 }
+
+        //Returns a bloclLen + 1 length array of all possible sorted 0-1 sequences of length blockLen
+        let Sorted_0_1_Sequences (blockLen:int) =
+            seq {for i = 0 to blockLen 
+                    do yield (Sorted_O_1_Sequence blockLen i)
+                                |> Seq.toArray }
+                |> Seq.toArray
+
+
+
