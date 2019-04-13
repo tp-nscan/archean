@@ -18,11 +18,32 @@ type CombinatoricsFixture () =
  
 
     [<TestMethod>]
-    member this.TestToIntArray() =
+    member this.TestInt_To_IntArray01() =
       let len = 6
       let expectedArray = [|1; 0; 1; 0; 1; 0|]
-      let converted = Combinatorics.ToIntArray len 21
+      let converted = Combinatorics.Int_To_IntArray01 len 21
       Assert.IsTrue (Combinatorics.CompareArrays expectedArray converted)
+
+      
+    [<TestMethod>]
+    member this.TestIntArray01_To_Int() =
+
+      let yak =
+        seq {for i=1 to 3 do
+                yield i}
+        |> Seq.toArray
+
+                
+      let ct = yak |> Seq.length
+
+      let ct2 = yak |> Seq.length
+
+
+      Assert.IsTrue true
+      //let len = 6
+      //let expectedArray = [|1; 0; 1; 0; 1; 0|]
+      //let converted = Combinatorics.Int_To_IntArray01 len 21
+      //Assert.IsTrue (Combinatorics.CompareArrays expectedArray converted)
 
  
     [<TestMethod>]

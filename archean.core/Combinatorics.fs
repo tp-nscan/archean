@@ -19,16 +19,31 @@ module Combinatorics =
         seq {(initialList.Length) .. -1 .. 1}                           // Going from the length of the list down to 1
         |> Seq.map (fun i -> nextItem i)                                // yield the next item
     
+            
+    let IsSorted (values:int[]) =
+        seq{for i=1 to values.Length - 1 do
+                if values.[i-1] > values.[i] then
+                    yield false} |> Seq.forall id
+
 
     let FisherYatesShuffleFromSeed (seed : int) =                                                  
         FisherYatesShuffle (new Random(seed))
 
 
-    let ToIntArray (len:int) (intVers:int) =
+    let Int_To_IntArray01 (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
-            if (((1 <<< loc) &&& (intBits)) <> 0) then 1 else 0
+            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
         Array.init len (fun i -> bitLoc i intVers)
 
+    let IntArray01_To_Int (len:int) (arrayVers:int[]) =
+        let mutable intRet = 0
+        let bump i =
+            if (arrayVers.[i] = 1) then
+                intRet <- intRet + 1
+            intRet <- intRet * 2
+
+        {1 .. len} |> Seq.iter(fun i -> bump i)
+        intRet
 
     let RandomIntPermutations (rnd : Random) (len: int) (count:int) =
         let initialList = [|0 .. len-1|]                                
@@ -119,7 +134,6 @@ module Combinatorics =
 module Combinatorics_Types =
 
     type Permutation = private Permutation of int[]
-
     module Permutation =
 
         let Identity (order: int) = Permutation [|0 .. order-1|]
@@ -138,7 +152,6 @@ module Combinatorics_Types =
             Permutation (Combinatorics.ComposeMapIntArrays (pA |> value) (pB |> value))
  
     type TwoCycleIntArray = private TwoCycleIntArray of int[]
-
     module TwoCycleIntArray =
 
         let Identity (order: int) = TwoCycleIntArray [|0 .. order-1|]

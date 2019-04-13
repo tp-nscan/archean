@@ -5,10 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SorterData.fs" />
     <Compile Include="Rop.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="Sorting.fs" />
+    <Compile Include="SorterA.fs" />
+    <Compile Include="SorterB.fs" />
     <Compile Include="GeneratedSortables.fs" />
+    <Compile Include="SortersFromData.fs" />
+    <Compile Include="SorterGen.fs" />
     <Compile Include="SortingReports.fs" />
   </ItemGroup>
 

@@ -17,7 +17,7 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int sc = 100;
+            int batchMult = 100;
 
             //BatchArgsList.Add(new BatchArgs() {
             //    Order = 11,
@@ -39,18 +39,18 @@ namespace archean.wpf
             BatchArgsList.Add(new BatchArgs()
             {
                 Order = 16,
-                RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.LooseSwitches,
+                RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.Green6,
                 SwitchableType = SortingReports.SwitchableType.IntArray,
-                SorterCount = sc * 10,
+                SorterCount = batchMult * 10,
                 SorterLen = 1000
             });
 
             BatchArgsList.Add(new BatchArgs()
             {
                 Order = 16,
-                RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.FullStage,
+                RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.Green7,
                 SwitchableType = SortingReports.SwitchableType.IntArray,
-                SorterCount = sc * 10,
+                SorterCount = batchMult * 10,
                 SorterLen = 1000
             });
 
@@ -75,6 +75,9 @@ namespace archean.wpf
         {
             try
             {
+                var quack = SorterGen.SorterGenMode.NewFullRand(
+                    Sorting.SorterDefModule.RandGenerationMode.FullStage);
+
                 log.Debug("Test Starting");
                 Tuple<string, string[]> q;
                 for (var i = 0; true; i++)
@@ -87,13 +90,12 @@ namespace archean.wpf
                         randGenerationMode: ba.RandGenerationMode,
                         switchableType: ba.SwitchableType,
                         sorterCount: ba.SorterCount,
-                        seed: (int)System.DateTime.Now.Ticks
+                        seed: Math.Abs((int)(DateTime.Now.Ticks))
                     );
 
+                    log.Info(q.Item1);
 
-                    log.Info(ba.SwitchableType);
                     var hist = q.Item2;
-
                     for (var j = 0; j < hist.Length; j++)
                     {
                         log.Info(hist[j]);
