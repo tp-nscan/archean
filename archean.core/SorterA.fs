@@ -12,18 +12,17 @@ module SorterA =
         let MakeSorter<'T> (switchmap:Switch->('T->'T*bool)) (sorterDef:SorterDef) =
             { sorterDef=sorterDef; switches=sorterDef.switches |> Array.map(fun i-> (switchmap i)) }
         
-
         let Sort<'T> (sorter:Sorter<'T>) (sortable: 'T) =
-            let wank = Array.init sorter.switches.Length (fun i -> 0)
+            let switchUses = Array.init sorter.switches.Length (fun i -> 0)
             let mutable stt = sortable;
             let yab2 dex sw =
                 let pr = sw stt
                 stt <- fst pr
                 if (snd pr) then
-                    wank.[dex] <- wank.[dex] + 1
+                    switchUses.[dex] <- switchUses.[dex] + 1
                     
             sorter.switches |> Array.iteri(yab2)
-            (wank, stt)
+            (switchUses, stt)
     
         //Run the sortable through the sorter, and return the result and if any of the switches were used
         let SortOneWithResults<'T> (sorter:Sorter<'T>) (sortable: 'T) =
@@ -57,7 +56,8 @@ module SorterA =
         
         //Run the sortables through the sorter, return the record usage on each switch, and return false if 
         //the checker fails to pass one of the outputs from the sorter
-        let SortManyTrackSwitchesAndCheckResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (switchTracker:int[]) (sortables: seq<'T>) =
+        let SortManyAndTrackSwitchesAndCheckResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) 
+                                                        (switchTracker:int[]) (sortables: seq<'T>) =
             let sorterWithTracker = SortOneAndTrackSwitches sorter switchTracker
             let allGood = sortables |> Seq.map (fun i -> (sorterWithTracker i) ) 
                                     |> Seq.forall(fun i -> checker (snd i))
@@ -66,20 +66,21 @@ module SorterA =
         //Run the sortables through the sorter, return the record usage on each switch, and return false if 
         //the checker fails to pass one of the outputs from the sorter
         let SortManyAndTrackSwitchesAndCheckResultsP<'T> (checker:'T->bool) (sorter:Sorter<'T>) 
-                                                            (switchTracker:int[]) (sortables: seq<'T>) =
+                                                         (switchTracker:int[]) (sortables: seq<'T>) =
             let sorterWithTracker = SortOneAndTrackSwitches sorter switchTracker
             let allGood = sortables |> Seq.toArray
                                     |> Array.Parallel.map (fun i -> (sorterWithTracker i) ) 
                                     |> Seq.forall (fun i -> checker (snd i))
             (allGood, switchTracker)
             
-        //Run the sortables through the sorter, return the number of switches used, and eturn false if 
+        //Run the sortables through the sorter, return the number of switches used, and return false if 
         //the checker fails to pass one of the outputs from the sorter
         let SortManyGetSwitchCountAndCheckResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (sortables: seq<'T>) =
             let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
             let res = SortManyAndTrackSwitchesAndCheckResultsP checker sorter switchTracker sortables
             (fst res, (snd res)|> Array.sumBy(fun i -> if (i>0) then 1 else 0))
             
+
         let MergeTrackerResultsIntoSwitchResults (sorter:Sorter<'T>) (switchTracker:int[]) = 
             seq { for i = 0 to switchTracker.Length - 1 do
                     if (switchTracker.[i] > 0) then
@@ -91,7 +92,7 @@ module SorterA =
         //the checker fails to pass one of the outputs from the sorter
         let SortManyAndGetSwitchResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (sortables: seq<'T>) =
             let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
-            let res = SortManyAndTrackSwitchesAndCheckResultsP checker sorter switchTracker sortables
+            let res = SortManyAndTrackSwitchesAndCheckResults checker sorter switchTracker sortables
             (fst res, (snd res)|> (MergeTrackerResultsIntoSwitchResults sorter))
 
         let GetSwitchCountForSorter (sorter:Sorter<int[]>) (sortables:seq<int[]>) =
@@ -101,6 +102,4 @@ module SorterA =
         let GetSwitchResultsForSorter (sorter:Sorter<int[]>) (sortables:seq<int[]>) =
             let checker t = Combinatorics.IsSorted t
             SortManyAndGetSwitchResults<int[]> checker sorter sortables
-
-
 

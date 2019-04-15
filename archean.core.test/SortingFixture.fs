@@ -5,11 +5,9 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open archean.core
 open archean.core.Combinatorics_Types
 open archean.core.Sorting
-open archean.core.SorterA
 
 [<TestClass>]
 type SortingFixture () =
-    let yak = true
 
     [<TestMethod>]
     member this.TestSwitchFromPermutation() =
@@ -51,37 +49,14 @@ type SortingFixture () =
         Assert.IsTrue (res.order = order)
         Assert.IsTrue (res.switches.Length = length)
 
-
- 
-
-    [<TestMethod>]
-    member this.TestMakeSorterForSortableIntArray() =
-        let rnd = new Random(123)
-        let order = 6
-        let len = 160
-        let sorterDef = SorterDef.CreateRandom order len rnd
-        let sorter = Sorter.MakeSorter SortableIntArray.SwitchFuncForSwitch sorterDef
-        let sortable = (SortableIntArray.CreateRandom order rnd) |> Seq.item 0
-        let res = Sorter.Sort sorter sortable.values
-        Assert.IsTrue (Combinatorics.IsSorted (snd res))
-
-    [<TestMethod>]
-    member this.TestGetFullSortingResultsForSortableIntArray() =
-        let rnd = new Random(123)
-        let order = 10
-        let len = 160
-        let sorterDef = SorterDef.CreateRandom order len rnd
-        let res = SortingReports.GetFullSortingResultsUsingIntArray sorterDef
-        Assert.IsTrue (true)
-
     [<TestMethod>]
     member this.TestSortableIntArray_IsSorted() =
         Assert.IsFalse (Combinatorics.IsSorted [|0; 1; 1; 0; 1; 0|])
         Assert.IsTrue (Combinatorics.IsSorted [|0; 0; 0; 0; 1; 1|])
 
 
-       [<TestMethod>]
-       member this.TestMergeSwitchesIntoStages() =
+    [<TestMethod>]
+    member this.TestMergeSwitchesIntoStages() =
         let order = 5
         let swrSet0 = [|
                         {Switch.low = 1; hi = 2};
@@ -118,49 +93,6 @@ type SortingFixture () =
         let res0 = Sorting.SorterResult.MergeSwitchResultsIntoStageResults order swrSet0
 
         Assert.IsTrue (res0.Length = 6)
-
-
-
-    [<TestMethod>]
-    member this.TestGetSorterSuccessRates() =
-        
-        let boko = seq { 0 .. 2 .. 8}
-        let koko = seq { 1 .. 5}
-
-        let dingo = boko |> Seq.append koko
-                         |> Seq.toArray
-
-        let rnd = new Random(123)
-
-        let guko = SorterDef.Green6Switches |> Seq.toArray
-        let guko2 = SorterDef.Green7Switches |> Seq.toArray
-
-        let yuko = SorterDef.CreateGreen2 30 rnd
-        let yuko2 = SorterDef.CreateGreen3 30 rnd
-
-        // FullStage
-        // order 6 : 120
-        // order 7 : 180
-        // order 8 : 260
-
-        // LooseSwitches
-        // order 6 : 120
-        // order 7 : 180
-        // order 8 : 260
-
-        let sorterCount = 1
-        
-        let order = 11
-        let sorterLen = 100
-        let seed = 100
-        let mode = Sorting.SorterDef.RandGenerationMode.FullStage
-
-        let res = seq {260 .. 10 .. 460} 
-                        |> Seq.map(fun i -> SortingReports.MakeStageAndSwitchUseHistogram 
-                                                order i mode SortingReports.SwitchableType.Generated sorterCount seed)
-                        |> Seq.toArray
-
-        Assert.IsTrue (true)
 
 
     [<TestMethod>]

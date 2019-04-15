@@ -46,109 +46,34 @@ module Sorting =
 
     type SwitchSet = {order:int; switches: array<Switch>}
     module SwitchSet =
-   
+
         let ForOrder (order:int) =
-                {
-                    order=order;
-                    switches=seq {for i = 0 to order - 1 do
-                                    for j = 0 to i - 1 do
-                                        yield { low=j; hi=i; } }
-                    |> Seq.toArray
-                }
+            {
+                SwitchSet.order=order;
+                switches=seq {for i = 0 to order - 1 do
+                                for j = 0 to i - 1 do
+                                    yield { low=j; hi=i; } }
+                |> Seq.toArray
+            }
+
+        let DrawRandomSwitches (switchSet:SwitchSet) (rnd:Random) =
+                seq { while true do 
+                            yield switchSet.switches.[rnd.Next(0, switchSet.switches.Length)] }
+
+        let RandomSwitchesOfOrder (order:int) (rnd:Random) =
+                DrawRandomSwitches (ForOrder order) rnd
 
 
     type SorterDef = {order:int; switches: array<Switch>}
     module SorterDef =
 
-        type RandGenerationMode = 
-            | LooseSwitches
-            | FullStage
-            | Green2
-            | Green3            
-            | Green4
-            | Green5
-            | Green6
-            | Green7
-
         let CreateRand (switchSet:SwitchSet) (len: int) (rnd : Random) =
             {
                 SorterDef.order=switchSet.order;
-                switches = seq { for i = 0 to len - 1 do
-                                    yield switchSet.switches.[rnd.Next(0, switchSet.switches.Length)] }
-                |> Seq.toArray
+                switches = SwitchSet.DrawRandomSwitches switchSet rnd
+                                |> Seq.take len
+                                |> Seq.toArray
             }
-
-        let Green2Switches =
-            seq {
-                    for i = 0 to 7 do yield {Switch.low=i*2; hi=i*2 + 1}
-                    for i = 0 to 3 do yield {Switch.low=i*4; hi=i*4 + 2}
-                                      yield {Switch.low=i*4 + 1; hi=i*4 + 3}
-                }
-        
-        let Green3Switches =
-            seq {
-                    for i = 0 to 7 do yield {Switch.low = i*2; hi = i*2 + 1}
-                    for i = 0 to 3 do yield {Switch.low = i*4; hi = i*4 + 2}
-                                      yield {Switch.low = i*4 + 1; hi = i*4 + 3}
-                    for i = 0 to 7 do yield {Switch.low = i; hi = i + 8};
-                }
-        
-        let Green4Switches =
-            seq {
-                    for i = 0 to 7 do yield {Switch.low = i*2; hi = i*2 + 1}
-                    for i = 0 to 3 do yield {Switch.low = i*4; hi = i*4 + 2}
-                                      yield {Switch.low = i*4 + 1; hi = i*4 + 3}
-                    for i = 0 to 7 do yield {Switch.low = i; hi = i + 8}
-                    yield {Switch.low=1; hi=2}; yield {Switch.low=5; hi=10}; yield {Switch.low=13; hi=14};
-                    yield {Switch.low=6; hi=9}; yield {Switch.low=3; hi=12}; yield {Switch.low=4; hi=8};
-                    yield {Switch.low=7; hi=11};
-                }
-        
-        let Green5Switches =
-            seq {
-                    for i = 0 to 7 do yield {Switch.low = i*2; hi = i*2 + 1}
-                    for i = 0 to 3 do yield {Switch.low = i*4; hi = i*4 + 2}
-                                      yield {Switch.low = i*4 + 1; hi = i*4 + 3}
-                    for i = 0 to 7 do yield {Switch.low = i; hi = i + 8}
-                    yield {Switch.low=1; hi=2}; yield {Switch.low=5; hi=10}; yield {Switch.low=13; hi=14};
-                    yield {Switch.low=6; hi=9}; yield {Switch.low=3; hi=12}; yield {Switch.low=4; hi=8};
-                    yield {Switch.low=7; hi=11};
-                    yield {Switch.low=2; hi=8}; yield {Switch.low=9; hi=10}; yield {Switch.low=11; hi=14};
-                    yield {Switch.low=1; hi=4}; yield {Switch.low=5; hi=6}; yield {Switch.low=7; hi=13};
-                }
-
-        let Green6Switches =
-            seq {
-                    for i = 0 to 7 do yield {Switch.low = i*2; hi = i*2 + 1}
-                    for i = 0 to 3 do yield {Switch.low = i*4; hi = i*4 + 2}
-                                      yield {Switch.low = i*4 + 1; hi = i*4 + 3}
-                    for i = 0 to 7 do yield {Switch.low = i; hi = i + 8}
-                    yield {Switch.low=1; hi=2}; yield {Switch.low=5; hi=10}; yield {Switch.low=13; hi=14};
-                    yield {Switch.low=6; hi=9}; yield {Switch.low=3; hi=12}; yield {Switch.low=4; hi=8};
-                    yield {Switch.low=7; hi=11};
-                    yield {Switch.low=2; hi=8}; yield {Switch.low=9; hi=10}; yield {Switch.low=11; hi=14};
-                    yield {Switch.low=1; hi=4}; yield {Switch.low=5; hi=6}; yield {Switch.low=7; hi=13};
-                    yield {Switch.low=2; hi=4}; yield {Switch.low=11; hi=13}; yield {Switch.low=7; hi=12};
-                    yield {Switch.low=3; hi=8};
-                }
-
-        let Green7Switches =
-            seq {
-                    for i = 0 to 7 do yield {Switch.low = i*2; hi = i*2 + 1}
-                    for i = 0 to 3 do yield {Switch.low = i*4; hi = i*4 + 2}
-                                      yield {Switch.low = i*4 + 1; hi = i*4 + 3}
-                    for i = 0 to 7 do yield {Switch.low = i; hi = i + 8}
-                    yield {Switch.low=1; hi=2}; yield {Switch.low=5; hi=10}; yield {Switch.low=13; hi=14};
-                    yield {Switch.low=6; hi=9}; yield {Switch.low=3; hi=12}; yield {Switch.low=4; hi=8};
-                    yield {Switch.low=7; hi=11};
-                    yield {Switch.low=2; hi=8}; yield {Switch.low=9; hi=10}; yield {Switch.low=11; hi=14};
-                    yield {Switch.low=1; hi=4}; yield {Switch.low=5; hi=6}; yield {Switch.low=7; hi=13};
-                    yield {Switch.low=2; hi=4}; yield {Switch.low=11; hi=13}; yield {Switch.low=7; hi=12};
-                    yield {Switch.low=3; hi=8};
-                    yield {Switch.low=3; hi=5}; yield {Switch.low=7; hi=9}; yield {Switch.low=10; hi=12};
-                    yield {Switch.low=6; hi=8};
-                }
-
 
         let CreateRandom (order:int) (len: int) (rnd : Random) =
             CreateRand (SwitchSet.ForOrder order) len rnd
@@ -160,91 +85,6 @@ module Sorting =
                                 |> Seq.take len
                                 |> Seq.toArray
             }
-
-        let CreateGreen2 (len: int) (rnd:Random) =
-            {
-                SorterDef.order = 16;
-                switches = (Stage.MakeStagePackedSwitchSeq rnd 16) 
-                            |> Seq.append Green2Switches
-                            |> Seq.take len
-                            |> Seq.toArray
-                |> Seq.toArray
-            }
-
-        let CreateGreen3 (len: int) (rnd:Random) =
-            {
-                SorterDef.order = 16;
-                switches = (Stage.MakeStagePackedSwitchSeq rnd 16) 
-                           |> Seq.append Green3Switches
-                           |> Seq.take len
-                           |> Seq.toArray
-                |> Seq.toArray
-            }
-
-        let CreateGreen4 (len: int) (rnd:Random) =
-            {
-                SorterDef.order = 16;
-                switches = (Stage.MakeStagePackedSwitchSeq rnd 16) 
-                           |> Seq.append Green4Switches
-                           |> Seq.take len
-                           |> Seq.toArray
-                |> Seq.toArray
-            }
-
-        let CreateGreen5 (len: int) (rnd:Random) =
-            {
-                SorterDef.order = 16;
-                switches = (Stage.MakeStagePackedSwitchSeq rnd 16) 
-                           |> Seq.append Green5Switches
-                           |> Seq.take len
-                           |> Seq.toArray
-                |> Seq.toArray
-            }
-
-        let CreateGreen6 (len: int) (rnd:Random) =
-            {
-                SorterDef.order = 16;
-                switches = (Stage.MakeStagePackedSwitchSeq rnd 16) 
-                           |> Seq.append Green6Switches
-                           |> Seq.take len
-                           |> Seq.toArray
-                |> Seq.toArray
-            }
-
-        let CreateGreen7 (len: int) (rnd:Random) =
-            {
-                SorterDef.order = 16;
-                switches = (Stage.MakeStagePackedSwitchSeq rnd 16) 
-                           |> Seq.append Green7Switches
-                           |> Seq.take len
-                           |> Seq.toArray
-                |> Seq.toArray
-            }
-
-
-
-
-
-        let FromPermutations (switchSet:SwitchSet) (len: int) =
-            {
-                SorterDef.order=switchSet.order;
-                switches = seq { for i = 0 to len - 1 do
-                                    yield switchSet.switches.[i] }
-                |> Seq.toArray
-            }
-
-        let CreateRandomSorterDef (order:int) (sorterLen: int) 
-                                  (randGenerationMode : RandGenerationMode) 
-                                  (rnd : Random) =
-            match randGenerationMode with
-            | LooseSwitches -> CreateRandom order sorterLen rnd
-            | FullStage -> CreateRandomPackedStages order sorterLen rnd
-            | Green2 -> CreateGreen2 sorterLen rnd
-            | Green3 -> CreateGreen3 sorterLen rnd
-            | Green4 -> CreateGreen4 sorterLen rnd
-            | Green5 -> CreateGreen5 sorterLen rnd  
-            | Green6 -> CreateGreen6 sorterLen rnd
-            | Green7 -> CreateGreen7 sorterLen rnd  
 
 
     type StagedSorterDef = { order:int; stages: array<Stage> }
@@ -287,9 +127,6 @@ module Sorting =
             Permutation.CreateRandom rnd order
             |> Seq.map(fun i -> { SortableIntArray.values = Permutation.value i })
 
-        let AllBinaryTestCases (order:int) =
-            {0 .. (1 <<< order) - 1}
-            |> Seq.map (fun i -> Combinatorics.Int_To_IntArray01 order i)
 
     
     type SorterResult = {sorterDef:SorterDef; stageResults:StageResult list}

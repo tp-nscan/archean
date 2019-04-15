@@ -5,7 +5,5 @@ open Microsoft.FSharp.Collections
 open Sorting
 
 module SorterGen =
-    type SorterGenMode = 
-        | FullRand of SorterDef.RandGenerationMode
-        | Prefixed of SortersFromData.GenPrefixMode
+    true
 

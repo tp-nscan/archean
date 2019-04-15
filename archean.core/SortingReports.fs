@@ -2,34 +2,22 @@
 open System
 open archean.core.Combinatorics_Types
 open archean.core.Sorting
-open archean.core.GeneratedSortables
+open archean.core.SortersFromData
 open Sorting.SorterDef
 open SorterA
 
 module SortingReports =
-
-    type SwitchableType =
-        | Generated
-        | IntArray
-
   
     let GetFullSortingResultsUsingIntArray (sorterDef:SorterDef) =
         let sorter = Sorter.MakeSorter SortableIntArray.SwitchFuncForSwitch sorterDef
-        (Sorter.GetSwitchResultsForSorter sorter (SortableIntArray.AllBinaryTestCases sorterDef.order), sorterDef)
-    
+        (Sorter.GetSwitchResultsForSorter sorter (IntBits.AllBinaryTestCases sorterDef.order), sorterDef)
+
 
     // returns (NumStagesUsed, NumSwitchesUsed, Count)
     let MakeStageAndSwitchUseHistogram (order:int) 
                                        (sorterLen: int) 
                                        (randGenerationMode : RandGenerationMode)
-                                       (switchableType : SwitchableType) 
                                        (sorterCount:int) (seed : int) =
-
-        //let EvalSorterDef (sd:SorterDef) =
-        //        if (switchableType=SwitchableType.Generated) then 
-        //                (GetFullSortingResultsUsingGenerated sd) else 
-        //                (GetFullSortingResultsUsingIntArray sd)
-
 
         let MakeHisoLine (tt:int[]) = 
             sprintf "%d\t%A\t%d\t%d\t%d"
@@ -38,8 +26,9 @@ module SortingReports =
         let rnd = new Random(seed)
         let histogram =
             {1 .. sorterCount}
-            |> Seq.map(fun i -> SorterDef.CreateRandomSorterDef order sorterLen randGenerationMode rnd)
-            |> Seq.map(fun i -> GetFullSortingResultsUsingIntArray i)
+            |> Seq.map(fun i -> SortersFromData.CreateRandomSorterDef order sorterLen randGenerationMode rnd)
+            |> Seq.toArray
+            |> Array.Parallel.map(fun i -> GetFullSortingResultsUsingIntArray i)
             |> Seq.filter(fun res -> fst (fst res))
             |> Seq.map(fun i -> Sorting.SorterResult.MakeSorterResult (snd i) (snd (fst i)) )
             |> Seq.groupBy(fun res -> SorterResult.SorterResultKey res.stageResults)
@@ -50,7 +39,6 @@ module SortingReports =
                                 order sorterLen randGenerationMode seed sorterCount (histogram|>Array.sumBy(fun a -> a.[2]))
         (summary, histogram |> Array.map(fun i-> (MakeHisoLine i)))
 
-    
 
     let GetFullSortingResultsUsingGenerated (sorterDef:SorterDef) =
         true

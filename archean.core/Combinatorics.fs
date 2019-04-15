@@ -86,7 +86,7 @@ module Combinatorics =
         let ref = [|0 .. (a.Length - 1)|]
         DistanceSquared a ref
 
-    // will do conventional sority if the stage array is all 1 or 2 cycles
+    // will do conventional sort if the stage array is all 1 or 2 cycles
     let SortIntArray (sortable: array<int>) (stage: array<int>) (counter: array<int>) =
         for i = 0 to stage.Length - 1 do
             let j = stage.[i]
@@ -188,5 +188,7 @@ module Combinatorics_Types =
                                 |> Seq.toArray }
                 |> Seq.toArray
 
-
+        let AllBinaryTestCases (order:int) =
+            {0 .. (1 <<< order) - 1}
+            |> Seq.map (fun i -> Combinatorics.Int_To_IntArray01 order i)
 

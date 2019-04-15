@@ -6,11 +6,17 @@ open archean.core.Sorting
 
 module SortersFromData =
 
-    type GenPrefixMode =
-         | Green2 
-         | Green3
-    
-    let ParseSorterDataToArrayOfStages (stagesStr:string) =
+    type RandSwitchFill = 
+            | LooseSwitches
+            | FullStage
+
+    type RandGenerationMode = 
+            | Green of int * RandSwitchFill
+            | End16 of int * RandSwitchFill
+            | None of RandSwitchFill
+
+
+    let ParseSorterStringToStages (stagesStr:string) =
 
         let MakeSwitch (s:string) =
             let pcs = s.Split([|',';|])
@@ -25,33 +31,65 @@ module SortersFromData =
                                 |> Seq.toList
                         )
             |> Seq.map(fun sws -> {Stage.switches = sws} )
+    
+
+    let ParseSorterStringToNStagesOfSwitches (stagesStr:string) (stageCount:int) =
+        (ParseSorterStringToStages stagesStr)
+        |> Seq.take stageCount
+        |> Seq.map(fun s -> s.switches|>List.toSeq)
+        |> Seq.concat
+
+
+    let ParseSorterStringToStagedSorter (stagesStr:string) (order:int)
+                                        (stageCount:int) =
+       let stages = stagesStr |> ParseSorterStringToStages
+                              |> Seq.take stageCount
+                              |> Seq.toArray
+       {StagedSorterDef.order=order; stages=stages}
+
+
+    let ParseSorterStringToSorter (stagesStr:string) (order:int) 
+                                  (stageCount:int) =
+       let switches = stagesStr |> ParseSorterStringToStages
+                                |> Seq.take stageCount
+                                |> Seq.map(fun s -> s.switches|>List.toSeq)
+                                |> Seq.concat |> Seq.toArray
+       {SorterDef.order=order; switches=switches}
+
+
+    let CreateDefinedPrefixSorter (totalSwitches: int) (definedStages: int)
+                                   (sorterDef:string) (order:int)
+                                   (randSwitchFill:RandSwitchFill) (rnd:Random) =
+        let switchFiller = 
+            match randSwitchFill with
+            | LooseSwitches -> (SwitchSet.RandomSwitchesOfOrder order rnd)
+            | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order) 
+                            
+        {
+            SorterDef.order = order;
+            switches = switchFiller
+                        |> Seq.append (ParseSorterStringToNStagesOfSwitches 
+                                            sorterDef definedStages)
+                        |> Seq.take totalSwitches
+                        |> Seq.toArray
             |> Seq.toArray
+        }
 
-                              
-    let ParseSorterDataToStagedSorter =
-        let stages = SorterData.Order4Str |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=4; stages=stages}
-
-    let GreenPrefix2 =
-        let stages = SorterData.Order16_GreenStr2 |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=16; stages=stages}
-
-    let GreenPrefix3 =
-        let stages = SorterData.Order16_GreenStr3 |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=16; stages=stages}
-
-    let GreenPrefix4 =
-        let stages = SorterData.Order16_GreenStr4 |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=16; stages=stages}
-
-    let GreenPrefix5 =
-        let stages = SorterData.Order16_GreenStr5 |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=16; stages=stages}
-
-    let GreenPrefix6 =
-        let stages = SorterData.Order16_GreenStr6 |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=16; stages=stages}
-
-    let GreenPrefix7 =
-        let stages = SorterData.Order16_GreenStr7 |> ParseSorterDataToArrayOfStages
-        {StagedSorterDef.order=16; stages=stages}
+        
+    let CreateRandomSorterDef (order:int) (totalSwitches: int) 
+                              (randGenerationMode : RandGenerationMode) 
+                              (rnd : Random) =
+            match randGenerationMode with
+            | Green (definedStages, randSwitchFill) -> CreateDefinedPrefixSorter
+                                                          totalSwitches definedStages 
+                                                          SorterData.Order16_Green order 
+                                                          randSwitchFill rnd
+            | End16 (definedStages, randSwitchFill) -> CreateDefinedPrefixSorter
+                                                          totalSwitches definedStages 
+                                                          SorterData.Order16_END order 
+                                                          randSwitchFill rnd
+            | None randFill ->
+                match randFill with
+                  | LooseSwitches -> SorterDef.CreateRandom order totalSwitches rnd
+                  | FullStage -> SorterDef.CreateRandomPackedStages order totalSwitches rnd
+                 

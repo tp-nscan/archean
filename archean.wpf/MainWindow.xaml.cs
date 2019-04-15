@@ -17,43 +17,20 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int batchMult = 100;
+            int batchMult = 50;
 
-            //BatchArgsList.Add(new BatchArgs() {
-            //    Order = 11,
-            //    RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.LooseSwitches,
-            //    SwitchableType = SortingReports.SwitchableType.Generated,
-            //    SorterCount = sc * 25,
-            //    SorterLen = 340 });
-
-            //BatchArgsList.Add(new BatchArgs()
-            //{
-            //    Order = 11,
-            //    RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.FullStage,
-            //    SwitchableType = SortingReports.SwitchableType.Generated,
-            //    SorterCount = sc * 25,
-            //    SorterLen = 340
-            //});
-
-
-            BatchArgsList.Add(new BatchArgs()
+            for (var stageCount = 2; stageCount < 10; stageCount++)
             {
-                Order = 16,
-                RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.Green6,
-                SwitchableType = SortingReports.SwitchableType.IntArray,
-                SorterCount = batchMult * 10,
-                SorterLen = 1000
-            });
-
-            BatchArgsList.Add(new BatchArgs()
-            {
-                Order = 16,
-                RandGenerationMode = Sorting.SorterDefModule.RandGenerationMode.Green7,
-                SwitchableType = SortingReports.SwitchableType.IntArray,
-                SorterCount = batchMult * 10,
-                SorterLen = 1000
-            });
-
+                BatchArgsList.Add(new BatchArgs()
+                {
+                    Order = 16,
+                    RandGenerationMode = SortersFromData.RandGenerationMode.NewEnd16(
+                        stageCount, 
+                        SortersFromData.RandSwitchFill.LooseSwitches),
+                    SorterCount = batchMult * 10,
+                    SorterLen = 1200 - (stageCount * 50)
+                });
+            }
         }
 
         private List<BatchArgs> BatchArgsList = new List<BatchArgs>();
@@ -75,9 +52,6 @@ namespace archean.wpf
         {
             try
             {
-                var quack = SorterGen.SorterGenMode.NewFullRand(
-                    Sorting.SorterDefModule.RandGenerationMode.FullStage);
-
                 log.Debug("Test Starting");
                 Tuple<string, string[]> q;
                 for (var i = 0; true; i++)
@@ -88,7 +62,6 @@ namespace archean.wpf
                         order: ba.Order,
                         sorterLen: ba.SorterLen,
                         randGenerationMode: ba.RandGenerationMode,
-                        switchableType: ba.SwitchableType,
                         sorterCount: ba.SorterCount,
                         seed: Math.Abs((int)(DateTime.Now.Ticks))
                     );
@@ -113,8 +86,7 @@ namespace archean.wpf
         {
             public int Order { get; set; }
             public int SorterLen { get; set; }
-            public Sorting.SorterDefModule.RandGenerationMode RandGenerationMode { get; set; }
-            public SortingReports.SwitchableType SwitchableType { get; set; }
+            public SortersFromData.RandGenerationMode RandGenerationMode { get; set; }
             public int SorterCount { get; set; }
         }
 
