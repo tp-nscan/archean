@@ -17,7 +17,7 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int batchMult = 50;
+            int batchMult = 5;
 
             for (var stageCount = 2; stageCount < 10; stageCount++)
             {
@@ -26,7 +26,7 @@ namespace archean.wpf
                     Order = 16,
                     RandGenerationMode = SortersFromData.RandGenerationMode.NewEnd16(
                         stageCount, 
-                        SortersFromData.RandSwitchFill.LooseSwitches),
+                        SortersFromData.RandSwitchFill.FullStage),
                     SorterCount = batchMult * 10,
                     SorterLen = 1200 - (stageCount * 50)
                 });

@@ -59,8 +59,8 @@ module SorterA =
         let SortManyAndTrackSwitchesAndCheckResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) 
                                                         (switchTracker:int[]) (sortables: seq<'T>) =
             let sorterWithTracker = SortOneAndTrackSwitches sorter switchTracker
-            let allGood = sortables |> Seq.map (fun i -> (sorterWithTracker i) ) 
-                                    |> Seq.forall(fun i -> checker (snd i))
+            let allGood = sortables |> Seq.map (fun sortable -> (sorterWithTracker sortable) ) 
+                                    |> Seq.forall(fun (switchTracker, sortable) -> checker sortable)
             (allGood, switchTracker)
 
         //Run the sortables through the sorter, return the record usage on each switch, and return false if 
@@ -81,23 +81,18 @@ module SorterA =
             (fst res, (snd res)|> Array.sumBy(fun i -> if (i>0) then 1 else 0))
             
 
-        let MergeTrackerResultsIntoSwitchResults (sorter:Sorter<'T>) (switchTracker:int[]) = 
-            seq { for i = 0 to switchTracker.Length - 1 do
-                    if (switchTracker.[i] > 0) then
-                        yield {switch=sorter.sorterDef.switches.[i]; switchIndex=i; useCount=switchTracker.[i] } }
-            |> Seq.toArray
-
-
         //Run the sortables through the sorter, return the number of switches used, and return false if 
         //the checker fails to pass one of the outputs from the sorter
         let SortManyAndGetSwitchResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (sortables: seq<'T>) =
             let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
-            let res = SortManyAndTrackSwitchesAndCheckResults checker sorter switchTracker sortables
-            (fst res, (snd res)|> (MergeTrackerResultsIntoSwitchResults sorter))
+            let (success, switchResults) = SortManyAndTrackSwitchesAndCheckResults checker sorter switchTracker sortables
+            (success, switchResults|> (SwitchResult.MergeTrackerResultsIntoSwitchResults sorter.sorterDef))
+
 
         let GetSwitchCountForSorter (sorter:Sorter<int[]>) (sortables:seq<int[]>) =
             let checker t = Combinatorics.IsSorted t
             SortManyGetSwitchCountAndCheckResults<int[]> checker sorter sortables
+
 
         let GetSwitchResultsForSorter (sorter:Sorter<int[]>) (sortables:seq<int[]>) =
             let checker t = Combinatorics.IsSorted t

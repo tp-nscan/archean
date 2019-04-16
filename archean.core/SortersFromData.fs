@@ -7,13 +7,18 @@ open archean.core.Sorting
 module SortersFromData =
 
     type RandSwitchFill = 
-            | LooseSwitches
-            | FullStage
-
+         | LooseSwitches
+         | FullStage
+    
+    //(Stages:int)
+    type ReferenceStages =
+         | Green of int
+         | End16 of int
+         
     type RandGenerationMode = 
-            | Green of int * RandSwitchFill
-            | End16 of int * RandSwitchFill
-            | None of RandSwitchFill
+         | Green of int * RandSwitchFill
+         | End16 of int * RandSwitchFill
+         | None of RandSwitchFill
 
 
     let ParseSorterStringToStages (stagesStr:string) =
