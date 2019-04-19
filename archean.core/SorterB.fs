@@ -26,8 +26,9 @@ module SorterB =
         switchTracker
     
     // returns early if a sort fails
-    let GetSwitchResultsForSorterAndCheckResults (switchTracker:int[]) (sorterDef:SorterDef) 
-                                   (sortableGen: _ -> seq<int[]>) =
+    let GetSwitchResultsForSorterAndCheckResults 
+                (switchTracker:int[]) (sorterDef:SorterDef) 
+                (startPos:int) (sortableGen: _ -> seq<int[]>) =
 
         let checker t = Combinatorics.IsSorted t
 
@@ -39,9 +40,9 @@ module SorterB =
                 sortable.[sw.hi] <- lv
                 sortable.[sw.low] <- hv
                 switchTracker.[switchDex] <- switchTracker.[switchDex] + 1
-
+        
         let runSorter (sortable:int[]) =
-            {0 .. sorterDef.switches.Length - 1 } 
+            {startPos .. sorterDef.switches.Length - 1 } 
             |> Seq.iteri(fun i -> (runSwitch sortable))
             sortable
 
@@ -52,7 +53,7 @@ module SorterB =
 
 
     let GetSwitchAndSwitchableResultsForSorter (switchTracker:int[]) (sorterDef:SorterDef) 
-                                                (sortableGen: _ -> seq<int[]>) = 
+                                               (sortableGen: _ -> seq<int[]>) = 
 
         let runSwitch (sortable:int[]) (switchDex:int)  =
             let sw = sorterDef.switches.[switchDex]
@@ -75,17 +76,3 @@ module SorterB =
         let sset = sortedItemsList |> Set.ofList
 
         (switchTracker, sset)
-
-
-    //let GetSwitchResultsForSorter (sorterDef:SorterDef) (sortableGen: _ -> seq<int[]>) = 
-    //    let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
-    //    _GetSwitchResultsForSorter switchTracker sorterDef sortableGen
-
-
-    //let GetSwitchResultsForSorterAndCheckResults (switchTracker:int[]) (sorterDef:SorterDef) (sortableGen: _ -> seq<int[]>) =
-    //    _GetSwitchResultsForSorterAndCheckResults switchTracker sorterDef sortableGen
-
-
-    //let GetSwitchAndSwitchableResultsForSorter (sorterDef:SorterDef) (sortableGen: _ -> seq<int[]>) = 
-    //    let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
-    //    _GetSwitchAndSwitchableResultsForSorter switchTracker sorterDef sortableGen

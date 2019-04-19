@@ -9,17 +9,17 @@ module SortersFromData =
     type RandSwitchFill = 
          | LooseSwitches
          | FullStage
+         | NoFill
     
-    //(Stages:int)
-    type ReferenceStages =
-         | Green of int
-         | End16 of int
-         
-    type RandGenerationMode = 
-         | Green of int * RandSwitchFill
-         | End16 of int * RandSwitchFill
-         | None of RandSwitchFill
+    type RefSorter =
+        | Green16
+        | End16
 
+    type RefSorterPrefixStages = {refSorter:RefSorter; stageCount:int}
+
+    type RandGenerationMode = 
+         | Prefixed of RefSorterPrefixStages * RandSwitchFill
+         | None of RandSwitchFill * int
 
     let ParseSorterStringToStages (stagesStr:string) =
 
@@ -52,6 +52,10 @@ module SortersFromData =
                               |> Seq.toArray
        {StagedSorterDef.order=order; stages=stages}
 
+    let GetReferenceSorterInfo (refSorter:RefSorter) =
+        match refSorter with
+        | Green16 -> (SorterData.Order16_Green, 16)
+        | End16 -> (SorterData.Order16_END, 16)
 
     let ParseSorterStringToSorter (stagesStr:string) (order:int) 
                                   (stageCount:int) =
@@ -61,40 +65,58 @@ module SortersFromData =
                                 |> Seq.concat |> Seq.toArray
        {SorterDef.order=order; switches=switches}
 
+    let CreateRefSorter (refSorter:RefSorter) (definedStages: int) =
+        let (sorterString, order) = (GetReferenceSorterInfo refSorter)
+        let switchesFromStages = (ParseSorterStringToNStagesOfSwitches sorterString definedStages)
+        {
+            SorterDef.order = order;
+            switches = switchesFromStages |> Seq.toArray
+            |> Seq.toArray
+        }
 
-    let CreateDefinedPrefixSorter (totalSwitches: int) (definedStages: int)
-                                   (sorterDef:string) (order:int)
+
+
+    let CreatePrefixedRandomSorter (totalSwitches: int) (definedStages: int)
+                                   (sorterDef:string, order:int)
                                    (randSwitchFill:RandSwitchFill) (rnd:Random) =
         let switchFiller = 
             match randSwitchFill with
             | LooseSwitches -> (SwitchSet.RandomSwitchesOfOrder order rnd)
-            | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order) 
-                            
-        {
-            SorterDef.order = order;
-            switches = switchFiller
-                        |> Seq.append (ParseSorterStringToNStagesOfSwitches 
-                                            sorterDef definedStages)
-                        |> Seq.take totalSwitches
-                        |> Seq.toArray
-            |> Seq.toArray
-        }
+            | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order)
+            | NoFill -> Seq.empty
 
         
-    let CreateRandomSorterDef (order:int) (totalSwitches: int) 
+        let switchesFromStages = (ParseSorterStringToNStagesOfSwitches sorterDef definedStages)
+        let randPadded = seq { yield! switchesFromStages; yield! switchFiller } 
+        {
+            SorterDef.order = order;
+            switches = randPadded
+                        |> Seq.take totalSwitches
+                        |> Seq.toArray
+        }
+
+
+    let CreatePrefixedSorter (randGenerationMode : RandGenerationMode) =
+         match randGenerationMode with
+         | Prefixed ({refSorter=refType; stageCount=refStages}, _ ) ->
+                CreateRefSorter refType refStages
+         | None ( _ , order) ->
+                {SorterDef.order = order; switches = Array.empty}
+
+        
+    let CreateRandomSorterDef (totalSwitches: int) 
                               (randGenerationMode : RandGenerationMode) 
                               (rnd : Random) =
-            match randGenerationMode with
-            | Green (definedStages, randSwitchFill) -> CreateDefinedPrefixSorter
-                                                          totalSwitches definedStages 
-                                                          SorterData.Order16_Green order 
-                                                          randSwitchFill rnd
-            | End16 (definedStages, randSwitchFill) -> CreateDefinedPrefixSorter
-                                                          totalSwitches definedStages 
-                                                          SorterData.Order16_END order 
-                                                          randSwitchFill rnd
-            | None randFill ->
-                match randFill with
-                  | LooseSwitches -> SorterDef.CreateRandom order totalSwitches rnd
-                  | FullStage -> SorterDef.CreateRandomPackedStages order totalSwitches rnd
+
+        match randGenerationMode with
+         | Prefixed ({refSorter=refType; stageCount=refStages}, randSwitchFill) ->
+            CreatePrefixedRandomSorter
+                            totalSwitches refStages 
+                            (GetReferenceSorterInfo refType) 
+                            randSwitchFill rnd
+         | None (randSwitchFill, order) ->
+            match randSwitchFill with
+                | LooseSwitches -> SorterDef.CreateRandom order totalSwitches rnd
+                | FullStage -> SorterDef.CreateRandomPackedStages order totalSwitches rnd
+                | NoFill -> {SorterDef.order = order; switches = Array.empty}
                  

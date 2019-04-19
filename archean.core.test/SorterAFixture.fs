@@ -20,26 +20,26 @@ type SorterAFixture () =
         let res = Sorter.Sort sorter sortable.values
         Assert.IsTrue (Combinatorics.IsSorted (snd res))
 
-    [<TestMethod>]
-    member this.TestGetFullSortingResultsForSortableIntArray() =
-        let rnd = new Random(123)
-        let order = 10
-        let len = 160
-        let sorterDef = SorterDef.CreateRandom order len rnd
-        let res = SortingReports.GetFullSortingResultsUsingIntArray sorterDef
-        Assert.IsTrue (true)
+    //[<TestMethod>]
+    //member this.TestGetFullSortingResultsForSortableIntArray() =
+    //    let rnd = new Random(123)
+    //    let order = 10
+    //    let len = 160
+    //    let sorterDef = SorterDef.CreateRandom order len rnd
+    //    let res = SortingReports.GetFullSortingResultsUsingIntArray sorterDef
+    //    Assert.IsTrue (true)
 
-    [<TestMethod>]
-    member this.TestGetSorterSuccessRates() =
-        let sorterCount = 1
-        let order = 11
-        let seed = 100
-        let mode = RandGenerationMode.None(RandSwitchFill.FullStage)
+    //[<TestMethod>]
+    //member this.TestGetSorterSuccessRates() =
+    //    let sorterCount = 1
+    //    let order = 11
+    //    let seed = 100
+    //    let mode = RandGenerationMode.None(RandSwitchFill.FullStage, order)
 
-        let res = seq {260 .. 10 .. 460} 
-                        |> Seq.map(fun i -> SortingReports.MakeStageAndSwitchUseHistogram 
-                                                order i mode sorterCount seed)
-                        |> Seq.toArray
+    //    let res = seq {260 .. 10 .. 460} 
+    //                    |> Seq.map(fun i -> SortingReports.MakeStageAndSwitchUseHistogram 
+    //                                            order i mode sorterCount seed)
+    //                    |> Seq.toArray
 
-        Assert.IsTrue (true)
+    //    Assert.IsTrue (true)
 

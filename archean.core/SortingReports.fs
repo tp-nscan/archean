@@ -3,78 +3,62 @@ open System
 open archean.core.Combinatorics_Types
 open archean.core.Sorting
 open archean.core.SortersFromData
-open Sorting.SorterDef
-open SorterA
+open SorterB
 
 module SortingReports =
   
     let SortableFuncAllBinary (order:int) () =
             IntBits.AllBinaryTestCases order
 
-    let GetFullSortingResultsUsingIntArray (sorterDef:SorterDef) =
-        let sorter = Sorter.MakeSorter SortableIntArray.SwitchFuncForSwitch sorterDef
-        (Sorter.GetSwitchResultsForSorter sorter (IntBits.AllBinaryTestCases sorterDef.order), sorterDef)
+    let MakeSwitchTracker (totalSwitches: int) (prefixSwitches: int) =
+        Array.init totalSwitches (fun i -> if (i<prefixSwitches) then 1 else 0)
 
-
-    let GetFullSortingResultsUsingIntArray2 (sorterDef:SorterDef) =
-        let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
-        let res = SorterB.GetSwitchResultsForSorterAndCheckResults switchTracker 
-                        sorterDef (SortableFuncAllBinary sorterDef.order)
-        (res, sorterDef)
+    let SortableTestCases (randGenerationMode:RandGenerationMode) =
+        let prefixSorter = CreatePrefixedSorter randGenerationMode
+        let switchTracker = Array.init prefixSorter.switches.Length (fun i -> 0)
+        let (_, sortableRes) = GetSwitchAndSwitchableResultsForSorter switchTracker 
+                                   prefixSorter (SortableFuncAllBinary prefixSorter.order)
+        sortableRes |> Set.toSeq
 
 
     // returns (NumStagesUsed, NumSwitchesUsed, Count)  
-    let MakeStageAndSwitchUseHistogram (order:int) 
-                                       (sorterLen: int) 
+    let MakeStageAndSwitchUseHistogram (sorterLen: int) 
                                        (randGenerationMode : RandGenerationMode)
                                        (sorterCount:int) (seed : int) =
 
+        let prefixedSorter = SortersFromData.CreatePrefixedSorter randGenerationMode
+        let prefixedSorterLength = prefixedSorter.switches.Length
+
+        let testSortables = (SortableTestCases randGenerationMode) |> Seq.toArray
+        let TestSortablesSeq () =
+            testSortables
+                |> Array.map(fun a -> Array.copy a)
+                |> Array.toSeq
+
+        let MakeSorterResults (sorterDef:SorterDef) (startPos:int) =
+            let res = SorterB.GetSwitchResultsForSorterAndCheckResults 
+                                (MakeSwitchTracker sorterLen prefixedSorterLength)
+                                sorterDef
+                                startPos
+                                TestSortablesSeq
+            (res, sorterDef)
+
         let MakeHistoLine (tt:int[]) = 
             sprintf "%d\t%A\t%d\t%d\t%d"
-                    order randGenerationMode tt.[0] tt.[1] tt.[2]
+                    prefixedSorter.order randGenerationMode tt.[0] tt.[1] tt.[2]
 
         let rnd = new Random(seed)
         let histogram =
             {1 .. sorterCount}
-            |> Seq.map(fun i -> SortersFromData.CreateRandomSorterDef order sorterLen randGenerationMode rnd)
+            |> Seq.map(fun i -> SortersFromData.CreateRandomSorterDef sorterLen randGenerationMode rnd)
             |> Seq.toArray
-            |> Array.Parallel.map(fun sorterDef -> GetFullSortingResultsUsingIntArray2 sorterDef)
-            |> Seq.filter(fun ((success, switchResults), sorterDef) -> success)
-            |> Seq.map(fun ((success, switchResults), sorterDef) -> Sorting.SorterResult.MakeSorterResult sorterDef switchResults)
+            |> Array.Parallel.map(fun sorterDef -> MakeSorterResults sorterDef prefixedSorterLength)
+            |> Seq.filter(fun ((success, _ ), _ ) -> success)
+            |> Seq.map(fun (( _ , switchResults), sorterDef) -> Sorting.SorterResult.MakeSorterResult sorterDef switchResults)
             |> Seq.groupBy(fun res -> SorterResult.SorterResultKey res.stageResults)
             |> Seq.map(fun ((success, switchResults), sorterResults) -> [| success; switchResults; sorterResults|> Seq.length |])
             |> Seq.toArray
 
         let summary = sprintf "order:%d sorterLen:%d randGenerationMode:%A seed:%d sorterCount:%d resultCount:%d" 
-                                order sorterLen randGenerationMode seed sorterCount (histogram|>Array.sumBy(fun a -> a.[2]))
+                                prefixedSorter.order sorterLen randGenerationMode seed sorterCount (histogram|>Array.sumBy(fun a -> a.[2]))
         (summary, histogram |> Array.map(fun i-> (MakeHistoLine i)))
-
-
-
-
- 
-    //// returns (NumStagesUsed, NumSwitchesUsed, Count)  
-    //let MakeStageAndSwitchUseHistogramOld (order:int) 
-    //                                   (sorterLen: int) 
-    //                                   (randGenerationMode : RandGenerationMode)
-    //                                   (sorterCount:int) (seed : int) =
-
-    //    let MakeHistoLine (tt:int[]) = 
-    //        sprintf "%d\t%A\t%d\t%d\t%d"
-    //                order randGenerationMode tt.[0] tt.[1] tt.[2]
-
-    //    let rnd = new Random(seed)
-    //    let histogram =
-    //        {1 .. sorterCount}
-    //        |> Seq.map(fun i -> SortersFromData.CreateRandomSorterDef order sorterLen randGenerationMode rnd)
-    //        |> Seq.toArray
-    //        |> Array.Parallel.map(fun sorterDef -> GetFullSortingResultsUsingIntArray2 sorterDef)
-    //        |> Seq.filter(fun ((success, switchResults), sorterDef) -> success)
-    //        |> Seq.map(fun ((success, switchResults), sorterDef) -> Sorting.SorterResult.MakeSorterResult sorterDef switchResults)
-    //        |> Seq.groupBy(fun res -> SorterResult.SorterResultKey res.stageResults)
-    //        |> Seq.map(fun ((success, switchResults), sorterResults) -> [| success; switchResults; sorterResults|> Seq.length |])
-    //        |> Seq.toArray
-
-    //    let summary = sprintf "order:%d sorterLen:%d randGenerationMode:%A seed:%d sorterCount:%d resultCount:%d" 
-    //                            order sorterLen randGenerationMode seed sorterCount (histogram|>Array.sumBy(fun a -> a.[2]))
-    //    (summary, histogram |> Array.map(fun i-> (MakeHistoLine i)))

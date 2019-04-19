@@ -5,6 +5,14 @@ open Microsoft.FSharp.Collections
 
 module Sorting =
 
+    // the number of bus lanes in a Sorter
+    module Order = 
+        type T = Order of int
+        let create i = 
+            if (i >= 0 )
+            then Some (Order i)
+            else None
+
     type Switch = {low:int;hi:int}
     module Switch =
         let SwitchSeqFromIntArray (pArray:int[]) =
