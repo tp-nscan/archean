@@ -27,18 +27,19 @@ type SorterBFixture () =
 
         let switchSet = SwitchSet.ForOrder order
         let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
+        let startPos = 0
         
         let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
-        let (res, switchTrack) = GetSwitchResultsForSorterAndCheckResults switchTracker 
-                                        sorterDef (SortableFunc order rnd sortableCount)
+        let (res, switchTrack) = GetSwitchResultsForGoodSorters switchTracker 
+                                        sorterDef startPos (SortableFunc order rnd sortableCount)
 
-        Assert.IsTrue (switchTrack.Length > 0)
+        Assert.IsTrue (switchTrack.Value.Length > 0)
 
 
     [<TestMethod>]
     member this.TestRunPrefixedSorterDef() =
         let order = 16
-        let totalSwitchCount = 70
+        let totalSwitchCount = 60
         let prefixStageCount = 3
         let prefixSwitchCount = 24
         let allStageCount = 10
@@ -47,6 +48,7 @@ type SorterBFixture () =
 
         let SortableFuncAllBinary (order:int) () =
             IntBits.AllBinaryTestCases order
+            |> Seq.map(fun i -> (i, 1))
 
         let prefixSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=prefixStageCount}
         let fullSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=allStageCount}
@@ -62,14 +64,55 @@ type SorterBFixture () =
 
              
         let switchTracker = Array.init totalSwitchCount (fun i -> 0)
-        let (_, sortableRes) = GetSwitchAndSwitchableResultsForSorter switchTracker 
+        let (_, sortableRes) = RunWeightedSwitchesAndGetWeightedResults switchTracker 
                                             prefixSorterDef (SortableFuncAllBinary order)
 
-        let SortableFunc() = sortableRes |> Set.toSeq
+        let SortableFunc() = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = GetSwitchAndSwitchableResultsForSorter switchTracker 
+        let (switchTrack, sortableRes2) = RunWeightedSwitchesAndGetWeightedResults switchTracker 
                                             fullSorterDef (SortableFunc)
 
 
         Assert.IsTrue (switchTrack.Length = totalSwitchCount)
-        Assert.IsTrue (sortableRes2.Count = 17)
+        Assert.IsTrue (sortableRes2.Length = 17)
+
+
+
+    //[<TestMethod>]
+    //member this.TestRunPrefixedSorterDef() =
+    //    let order = 16
+    //    let totalSwitchCount = 60
+    //    let prefixStageCount = 3
+    //    let prefixSwitchCount = 24
+    //    let allStageCount = 10
+    //    let seed = 123
+    //    let rnd = new Random(seed)
+
+    //    let SortableFuncAllBinary (order:int) () =
+    //        IntBits.AllBinaryTestCases order
+
+    //    let prefixSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=prefixStageCount}
+    //    let fullSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=allStageCount}
+
+    //    let prefixedSorterGenMode = RandGenerationMode.Prefixed(prefixSorterStages, RandSwitchFill.NoFill)
+    //    let fullSorterGenMode = RandGenerationMode.Prefixed(fullSorterStages, RandSwitchFill.NoFill)
+
+    //    let prefixSorterDef = SortersFromData.CreateRandomSorterDef 
+    //                            prefixSwitchCount prefixedSorterGenMode rnd
+
+    //    let fullSorterDef = SortersFromData.CreateRandomSorterDef 
+    //                            totalSwitchCount fullSorterGenMode rnd
+
+             
+    //    let switchTracker = Array.init totalSwitchCount (fun i -> 0)
+    //    let (_, sortableRes) = GetSwitchAndSwitchableResultsForSorter switchTracker 
+    //                                        prefixSorterDef (SortableFuncAllBinary order)
+
+    //    let SortableFunc() = sortableRes |> Set.toSeq
+        
+    //    let (switchTrack, sortableRes2) = GetSwitchAndSwitchableResultsForSorter2 switchTracker 
+    //                                        fullSorterDef (SortableFunc)
+
+
+    //    Assert.IsTrue (switchTrack.Length = totalSwitchCount)
+    //    Assert.IsTrue (sortableRes2.Length = 17)

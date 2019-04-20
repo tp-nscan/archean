@@ -114,7 +114,7 @@ module Sorting =
     type SwitchResult = {switch:Switch; switchIndex:int; useCount:int}
     module SwitchResult =
 
-        let MergeTrackerResultsIntoSwitchResults (sorterDef:SorterDef) (switchTracker:int[]) = 
+        let CollectTheUsedSwitches (sorterDef:SorterDef) (switchTracker:int[]) = 
             seq { for i = 0 to switchTracker.Length - 1 do
                     if (switchTracker.[i] > 0) then
                         yield {switch=sorterDef.switches.[i]; switchIndex=i; useCount=switchTracker.[i] } }

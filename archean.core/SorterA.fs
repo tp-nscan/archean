@@ -86,7 +86,7 @@ module SorterA =
         let SortManyAndGetSwitchResults<'T> (checker:'T->bool) (sorter:Sorter<'T>) (sortables: seq<'T>) =
             let switchTracker = Array.init sorter.switches.Length (fun i -> 0)
             let (success, switchResults) = SortManyAndTrackSwitchesAndCheckResults checker sorter switchTracker sortables
-            (success, switchResults|> (SwitchResult.MergeTrackerResultsIntoSwitchResults sorter.sorterDef))
+            (success, switchResults|> (SwitchResult.CollectTheUsedSwitches sorter.sorterDef))
 
 
         let GetSwitchCountForSorter (sorter:Sorter<int[]>) (sortables:seq<int[]>) =
