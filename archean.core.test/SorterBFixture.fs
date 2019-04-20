@@ -37,7 +37,7 @@ type SorterBFixture () =
 
 
     [<TestMethod>]
-    member this.TestRunPrefixedSorterDef() =
+    member this.TestRunWeightedSwitchesAndGetWeightedResults() =
         let order = 16
         let totalSwitchCount = 60
         let prefixStageCount = 3

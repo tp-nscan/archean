@@ -10,7 +10,7 @@ module SortingReports =
     let SortableFuncAllBinary (order:int) () =
             IntBits.AllBinaryTestCases order
 
-    let SortableFuncAllBinary2 (order:int) () =
+    let WeightedSortableFuncAllBinary (order:int) () =
             IntBits.AllBinaryTestCases order
             |> Seq.map(fun i -> (i, 1))
 
@@ -24,11 +24,11 @@ module SortingReports =
                                    prefixSorter (SortableFuncAllBinary prefixSorter.order)
         sortableRes |> Set.toSeq
 
-    let SortableTestCases2 (randGenerationMode:RandGenerationMode) =
+    let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =
         let prefixSorter = CreatePrefixedSorter randGenerationMode
         let switchTracker = Array.init prefixSorter.switches.Length (fun i -> 0)
         let (_, sortableRes) = RunWeightedSwitchesAndGetWeightedResults switchTracker 
-                                   prefixSorter (SortableFuncAllBinary2 prefixSorter.order)
+                                   prefixSorter (WeightedSortableFuncAllBinary prefixSorter.order)
         sortableRes |> Array.toSeq
 
     // returns (NumStagesUsed, NumSwitchesUsed, Count)  
@@ -79,7 +79,7 @@ module SortingReports =
                                        (randGenerationMode : RandGenerationMode)
                                        (sorterCount:int) (seed : int) =
 
-        let prefixedSorter = SortersFromData.CreatePrefixedSorter randGenerationMode
+        let prefixedSorter = CreatePrefixedSorter randGenerationMode
         let prefixedSorterLength = prefixedSorter.switches.Length
 
         let testSortables = (SortableTestCases randGenerationMode) |> Seq.toArray
@@ -103,11 +103,11 @@ module SortingReports =
         let rnd = new Random(seed)
         let histogram =
             {1 .. sorterCount}
-            |> Seq.map(fun i -> SortersFromData.CreateRandomSorterDef sorterLen randGenerationMode rnd)
+            |> Seq.map(fun i -> CreateRandomSorterDef sorterLen randGenerationMode rnd)
             |> Seq.toArray
             |> Array.Parallel.map(fun sorterDef -> MakeSorterResults sorterDef prefixedSorterLength)
             |> Seq.filter(fun ((success, _ ), _ ) -> success)
-            |> Seq.map(fun (( _ , switchResults), sorterDef) -> Sorting.SorterResult.MakeSorterResult sorterDef switchResults.Value)
+            |> Seq.map(fun (( _ , switchResults), sorterDef) -> SorterResult.MakeSorterResult sorterDef switchResults.Value)
             |> Seq.groupBy(fun res -> SorterResult.SorterResultKey res.stageResults)
             |> Seq.map(fun ((success, switchResults), sorterResults) -> [| success; switchResults; sorterResults|> Seq.length |])
             |> Seq.toArray

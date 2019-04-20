@@ -11,6 +11,8 @@ module SortersFromData =
          | FullStage
          | NoFill
     
+    type RandSorterStages = {randSwitchFill:RandSwitchFill; stageCount:int}
+
     type RefSorter =
         | Green16
         | End16
@@ -71,9 +73,7 @@ module SortersFromData =
         {
             SorterDef.order = order;
             switches = switchesFromStages |> Seq.toArray
-            |> Seq.toArray
         }
-
 
 
     let CreatePrefixedRandomSorter (totalSwitches: int) (definedStages: int)
