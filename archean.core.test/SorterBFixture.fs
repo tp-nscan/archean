@@ -27,10 +27,9 @@ type SorterBFixture () =
 
         let switchSet = SwitchSet.ForOrder order
         let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
-        let startPos = 0
-        
+        let startPos = 5
         let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
-        let (res, switchTrack) = GetSwitchResultsForGoodSorters switchTracker 
+        let (res, switchTrack) = GetSwitchUsagesForGoodSorters switchTracker 
                                         sorterDef startPos (SortableFunc order rnd sortableCount)
 
         Assert.IsTrue (switchTrack.Value.Length > 0)
@@ -39,12 +38,13 @@ type SorterBFixture () =
     [<TestMethod>]
     member this.TestRunWeightedSwitchesAndGetWeightedResults() =
         let order = 16
-        let totalSwitchCount = 60
+        let totalStages = 10
         let prefixStageCount = 3
-        let prefixSwitchCount = 24
         let allStageCount = 10
         let seed = 123
         let rnd = new Random(seed)
+
+        let randSorterStages = {RandSorterStages.order = order; stageCount=totalStages; randSwitchFill=RandSwitchFill.NoFill}
 
         let SortableFuncAllBinary (order:int) () =
             IntBits.AllBinaryTestCases order
@@ -53,27 +53,27 @@ type SorterBFixture () =
         let prefixSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=prefixStageCount}
         let fullSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=allStageCount}
 
-        let prefixedSorterGenMode = RandGenerationMode.Prefixed(prefixSorterStages, RandSwitchFill.NoFill)
-        let fullSorterGenMode = RandGenerationMode.Prefixed(fullSorterStages, RandSwitchFill.NoFill)
+        let prefixedSorterGenMode = RandGenerationMode.Prefixed(prefixSorterStages, randSorterStages)
+        let fullSorterGenMode = RandGenerationMode.Prefixed(fullSorterStages, randSorterStages)
 
         let prefixSorterDef = SortersFromData.CreateRandomSorterDef 
-                                prefixSwitchCount prefixedSorterGenMode rnd
+                                prefixedSorterGenMode rnd
 
         let fullSorterDef = SortersFromData.CreateRandomSorterDef 
-                                totalSwitchCount fullSorterGenMode rnd
+                                fullSorterGenMode rnd
 
              
-        let switchTracker = Array.init totalSwitchCount (fun i -> 0)
-        let (_, sortableRes) = RunWeightedSwitchesAndGetWeightedResults switchTracker 
+        let switchTracker = Array.init totalStages (fun i -> 0)
+        let (_, sortableRes) = RunWeightedSortablesOnSorterAndReturnResultsSet switchTracker 
                                             prefixSorterDef (SortableFuncAllBinary order)
 
         let SortableFunc() = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = RunWeightedSwitchesAndGetWeightedResults switchTracker 
+        let (switchTrack, sortableRes2) = RunWeightedSortablesOnSorterAndReturnResultsSet switchTracker 
                                             fullSorterDef (SortableFunc)
 
 
-        Assert.IsTrue (switchTrack.Length = totalSwitchCount)
+        Assert.IsTrue (switchTrack.Length = totalStages)
         Assert.IsTrue (sortableRes2.Length = 17)
 
 

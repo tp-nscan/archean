@@ -30,7 +30,7 @@ type SortersFromDataFixture () =
     member this.TestParseSorterStringToStagedSorter() =
       let stagedSorter = SortersFromData.ParseSorterStringToStagedSorter
                                 SorterData.Order16_Green 16 3
-      Assert.AreEqual(stagedSorter.stages.Length, 3)
+      Assert.AreEqual(stagedSorter.stageIndexes.Length , 3)
   
    
     [<TestMethod>]

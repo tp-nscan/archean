@@ -60,17 +60,23 @@ type SortingFixture () =
         let order = 5
         let swrSet0 = [|
                         {Switch.low = 1; hi = 2};
+
                         {Switch.low = 1; hi = 3};
                         {Switch.low = 2; hi = 4};
+
                         {Switch.low = 0; hi = 1};
+
                         {Switch.low = 0; hi = 1};
                         {Switch.low = 2; hi = 3};
+
                         {Switch.low = 3; hi = 4};
                         {Switch.low = 1; hi = 2};
+
                         {Switch.low = 0; hi = 3};
                      |]
 
         let res0 = Stage.MergeSwitchesIntoStages order swrSet0 |> Seq.toArray
+        let res1 = Stage.GetStageIndexesFromSwitches order swrSet0 |> Seq.toArray
   
         Assert.IsTrue (true)
 
@@ -79,15 +85,15 @@ type SortingFixture () =
     member this.TestMergeSwitchResultsIntoStageResults() =
         let order = 5
         let swrSet0 = [|
-                        {SwitchResult.switch={Switch.low = 1; hi = 2}; switchIndex=0; useCount=1};
-                        {SwitchResult.switch={Switch.low = 1; hi = 3}; switchIndex=1; useCount=1};
-                        {SwitchResult.switch={Switch.low = 2; hi = 4}; switchIndex=2; useCount=1};
-                        {SwitchResult.switch={Switch.low = 0; hi = 1}; switchIndex=3; useCount=1};
-                        {SwitchResult.switch={Switch.low = 0; hi = 1}; switchIndex=4; useCount=1};
-                        {SwitchResult.switch={Switch.low = 2; hi = 3}; switchIndex=5; useCount=1};
-                        {SwitchResult.switch={Switch.low = 3; hi = 4}; switchIndex=6; useCount=1};
-                        {SwitchResult.switch={Switch.low = 1; hi = 2}; switchIndex=7; useCount=1};
-                        {SwitchResult.switch={Switch.low = 0; hi = 3}; switchIndex=8; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 1; hi = 2}; switchIndex=0; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 1; hi = 3}; switchIndex=1; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 2; hi = 4}; switchIndex=2; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 0; hi = 1}; switchIndex=3; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 0; hi = 1}; switchIndex=4; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 2; hi = 3}; switchIndex=5; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 3; hi = 4}; switchIndex=6; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 1; hi = 2}; switchIndex=7; useCount=1};
+                        {SwitchUsage.switch={Switch.low = 0; hi = 3}; switchIndex=8; useCount=1};
                      |]
                     
         let res0 = Sorting.SorterResult.MergeSwitchResultsIntoStageResults order swrSet0

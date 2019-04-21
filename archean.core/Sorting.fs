@@ -45,6 +45,21 @@ module Sorting =
                     yield { Stage.switches=switchesForStage |> Seq.toList }
                  }
          
+        let GetStageIndexesFromSwitches (order:int) (switches:seq<Switch>) =
+            let mutable stageTracker = Array.init order (fun i -> false)
+            let mutable curDex = 0
+            seq { 
+                    yield curDex
+                    for sw in switches do
+                        if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
+                            yield curDex
+                            stageTracker <- Array.init order (fun i -> false)
+                        stageTracker.[sw.hi] <- true
+                        stageTracker.[sw.low] <- true
+                        curDex <- curDex + 1
+                    yield curDex
+                 }
+
         let MakeStagePackedSwitchSeq (rnd:Random) (order: int) =
             let aa (rnd:Random)  = 
                 (TwoCycleIntArray.MakeRandomPolyCycle rnd order)
@@ -95,7 +110,22 @@ module Sorting =
             }
 
 
-    type StagedSorterDef = { order:int; stages: array<Stage> }
+    //type StagedSorterDef = { order:int; stages: array<Stage> }
+    //module StagedSorterDef =
+
+    //    let StageArrayToSwitchArray (sta: array<Stage>) =
+    //        seq { for stg in sta do yield! (stg.switches |> List.toSeq)}
+    //        |> Seq.toArray
+        
+    //    let ToStagedSorterDef (sd:SorterDef) =
+    //       {StagedSorterDef.order= sd.order; stages=sd.switches 
+    //                                            |> (Stage.MergeSwitchesIntoStages sd.order) 
+    //                                            |> Seq.toArray}
+
+    //    let ToSorterDef (ssd:StagedSorterDef) =
+    //       {SorterDef.order= ssd.order; switches=ssd.stages |> StageArrayToSwitchArray}
+
+    type StagedSorterDef = { sorterDef:SorterDef; stageIndexes: array<int> }
     module StagedSorterDef =
 
         let StageArrayToSwitchArray (sta: array<Stage>) =
@@ -103,16 +133,17 @@ module Sorting =
             |> Seq.toArray
         
         let ToStagedSorterDef (sd:SorterDef) =
-           {StagedSorterDef.order= sd.order; stages=sd.switches 
-                                                |> (Stage.MergeSwitchesIntoStages sd.order) 
+           {StagedSorterDef.sorterDef= sd; stageIndexes=sd.switches 
+                                                |> (Stage.GetStageIndexesFromSwitches sd.order) 
                                                 |> Seq.toArray}
 
-        let ToSorterDef (ssd:StagedSorterDef) =
-           {SorterDef.order= ssd.order; switches=ssd.stages |> StageArrayToSwitchArray}
+        let GetSwitchesForStageWithIndexes (stagedSorterDef:StagedSorterDef) =
+            true
 
- 
-    type SwitchResult = {switch:Switch; switchIndex:int; useCount:int}
-    module SwitchResult =
+
+
+    type SwitchUsage = {switch:Switch; switchIndex:int; useCount:int}
+    module SwitchUsage =
 
         let CollectTheUsedSwitches (sorterDef:SorterDef) (switchTracker:int[]) = 
             seq { for i = 0 to switchTracker.Length - 1 do
@@ -121,7 +152,7 @@ module Sorting =
             |> Seq.toArray
     
 
-    type StageResult = {switchResults:SwitchResult list}
+    type StageResult = {switchResults:SwitchUsage list}
 
 
     type SortableIntArray = {values:int[]}
@@ -148,12 +179,12 @@ module Sorting =
     
     type SorterResult = {sorterDef:SorterDef; stageResults:StageResult list}
     module SorterResult =
-        let SorterResultKey (stageResults:StageResult list) =
+        let TotalNumberOfSwitchResultsIn (stageResults:StageResult list) =
             (stageResults.Length, stageResults |> List.fold(fun s i -> s + i.switchResults.Length) 0)
 
-        let MergeSwitchResultsIntoStageResults (order:int) (switchResults:SwitchResult[]) =
+        let MergeSwitchResultsIntoStageResults (order:int) (switchResults:SwitchUsage[]) =
             let mutable stageTracker = Array.init order (fun i -> false)
-            let switchResultsForStage = new ResizeArray<SwitchResult>()
+            let switchResultsForStage = new ResizeArray<SwitchUsage>()
 
             seq { for i = 0 to switchResults.Length - 1 do
                     let curSwitch = switchResults.[i].switch
@@ -171,7 +202,7 @@ module Sorting =
             |> Seq.toList
 
 
-        let MakeSorterResult (sorterDef:SorterDef) (switchResults:SwitchResult[]) =
+        let MakeSorterResult (sorterDef:SorterDef) (switchResults:SwitchUsage[]) =
             {sorterDef=sorterDef; stageResults=MergeSwitchResultsIntoStageResults sorterDef.order switchResults}
 
 

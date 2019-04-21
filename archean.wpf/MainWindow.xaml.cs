@@ -17,37 +17,36 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int batchMult = 5000;
+            int batchMult = 50;
+            int Order = 16;
+            int totalStageCount = 150;
 
-
-            for (var stageCount = 2; stageCount < 10; stageCount++)
+            for (var prefixStageCount = 2; prefixStageCount < 10; prefixStageCount++)
             {
                 var refSorter = SortersFromData.RefSorter.End16;
                 var randSwitchFill = SortersFromData.RandSwitchFill.FullStage;
-                var refSorterPrefixStages = new SortersFromData.RefSorterPrefixStages(refSorter, stageCount);
+                var randSorterStages = new SortersFromData.RandSorterStages(Order, totalStageCount - prefixStageCount * 2, randSwitchFill);
+                var refSorterPrefixStages = new SortersFromData.RefSorterPrefixStages(refSorter, prefixStageCount);
                 var randGenerationMode = SortersFromData.RandGenerationMode.NewPrefixed(
-                    refSorterPrefixStages, randSwitchFill);
+                    refSorterPrefixStages, randSorterStages);
 
                 BatchArgsList.Add(new BatchArgs()
                 {
-                    Order = 16,
                     RandGenerationMode = randGenerationMode,
-                    SorterCount = batchMult * 10,
-                    SorterLen = 1200 - (stageCount * 50)
+                    SorterCount = batchMult * 10
                 });
 
                 var refSorter2 = SortersFromData.RefSorter.Green16;
                 var randSwitchFill2 = SortersFromData.RandSwitchFill.FullStage;
-                var refSorterPrefixStages2 = new SortersFromData.RefSorterPrefixStages(refSorter2, stageCount);
+                var randSorterStages2 = new SortersFromData.RandSorterStages(Order, totalStageCount - prefixStageCount * 2, randSwitchFill2);
+                var refSorterPrefixStages2 = new SortersFromData.RefSorterPrefixStages(refSorter2, prefixStageCount);
                 var randGenerationMode2 = SortersFromData.RandGenerationMode.NewPrefixed(
-                    refSorterPrefixStages2, randSwitchFill2);
+                    refSorterPrefixStages2, randSorterStages2);
 
                 BatchArgsList.Add(new BatchArgs()
                 {
-                    Order = 16,
                     RandGenerationMode = randGenerationMode2,
-                    SorterCount = batchMult * 10,
-                    SorterLen = 1200 - (stageCount * 50)
+                    SorterCount = batchMult * 10
                 });
 
 
@@ -80,7 +79,6 @@ namespace archean.wpf
                     var ba = BatchArgsList[i % BatchArgsList.Count];
                     q = SortingReports.MakeStageAndSwitchUseHistogram
                     (
-                        sorterLen: ba.SorterLen,
                         randGenerationMode: ba.RandGenerationMode,
                         sorterCount: ba.SorterCount,
                         seed: Math.Abs((int)(DateTime.Now.Ticks))
@@ -104,8 +102,6 @@ namespace archean.wpf
 
         public class BatchArgs
         {
-            public int Order { get; set; }
-            public int SorterLen { get; set; }
             public SortersFromData.RandGenerationMode RandGenerationMode { get; set; }
             public int SorterCount { get; set; }
         }

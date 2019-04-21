@@ -1,83 +1,92 @@
 ﻿namespace archean.core
-open System
-open Combinatorics_Types
 open Microsoft.FSharp.Collections
 open Sorting
 
 module SorterB =
 
-    let runSwitch (sorterDef:SorterDef) (switchTracker:int[])
-                  (sortable:int[]) (switchDex:int)  =
-        let sw = sorterDef.switches.[switchDex]
-        let lv = sortable.[sw.low]
-        let hv = sortable.[sw.hi]
+    let runSwitch (switch:Switch) (switchTracker:int[])
+                  (sortable:int[]) (switchDex:int) =
+        let lv = sortable.[switch.low]
+        let hv = sortable.[switch.hi]
         if(lv > hv) then
-            sortable.[sw.hi] <- lv
-            sortable.[sw.low] <- hv
+            sortable.[switch.hi] <- lv
+            sortable.[switch.low] <- hv
             switchTracker.[switchDex] <- switchTracker.[switchDex] + 1
 
-    let runWeightedSwitch (sorterDef:SorterDef) (switchTracker:int[]) 
-                          (sortable:int[], weight:int) (switchDex:int)  =
-        let sw = sorterDef.switches.[switchDex]
-        let lv = sortable.[sw.low]
-        let hv = sortable.[sw.hi]
+
+    let runWeightedSortables (switch:Switch) (switchTracker:int[]) 
+                             (sortable:int[], weight:int) (switchDex:int) =
+        let lv = sortable.[switch.low]
+        let hv = sortable.[switch.hi]
         if(lv > hv) then
-            sortable.[sw.hi] <- lv
-            sortable.[sw.low] <- hv
+            sortable.[switch.hi] <- lv
+            sortable.[switch.low] <- hv
             switchTracker.[switchDex] <- switchTracker.[switchDex] + weight
 
-    let GetSwitchResultsForSorter (switchTracker:int[]) (sorterDef:SorterDef) 
-                                  (startPos:int) (sortableGen: _ -> seq<int[]>) =
 
-        let runSorter (sortable:int[]) =
-            {startPos .. sorterDef.switches.Length - 1 } 
-            |> Seq.iteri(fun i -> (runSwitch sorterDef switchTracker sortable))
-            
-        sortableGen() |> Seq.iter(runSorter)
-        switchTracker
-    
-    // returns early if a sort fails on any of the sortables
-    let GetSwitchResultsForGoodSorters 
-                (switchTracker:int[]) (sorterDef:SorterDef) 
-                (startPos:int) (sortableGen: _ -> seq<int[]>) =
-
-        let checker t = Combinatorics.IsSorted t
-        
-        let runSorter (sortable:int[]) =
-            {startPos .. sorterDef.switches.Length - 1 } 
-            |> Seq.iteri(fun i -> (runSwitch sorterDef switchTracker sortable))
+    let runSorterSwitchSequence (startPos:int) (endPos:int) 
+                                (sorterDef:SorterDef) (switchTracker:int[]) 
+                                (sortable:int[])  =
+            {startPos .. endPos } 
+            |> Seq.iteri(fun i -> (runSwitch sorterDef.switches.[i] switchTracker sortable))
             sortable
 
-        let allGood = sortableGen() |> Seq.map(runSorter)
-                                    |> Seq.forall(fun sortable -> checker sortable)
+            
+    let runSorter (sorterDef:SorterDef) (switchTracker:int[]) 
+                        (sortable:int[]) =
+            runSorterSwitchSequence 0 (sorterDef.switches.Length - 1) 
+                                    sorterDef switchTracker sortable
+
+
+    let GetSwitchResultsForSorter (switchTracker:int[]) (sorterDef:SorterDef) 
+                                  (sortableGen: _ -> seq<int[]>) =
+        let rs (sortable:int[]) = 
+            runSorter sorterDef switchTracker sortable
+            |> ignore
+
+        sortableGen() |> Seq.iter(rs)
+        switchTracker
+    
+
+    // returns early if a sort fails on any of the sortables
+    let GetSwitchUsagesForGoodSorters 
+                (switchTracker:int[]) (sorterDef:SorterDef)
+                (startPos:int)
+                (sortableGen: _ -> seq<int[]>) =
+
+        let rs (sortable:int[]) = 
+            runSorterSwitchSequence
+                startPos (sorterDef.switches.Length - 1)
+                sorterDef switchTracker sortable
+            
+        let allGood = sortableGen() |> Seq.map(rs)
+                                    |> Seq.forall(Combinatorics.IsSorted)
         if allGood then
-             (allGood, Some (SwitchResult.CollectTheUsedSwitches sorterDef switchTracker))
+             (allGood, Some (SwitchUsage.CollectTheUsedSwitches sorterDef switchTracker))
         else (allGood, None)
 
 
     let RunSwitchesAndGetResults (switchTracker:int[]) 
                 (sorterDef:SorterDef) (sortableGen: _ -> seq<int[]>) = 
 
-        let runSorter (sortable:int[]) =
-            {0 .. sorterDef.switches.Length - 1 } 
-            |> Seq.iteri(fun i -> (runSwitch sorterDef switchTracker sortable))
-            sortable
-        
+        let rs (sortable:int[]) = 
+            runSorter sorterDef switchTracker sortable
+
         let sortedItemsList = sortableGen()
-                                |> Seq.map(runSorter)
+                                |> Seq.map(rs)
                                 |> Seq.toList
 
-        let sset = sortedItemsList |> Set.ofList
+        (switchTracker, sortedItemsList |> Set.ofList)
 
-        (switchTracker, sset)
-
-
-    let RunWeightedSwitchesAndGetWeightedResults (switchTracker:int[]) 
-                 (sorterDef:SorterDef) (sortableGen: _ -> seq<int[] * int>) = 
+    
+    let RunWeightedSortablesOnSorterSwitchSequenceAndReturnResultsSet 
+                 (switchTracker:int[]) (sorterDef:SorterDef) 
+                 (startPos:int) (endPos:int)
+                 (sortableGen: _ -> seq<int[] * int>) = 
 
         let runSorter (sortable:int[]*int) =
-            {0 .. sorterDef.switches.Length - 1 } 
-            |> Seq.iteri(fun i -> (runWeightedSwitch sorterDef switchTracker sortable))
+            {startPos .. endPos} 
+            |> Seq.iteri(fun i -> (runWeightedSortables sorterDef.switches.[i] switchTracker sortable))
             fst sortable
         
         let sortedItemsList = sortableGen()
@@ -86,3 +95,13 @@ module SorterB =
                                 |> Seq.toArray
 
         (switchTracker, sortedItemsList)
+    
+
+    let RunWeightedSortablesOnSorterAndReturnResultsSet 
+                 (switchTracker:int[]) (sorterDef:SorterDef)
+                 (sortableGen: _ -> seq<int[] * int>) = 
+
+        RunWeightedSortablesOnSorterSwitchSequenceAndReturnResultsSet
+            switchTracker sorterDef 
+            0 (sorterDef.switches.Length - 1)
+            sortableGen
