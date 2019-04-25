@@ -4,6 +4,9 @@ open Sorting
 
 module SorterB =
 
+    let MakeSwitchTracker (sorterDef: SorterDef) =
+        Array.init sorterDef.switches.Length (fun i -> 0)
+
     let runSwitch (switch:Switch) (switchTracker:int[])
                   (sortable:int[]) (switchDex:int) =
         let lv = sortable.[switch.low]
@@ -49,7 +52,7 @@ module SorterB =
     
 
     // returns early if a sort fails on any of the sortables
-    let GetSwitchUsagesForGoodSorters 
+    let GetSwitchUsagesIfSorterAlwaysWorks 
                 (switchTracker:int[]) (sorterDef:SorterDef)
                 (startPos:int)
                 (sortableGen: _ -> seq<int[]>) =
@@ -79,14 +82,14 @@ module SorterB =
         (switchTracker, sortedItemsList |> Set.ofList)
 
     
-    let RunWeightedSortablesOnSorterSwitchSequenceAndReturnResultsSet 
+    let RunWeightedOnSwitches
                  (switchTracker:int[]) (sorterDef:SorterDef) 
-                 (startPos:int) (endPos:int)
+                 (switchIndexes:seq<int>)
                  (sortableGen: _ -> seq<int[] * int>) = 
 
         let runSorter (sortable:int[]*int) =
-            {startPos .. endPos} 
-            |> Seq.iteri(fun i -> (runWeightedSortables sorterDef.switches.[i] switchTracker sortable))
+            switchIndexes 
+            |> Seq.iter(fun i -> (runWeightedSortables sorterDef.switches.[i] switchTracker sortable i))
             fst sortable
         
         let sortedItemsList = sortableGen()
@@ -97,11 +100,56 @@ module SorterB =
         (switchTracker, sortedItemsList)
     
 
-    let RunWeightedSortablesOnSorterAndReturnResultsSet 
+    let RunWeightedOnSorter 
                  (switchTracker:int[]) (sorterDef:SorterDef)
                  (sortableGen: _ -> seq<int[] * int>) = 
 
-        RunWeightedSortablesOnSorterSwitchSequenceAndReturnResultsSet
-            switchTracker sorterDef 
-            0 (sorterDef.switches.Length - 1)
-            sortableGen
+            RunWeightedOnSwitches
+                switchTracker sorterDef 
+                { 0 .. (sorterDef.switches.Length - 1)}
+                sortableGen
+    
+
+    let RunWeightedOnStage
+                     (stagedSorterDef:StagedSorterDef) (switchTracker:int[]) 
+                     (stageNum:int) (sortableGen: _ -> seq<int[] * int>) =
+                  
+            RunWeightedOnSwitches
+                         switchTracker stagedSorterDef.sorterDef
+                         (StagedSorterDef.GetSwitchIndexesForStage stagedSorterDef stageNum)
+                         sortableGen
+
+
+    let GetStagePerfAndSwitchUsage (switchTracker:int[])
+                                   (stagedSorterDef:StagedSorterDef) 
+                                   (stageToTest:int)
+                                   (sortableGen: _ -> seq<int[] * int>) =
+
+            let SeqFuncFromWghtedArray (wa:(int[]*int)[]) () =
+                wa |> Array.map(fun a -> Array.copy (fst a))
+                   |> Array.toSeq
+
+            let (switchTrack, weightedRes) = RunWeightedOnStage stagedSorterDef switchTracker stageToTest sortableGen 
+
+            let sortablesStage1 =  SeqFuncFromWghtedArray weightedRes
+            let suffixStart = stagedSorterDef.stageIndexes.[stageToTest + 1]
+
+            let res = GetSwitchUsagesIfSorterAlwaysWorks 
+                            switchTrack
+                            stagedSorterDef.sorterDef
+                            suffixStart
+                            sortablesStage1
+
+            match (snd res) with
+            | Some swithcUseArray -> (true, Some(weightedRes |> Array.length, swithcUseArray))
+            | None -> (false, None)
+
+    //let GetSwitchUsagesIfSorterAlwaysWorks 
+    //            (switchTracker:int[]) (sorterDef:SorterDef)
+    //            (startPos:int)
+    //            (sortableGen: _ -> seq<int[]>) =
+
+
+
+
+           // let (switchTrack1, weightedRes1) = RunWeightedOnStage stagedSorterDef switchTrack 1 sortablesStage1

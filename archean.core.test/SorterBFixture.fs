@@ -29,7 +29,7 @@ type SorterBFixture () =
         let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
         let startPos = 5
         let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
-        let (res, switchTrack) = GetSwitchUsagesForGoodSorters switchTracker 
+        let (res, switchTrack) = GetSwitchUsagesIfSorterAlwaysWorks switchTracker 
                                         sorterDef startPos (SortableFunc order rnd sortableCount)
 
         Assert.IsTrue (switchTrack.Value.Length > 0)
@@ -64,12 +64,12 @@ type SorterBFixture () =
 
              
         let switchTracker = Array.init totalStages (fun i -> 0)
-        let (_, sortableRes) = RunWeightedSortablesOnSorterAndReturnResultsSet switchTracker 
+        let (_, sortableRes) = RunWeightedOnSorter switchTracker 
                                             prefixSorterDef (SortableFuncAllBinary order)
 
         let SortableFunc() = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = RunWeightedSortablesOnSorterAndReturnResultsSet switchTracker 
+        let (switchTrack, sortableRes2) = RunWeightedOnSorter switchTracker 
                                             fullSorterDef (SortableFunc)
 
 
@@ -77,6 +77,24 @@ type SorterBFixture () =
         Assert.IsTrue (sortableRes2.Length = 17)
 
 
+    [<TestMethod>]
+    member this.TestRunStagedSorter() =
+        let length = 229
+        let evalStageDex = 1
+        let order = 10
+        
+        let rnd = new Random(49123)
+        let stagedSorter = (SorterDef.CreateRandomPackedStages order length rnd) |> StagedSorterDef.ToStagedSorterDef
+        let switchTracker = SorterB.MakeSwitchTracker stagedSorter.sorterDef
+
+        let res = SorterB.GetStagePerfAndSwitchUsage 
+                            switchTracker 
+                            stagedSorter
+                            evalStageDex
+                            (SortableIntArray.WeightedSortableFuncAllBinary order)
+                            
+
+        Assert.IsTrue (true)
 
     //[<TestMethod>]
     //member this.TestRunPrefixedSorterDef() =

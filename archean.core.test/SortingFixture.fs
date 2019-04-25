@@ -5,6 +5,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open archean.core
 open archean.core.Combinatorics_Types
 open archean.core.Sorting
+open archean.core.SortersFromData
 
 [<TestClass>]
 type SortingFixture () =
@@ -99,6 +100,15 @@ type SortingFixture () =
         let res0 = Sorting.SorterResult.MergeSwitchResultsIntoStageResults order swrSet0
 
         Assert.IsTrue (res0.Length = 6)
+
+    [<TestMethod>]
+    member this.TestToStagedSorterDef() =
+        let sorterDef = SortersFromData.CreateRefSorter RefSorter.End16 9
+            
+        let stagedSorterDef = StagedSorterDef.ToStagedSorterDef sorterDef 
+
+        Assert.IsTrue (stagedSorterDef.stageIndexes.Length = 10)
+
 
 
     [<TestMethod>]

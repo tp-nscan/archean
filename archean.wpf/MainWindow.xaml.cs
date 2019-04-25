@@ -17,11 +17,11 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int batchMult = 50;
+            int batchMult = 2000;
             int Order = 16;
             int totalStageCount = 150;
 
-            for (var prefixStageCount = 2; prefixStageCount < 10; prefixStageCount++)
+            for (var prefixStageCount = 2; prefixStageCount < 6; prefixStageCount++)
             {
                 var refSorter = SortersFromData.RefSorter.End16;
                 var randSwitchFill = SortersFromData.RandSwitchFill.FullStage;
@@ -77,7 +77,7 @@ namespace archean.wpf
                 for (var i = 0; true; i++)
                 {
                     var ba = BatchArgsList[i % BatchArgsList.Count];
-                    q = SortingReports.MakeStageAndSwitchUseHistogram
+                    q = SortingReports.MakeStagePerfHistogram
                     (
                         randGenerationMode: ba.RandGenerationMode,
                         sorterCount: ba.SorterCount,

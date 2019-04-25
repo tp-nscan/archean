@@ -26,7 +26,9 @@ module Sorting =
          
         let SwitchSeqFromPolyCycle (p:TwoCycleIntArray) =
             SwitchSeqFromIntArray (TwoCycleIntArray.value p)
-
+        
+        let ToString (sw:Switch) =
+            sprintf "(%d,%d)" sw.low sw.hi
 
     type Stage = {switches:Switch list}
     module Stage =
@@ -110,21 +112,6 @@ module Sorting =
             }
 
 
-    //type StagedSorterDef = { order:int; stages: array<Stage> }
-    //module StagedSorterDef =
-
-    //    let StageArrayToSwitchArray (sta: array<Stage>) =
-    //        seq { for stg in sta do yield! (stg.switches |> List.toSeq)}
-    //        |> Seq.toArray
-        
-    //    let ToStagedSorterDef (sd:SorterDef) =
-    //       {StagedSorterDef.order= sd.order; stages=sd.switches 
-    //                                            |> (Stage.MergeSwitchesIntoStages sd.order) 
-    //                                            |> Seq.toArray}
-
-    //    let ToSorterDef (ssd:StagedSorterDef) =
-    //       {SorterDef.order= ssd.order; switches=ssd.stages |> StageArrayToSwitchArray}
-
     type StagedSorterDef = { sorterDef:SorterDef; stageIndexes: array<int> }
     module StagedSorterDef =
 
@@ -137,8 +124,9 @@ module Sorting =
                                                 |> (Stage.GetStageIndexesFromSwitches sd.order) 
                                                 |> Seq.toArray}
 
-        let GetSwitchesForStageWithIndexes (stagedSorterDef:StagedSorterDef) =
-            true
+        let GetSwitchIndexesForStage (ssd:StagedSorterDef) (statgeNum:int) =
+            { ssd.stageIndexes.[statgeNum] .. 
+               (ssd.stageIndexes.[statgeNum + 1] - 1) }
 
 
 
@@ -153,6 +141,9 @@ module Sorting =
     
 
     type StageResult = {switchResults:SwitchUsage list}
+    module StageResult =
+        let SwitchReport (stageResult:StageResult) =
+            stageResult.switchResults |> List.map(fun su -> Switch.ToString su.switch)
 
 
     type SortableIntArray = {values:int[]}
@@ -174,6 +165,13 @@ module Sorting =
         let CreateRandom (order:int) (rnd : Random) =
             Permutation.CreateRandom rnd order
             |> Seq.map(fun i -> { SortableIntArray.values = Permutation.value i })
+              
+        let SortableFuncAllBinary (order:int) () =
+                IntBits.AllBinaryTestCases order
+
+        let WeightedSortableFuncAllBinary (order:int) () =
+                IntBits.AllBinaryTestCases order
+                |> Seq.map(fun i -> (i, 1))
 
 
     
@@ -205,6 +203,17 @@ module Sorting =
         let MakeSorterResult (sorterDef:SorterDef) (switchResults:SwitchUsage[]) =
             {sorterDef=sorterDef; stageResults=MergeSwitchResultsIntoStageResults sorterDef.order switchResults}
 
+        let GetSorterString (sorterResult:SorterResult) =
+            let sb = new System.Text.StringBuilder()
+            let myPrint format = Printf.bprintf sb format
+
+            let PrintStage (stageResult:StageResult) =
+                myPrint "["
+                stageResult |> StageResult.SwitchReport |> List.iter(fun sw-> myPrint "%s," sw)
+                myPrint "]\n"
+
+            sorterResult.stageResults |> List.iter(fun sr-> PrintStage sr)
+            sb.ToString()
 
     module SortableGen =
     

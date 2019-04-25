@@ -23,6 +23,20 @@ module SortersFromData =
          | Prefixed of RefSorterPrefixStages * RandSorterStages
          | Pure of RandSorterStages
     
+    let To_PrefixStageCount (randGenerationMode:RandGenerationMode) =
+         match randGenerationMode with
+         | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
+                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
+                        refStageCount
+         | Pure _ -> 0
+
+    let To_RefSorter_PrefixStages (randGenerationMode:RandGenerationMode) =
+         match randGenerationMode with
+         | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
+                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
+                     sprintf "%A\t%d" refType refStageCount
+         | Pure _ -> "\t"
+
     let GetSorterStageCount (randGenerationMode:RandGenerationMode) =
         match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
