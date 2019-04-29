@@ -20,7 +20,7 @@ type SorterFixture () =
 
         let MakeSortable = Array.init order (fun i -> order - i - 1)
 
-        let SortableFunc (order:int) (rnd : Random) (count:int) () =
+        let SortableFunc (order:int) (rnd : Random) (count:int) =
             Permutation.CreateRandom rnd order
             |> Seq.map(fun i -> Permutation.value i )
             |> Seq.take count
@@ -54,10 +54,6 @@ type SorterFixture () =
             randSwitchFill=RandSwitchFill.FullStage}
 
 
-        let SortableFuncAllBinary (order:int) () =
-            IntBits.AllBinaryTestCases order
-            |> Seq.map(fun i -> (i, 1))
-
         let prefixSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=prefixStageCount}
         let fullSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=allStageCount}
 
@@ -72,12 +68,14 @@ type SorterFixture () =
 
              
         let switchTracker = SwitchTracker.Make fullSorterDef.switches.Length
-        let (_, sortableRes) = RunWeightedOnSorter switchTracker 
-                                            prefixSorterDef (SortableFuncAllBinary order)
-
-        let SortableFunc() = sortableRes |> Array.toSeq
+        let (_, sortableRes) = RunWeightedSortables 
+                                    switchTracker 
+                                    prefixSorterDef 
+                                    (SortableIntArray.WeightedSortableSeqAllBinary order)
+                
+        let SortableFunc = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = RunWeightedOnSorter switchTracker 
+        let (switchTrack, sortableRes2) = RunWeightedSortables switchTracker 
                                             fullSorterDef (SortableFunc)
 
         Assert.IsTrue (sortableRes2.Length = 17)
@@ -98,7 +96,7 @@ type SorterFixture () =
                     switchTracker 
                     stagedSorter
                     evalStageDex
-                    (SortableIntArray.WeightedSortableFuncAllBinary order)
+                    (SortableIntArray.WeightedSortableSeqAllBinary order)
                             
 
         Assert.IsTrue (true)

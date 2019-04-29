@@ -17,7 +17,7 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int batchMult = 1000;
+            int batchMult = 100;
             int Order = 16;
             int totalStageCount = 150;
 

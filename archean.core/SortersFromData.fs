@@ -1,5 +1,6 @@
 ﻿namespace archean.core
 open System
+open archean.core
 open archean.core.Sorting
 
 module SortersFromData =
@@ -219,4 +220,21 @@ module SortersFromData =
                                     |> StagedSorterDef.ToStagedSorterDef
 
 
+    let SortableTestCases (randGenerationMode:RandGenerationMode) =
+        let prefixSorter = CreatePrefixedSorter randGenerationMode
+        let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
+        let (_, sortableRes) = Sorter.RunSortables 
+                                   switchTracker 
+                                   prefixSorter 
+                                   (SortableIntArray.SortableSeqAllBinary prefixSorter.order)
+        sortableRes |> Set.toSeq
 
+
+    let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =
+        let prefixSorter = CreatePrefixedSorter randGenerationMode
+        let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
+        let (_, sortableRes) = Sorter.RunWeightedSortables
+                                   switchTracker 
+                                   prefixSorter 
+                                   (SortableIntArray.WeightedSortableSeqAllBinary prefixSorter.order)
+        sortableRes |> Array.toSeq

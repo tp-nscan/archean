@@ -7,31 +7,12 @@ open archean.core.Sorter
 module SortingReports =
 
     type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
-    
-    let SortableTestCases (randGenerationMode:RandGenerationMode) =
-        let prefixSorter = CreatePrefixedSorter randGenerationMode
-        let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
-        let (_, sortableRes) = RunSwitchesAndGetResults 
-                                   switchTracker 
-                                   prefixSorter 
-                                   (SortableIntArray.SortableFuncAllBinary prefixSorter.order)
-        sortableRes |> Set.toSeq
-
-
-    let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =
-        let prefixSorter = CreatePrefixedSorter randGenerationMode
-        let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
-        let (_, sortableRes) = RunWeightedOnSorter 
-                                   switchTracker 
-                                   prefixSorter 
-                                   (SortableIntArray.WeightedSortableFuncAllBinary prefixSorter.order)
-        sortableRes |> Array.toSeq
-
 
     let MakeHistoItem 
             (stageCount:int) 
             (switchCount:int) 
             (res:seq<int*SorterResult>) =
+
         let aa = res |> Seq.map(fun i -> (fst i)) |> Seq.toArray
         {
             stageCount=stageCount; 
@@ -51,23 +32,15 @@ module SortingReports =
         let prefixedSorterLength = prefixedSorter.switches.Length
         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
         let testSortables = (SortableTestCases (randGenerationMode |> RemoveLastRefStage)) |> Seq.toArray
-        let TestSortablesSeq () =
-            testSortables
-                |> Array.map(fun a -> (Array.copy a, 1))
-                |> Array.toSeq
 
         let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
             let res = StagedSorter.GetStagePerfAndSwitchUsage 
                                 (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
                                 stagedSorterDef
                                 ((randGenerationMode |> To_PrefixStageCount))
-                                TestSortablesSeq
+                                (SortableIntArray.WeightedSortableSeq testSortables)
             (res, stagedSorterDef)
         
-        
-        
-    //type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
-
         let MakeHistoLine (tt:HistoItem) = 
             sprintf "%s\t%d\t%d\t%d\t%f\t%d"
                     (randGenerationMode |> To_RefSorter_PrefixStages)  
@@ -125,13 +98,10 @@ module SortingReports =
                         (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
                         stagedSorterDef
                         (randGenerationMode |> To_PrefixStageCount)
-                        TestSortablesSeq
+                        (SortableIntArray.WeightedSortableSeq testSortables)
             (res, stagedSorterDef)
         
         
-        
-    //type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
-
         let MakeHistoLine (tt:HistoItem) = 
 
             sprintf "%s\t%d\t%d\t%d\t%f\t%d"
@@ -166,23 +136,16 @@ module SortingReports =
         let prefixedSorter = CreatePrefixedSorter randGenerationMode
         let prefixedSorterLength = prefixedSorter.switches.Length
         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases (randGenerationMode |> RemoveLastRefStage)) |> Seq.toArray
-        let TestSortablesSeq () =
-            testSortables
-                |> Array.map(fun a -> (Array.copy a, 1))
-                |> Array.toSeq
+        let testSortables = (SortableTestCases (randGenerationMode |> RemoveLastRefStage)) 
+                            |> Seq.toArray
 
         let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
             let res = StagedSorter.GetStagePerfAndSwitchUsage 
                         (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
                         stagedSorterDef
                         (randGenerationMode |> To_PrefixStageCount)
-                        TestSortablesSeq
+                        (SortableIntArray.WeightedSortableSeq testSortables)
             (res, stagedSorterDef)
-        
-        
-        
-    //type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
 
         let MakeHistoLine (tt:HistoItem) = 
             sprintf "%s\t%d\t%d\t%d\t%f\t%d"
@@ -210,9 +173,6 @@ module SortingReports =
    
 
 
-
-
-
      //returns (NumStagesUsed, NumSwitchesUsed, Count)  
     let MakeStageAndSwitchUseHistogram 
                         (randGenerationMode : RandGenerationMode)
@@ -222,18 +182,15 @@ module SortingReports =
         let prefixedSorter = CreatePrefixedSorter randGenerationMode
         let prefixedSorterLength = prefixedSorter.switches.Length
         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases randGenerationMode) |> Seq.toArray
-        let TestSortablesSeq () =
-            testSortables
-                |> Array.map(fun a -> Array.copy a)
-                |> Array.toSeq
+        let testSortables = (SortableTestCases randGenerationMode) 
+                            |> Seq.toArray
 
         let MakeSorterResults (sorterDef:SorterDef) =
             let res = Sorter.GetSwitchUsagesIfSorterAlwaysWorks 
                                 (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
                                 sorterDef
                                 prefixedSorterLength
-                                TestSortablesSeq
+                                (SortableIntArray.SortableSeq testSortables)
             (res, sorterDef)
 
         let MakeHistoLine (tt:int[]) = 

@@ -111,13 +111,26 @@ module Sorting =
         let CreateRandom (order:int) (rnd : Random) =
             Permutation.CreateRandom rnd order
             |> Seq.map(fun i -> { SortableIntArray.values = Permutation.value i })
-              
-        let SortableFuncAllBinary (order:int) () =
+             
+        let SortableSeq (sortables:int[][]) =
+            sortables
+                |> Array.map(fun a -> Array.copy a)
+                |> Array.toSeq
+
+        let WeightedSortableSeq (sortables:int[][]) =
+            sortables
+                |> Array.map(fun a -> (Array.copy a, 1))
+                |> Array.toSeq
+
+
+        let SortableSeqAllBinary (order:int) =
                 IntBits.AllBinaryTestCases order
 
-        let WeightedSortableFuncAllBinary (order:int) () =
+        let WeightedSortableSeqAllBinary (order:int) =
                 IntBits.AllBinaryTestCases order
                 |> Seq.map(fun i -> (i, 1))
+
+         
 
 
     type SorterDef = {order:int; switches: array<Switch>}

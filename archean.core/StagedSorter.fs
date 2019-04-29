@@ -11,14 +11,14 @@ module StagedSorter =
                 (switchTracker:SwitchTracker)
                 (stagedSorterDef:StagedSorterDef)
                 (startPos:int)
-                (sortableGen: _ -> seq<int[]>) =
+                (sortableGen: seq<int[]>) =
 
         let rs (sortable:int[]) = 
             RunSwitchSequence
                 startPos (stagedSorterDef.sorterDef.switches.Length - 1)
                 stagedSorterDef.sorterDef switchTracker sortable
             
-        let allGood = sortableGen() |> Seq.map(rs)
+        let allGood = sortableGen |> Seq.map(rs)
                                     |> Seq.forall(Combinatorics.IsSorted)
         if allGood then
              (allGood, Some (SwitchUsage.CollectTheUsedSwitches stagedSorterDef.sorterDef switchTracker))
@@ -28,7 +28,7 @@ module StagedSorter =
     let RunWeightedOnStage
                      (stagedSorterDef:StagedSorterDef) 
                      (switchTracker:SwitchTracker) 
-                     (stageNum:int) (sortableGen: _ -> seq<int[] * int>) =
+                     (stageNum:int) (sortableGen: seq<int[] * int>) =
 
             let yuk = (StagedSorterDef.GetSwitchIndexesForStage stagedSorterDef stageNum)
                                 |> Seq.toArray
@@ -43,9 +43,9 @@ module StagedSorter =
     let GetStagePerfAndSwitchUsage (switchTracker:SwitchTracker)
                                    (stagedSorterDef:StagedSorterDef) 
                                    (stageToTest:int)
-                                   (sortableGen: _ -> seq<int[] * int>) =
+                                   (sortableGen: seq<int[] * int>) =
 
-            let SeqFuncFromWghtedArray (wa:(int[]*int)[]) () =
+            let SeqFuncFromWghtedArray (wa:(int[]*int)[]) =
                 wa |> Array.map(fun a -> Array.copy (fst a))
                    |> Array.toSeq
 
@@ -62,5 +62,5 @@ module StagedSorter =
                             sortablesStage1
 
             match (snd res) with
-            | Some swithcUseArray -> (true, Some(weightedRes |> Array.length, swithcUseArray))
+            | Some switchUseArray -> (true, Some(weightedRes |> Array.length, switchUseArray))
             | None -> (false, None)

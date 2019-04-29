@@ -75,14 +75,14 @@ module Sorter =
                 (switchTracker:SwitchTracker) 
                 (sorterDef:SorterDef)
                 (startPos:int)
-                (sortableGen: _ -> seq<int[]>) =
+                (sortableGen: seq<int[]>) =
 
         let rs (sortable:int[]) = 
             RunSwitchSequence
                 startPos (sorterDef.switches.Length - 1)
                 sorterDef switchTracker sortable
             
-        let allGood = sortableGen() |> Seq.map(rs)
+        let allGood = sortableGen |> Seq.map(rs)
                                     |> Seq.forall(Combinatorics.IsSorted)
         if allGood then
              (allGood, Some (SwitchUsage.CollectTheUsedSwitches sorterDef switchTracker))
@@ -97,18 +97,18 @@ module Sorter =
                     switchTracker
                     sorterDef
                     startPos
-                    (Sorting.SortableIntArray.SortableFuncAllBinary sorterDef.order)
+                    (Sorting.SortableIntArray.SortableSeqAllBinary sorterDef.order)
 
 
-    let RunSwitchesAndGetResults 
+    let RunSortables 
                 (switchTracker:SwitchTracker) 
                 (sorterDef:SorterDef) 
-                (sortableGen: _ -> seq<int[]>) = 
+                (sortableGen: seq<int[]>) = 
 
         let rs (sortable:int[]) = 
             RunSorterOnASortable sorterDef switchTracker sortable
 
-        let sortedItemsList = sortableGen()
+        let sortedItemsList = sortableGen
                                 |> Seq.map(rs)
                                 |> Seq.toList
 
@@ -118,10 +118,10 @@ module Sorter =
     let MapAllZeroOneSwitchables (sorterDef:SorterDef) =
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
         let (switchTracker, sortedItemsList) =  
-            RunSwitchesAndGetResults 
+            RunSortables 
                     switchTracker 
                     sorterDef 
-                    (SortableIntArray.SortableFuncAllBinary sorterDef.order)
+                    (SortableIntArray.SortableSeqAllBinary sorterDef.order)
         (
             switchTracker,
             sortedItemsList |> Set.filter(fun stb -> not (Combinatorics.IsSorted stb))
@@ -133,7 +133,7 @@ module Sorter =
                  (switchTracker:SwitchTracker) 
                  (sorterDef:SorterDef) 
                  (switchIndexes:seq<int>)
-                 (sortableGen: _ -> seq<int[] * int>) = 
+                 (sortableGen: seq<int[] * int>) = 
 
         let runSorter (sortable:int[]*int) =
             switchIndexes 
@@ -145,7 +145,7 @@ module Sorter =
                                     switchDex))
             fst sortable
         
-        let sortedItemsList = sortableGen()
+        let sortedItemsList = sortableGen
                                 |> Seq.map(runSorter)
                                 |> Seq.countBy id
                                 |> Seq.toArray
@@ -153,10 +153,10 @@ module Sorter =
         (switchTracker, sortedItemsList)
     
 
-    let RunWeightedOnSorter 
+    let RunWeightedSortables 
                  (switchTracker:SwitchTracker)
                  (sorterDef:SorterDef)
-                 (sortableGen: _ -> seq<int[] * int>) = 
+                 (sortableGen: seq<int[] * int>) = 
 
             RunWeightedOnSwitches
                 switchTracker 

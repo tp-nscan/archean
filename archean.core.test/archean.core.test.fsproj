@@ -11,6 +11,7 @@
     <Compile Include="SortingFixture.fs" />
     <Compile Include="SorterAFixture.fs" />
     <Compile Include="SorterFixture.fs" />
+    <Compile Include="StagedSorterFixture.fs" />
     <Compile Include="SortersFromDataFixture.fs" />
     <Compile Include="GeneratedSortableFixture.fs" />
     <Compile Include="Program.fs" />
