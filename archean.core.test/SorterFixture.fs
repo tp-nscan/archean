@@ -4,11 +4,11 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open archean.core
 open archean.core.Combinatorics_Types
 open archean.core.Sorting
-open archean.core.SorterB
+open archean.core.Sorter
 open archean.core.SortersFromData
 
 [<TestClass>]
-type SorterBFixture () =
+type SorterFixture () =
 
     [<TestMethod>]
     member this.TestRunSorterDef() =
@@ -28,7 +28,7 @@ type SorterBFixture () =
         let switchSet = SwitchSet.ForOrder order
         let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
         let startPos = 5
-        let switchTracker = Array.init sorterDef.switches.Length (fun i -> 0)
+        let switchTracker = SwitchTracker.Make sorterDef.switches.Length
         let (res, switchTrack) = GetSwitchUsagesIfSorterAlwaysWorks switchTracker 
                                         sorterDef startPos (SortableFunc order rnd sortableCount)
 
@@ -38,13 +38,21 @@ type SorterBFixture () =
     [<TestMethod>]
     member this.TestRunWeightedSwitchesAndGetWeightedResults() =
         let order = 16
-        let totalStages = 10
         let prefixStageCount = 3
         let allStageCount = 10
         let seed = 123
         let rnd = new Random(seed)
 
-        let randSorterStages = {RandSorterStages.order = order; stageCount=totalStages; randSwitchFill=RandSwitchFill.NoFill}
+        let randSorterStagesNoFill = 
+            {RandSorterStages.order = order; 
+            stageCount=0; 
+            randSwitchFill=RandSwitchFill.NoFill}
+
+        let randSorterStagesFullStage = 
+            {RandSorterStages.order = order; 
+            stageCount=allStageCount; 
+            randSwitchFill=RandSwitchFill.FullStage}
+
 
         let SortableFuncAllBinary (order:int) () =
             IntBits.AllBinaryTestCases order
@@ -53,8 +61,8 @@ type SorterBFixture () =
         let prefixSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=prefixStageCount}
         let fullSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=allStageCount}
 
-        let prefixedSorterGenMode = RandGenerationMode.Prefixed(prefixSorterStages, randSorterStages)
-        let fullSorterGenMode = RandGenerationMode.Prefixed(fullSorterStages, randSorterStages)
+        let prefixedSorterGenMode = RandGenerationMode.Prefixed(prefixSorterStages, randSorterStagesNoFill)
+        let fullSorterGenMode = RandGenerationMode.Prefixed(fullSorterStages, randSorterStagesFullStage)
 
         let prefixSorterDef = SortersFromData.CreateRandomSorterDef 
                                 prefixedSorterGenMode rnd
@@ -63,7 +71,7 @@ type SorterBFixture () =
                                 fullSorterGenMode rnd
 
              
-        let switchTracker = Array.init totalStages (fun i -> 0)
+        let switchTracker = SwitchTracker.Make fullSorterDef.switches.Length
         let (_, sortableRes) = RunWeightedOnSorter switchTracker 
                                             prefixSorterDef (SortableFuncAllBinary order)
 
@@ -72,8 +80,6 @@ type SorterBFixture () =
         let (switchTrack, sortableRes2) = RunWeightedOnSorter switchTracker 
                                             fullSorterDef (SortableFunc)
 
-
-        Assert.IsTrue (switchTrack.Length = totalStages)
         Assert.IsTrue (sortableRes2.Length = 17)
 
 
@@ -84,17 +90,52 @@ type SorterBFixture () =
         let order = 10
         
         let rnd = new Random(49123)
-        let stagedSorter = (SorterDef.CreateRandomPackedStages order length rnd) |> StagedSorterDef.ToStagedSorterDef
-        let switchTracker = SorterB.MakeSwitchTracker stagedSorter.sorterDef
+        let stagedSorter = (SorterDef.CreateRandomPackedStages order length rnd) 
+                            |> StagedSorterDef.ToStagedSorterDef
+        let switchTracker = SwitchTracker.Make stagedSorter.sorterDef.switches.Length
 
-        let res = SorterB.GetStagePerfAndSwitchUsage 
-                            switchTracker 
-                            stagedSorter
-                            evalStageDex
-                            (SortableIntArray.WeightedSortableFuncAllBinary order)
+        let res = StagedSorter.GetStagePerfAndSwitchUsage 
+                    switchTracker 
+                    stagedSorter
+                    evalStageDex
+                    (SortableIntArray.WeightedSortableFuncAllBinary order)
                             
 
         Assert.IsTrue (true)
+
+
+    [<TestMethod>]
+    member this.TestEvalSorterDef() =
+        let length = 929
+        let evalStageDex = 1
+        let order = 16
+        let bbub = "[(7,8),(5,9),(4,11),(1,10),(0,13),(3,14),(6,15),(2,12)]
+                    [(2,3),(12,14),(0,7),(10,15),(4,5),(8,13),(1,6),(9,11)]
+                    [(0,2),(3,7),(8,12),(13,14),(1,4),(6,9),(11,15),(5,10)]
+                    [(0,1),(2,5),(9,13),(14,15),(4,8),(10,12),(3,6),(7,11)]
+                    [(1,3),(7,8),(2,4),(5,9),(12,14),(6,10),(11,13)]
+                    [(1,2),(3,4),(5,7),(8,9),(11,12),(13,14)]
+                    [(2,3),(4,6),(10,11),(12,13)]
+                    [(4,5),(6,7),(9,11),(8,10)]
+                    [(5,6),(7,8),(9,10),(0,1),(3,13),(4,15),(2,12)]"
+
+        let yzkk = "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15)]
+                    [(0,2),(1,3),(4,6),(5,7),(8,10),(9,11),(12,14),(13,15)]
+                    [(0,4),(1,5),(2,6),(3,7),(8,12),(9,13),(10,14),(11,15)]
+                    [(0,8),(1,9),(2,10),(3,11),(4,12),(5,13),(6,14),(7,15)]
+                    [(1,2),(5,10),(13,14),(6,9),(3,12),(4,8),(7,11)]
+                    [(2,8),(9,10),(11,14),(1,4),(5,6),(7,13)]
+                    [(2,4),(11,13),(7,12),(3,8)]
+                    [(3,5),(7,9),(10,12),(6,8)]
+                    [(3,4),(5,6),(7,8),(9,10),(11,12)]
+                    [(6,7),(8,9)]"
+
+        let sorterDef = SortersFromData.ParseSorterStringToSorter
+                                    bbub 16 9
+
+        let res = MapAllZeroOneSwitchables sorterDef
+        Assert.IsTrue (true)
+
 
     //[<TestMethod>]
     //member this.TestRunPrefixedSorterDef() =

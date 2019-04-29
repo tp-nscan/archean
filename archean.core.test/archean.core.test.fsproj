@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortersFromDataFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="SortingFixture.fs" />
     <Compile Include="SorterAFixture.fs" />
-    <Compile Include="SorterBFixture.fs" />
+    <Compile Include="SorterFixture.fs" />
+    <Compile Include="SortersFromDataFixture.fs" />
     <Compile Include="GeneratedSortableFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -17,11 +17,13 @@ namespace archean.wpf
         public MainWindow()
         {
             InitializeComponent();
-            int batchMult = 2000;
+            int batchMult = 1000;
             int Order = 16;
             int totalStageCount = 150;
 
-            for (var prefixStageCount = 2; prefixStageCount < 6; prefixStageCount++)
+           // var s = new archean.core.Sorting.SwitchCount(4);
+
+            for (var prefixStageCount = 3; prefixStageCount < 10; prefixStageCount++)
             {
                 var refSorter = SortersFromData.RefSorter.End16;
                 var randSwitchFill = SortersFromData.RandSwitchFill.FullStage;

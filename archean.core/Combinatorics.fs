@@ -6,18 +6,18 @@ module Combinatorics =
 
     let FisherYatesShuffle (rnd : Random) (initialList : array<'a>) =
         let availableFlags = Array.init initialList.Length (fun i -> (i, true))
-                                                                        // Which items are available and their indices
+                                                          // Which items are available and their indices
         let nextItem nLeft =
-            let nItem = rnd.Next(0, nLeft)                              // Index out of available items
-            let index =                                                 // Index in original deck
-                availableFlags                                          // Go through available array
-                |> Seq.filter (fun (ndx,f) -> f)                        // and pick out only the available tuples
-                |> Seq.item nItem                                        // Get the one at our chosen index
-                |> fst                                                  // and retrieve it's index into the original array
-            availableFlags.[index] <- (index, false)                    // Mark that index as unavailable
-            initialList.[index]                                         // and return the original item
-        seq {(initialList.Length) .. -1 .. 1}                           // Going from the length of the list down to 1
-        |> Seq.map (fun i -> nextItem i)                                // yield the next item
+            let nItem = rnd.Next(0, nLeft)                // Index out of available items
+            let index =                                   // Index in original deck
+                availableFlags                            // Go through available array
+                |> Seq.filter (fun (ndx,f) -> f)          // and pick out only the available tuples
+                |> Seq.item nItem                         // Get the one at our chosen index
+                |> fst                                    // and retrieve it's index into the original array
+            availableFlags.[index] <- (index, false)      // Mark that index as unavailable
+            initialList.[index]                           // and return the original item
+        seq {(initialList.Length) .. -1 .. 1}             // Going from the length of the list down to 1
+        |> Seq.map (fun i -> nextItem i)                  // yield the next item
     
             
     let IsSorted (values:int[]) =
@@ -35,6 +35,7 @@ module Combinatorics =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
         Array.init len (fun i -> bitLoc i intVers)
 
+
     let IntArray01_To_Int (len:int) (arrayVers:int[]) =
         let mutable intRet = 0
         let bump i =
@@ -44,6 +45,7 @@ module Combinatorics =
 
         {1 .. len} |> Seq.iter(fun i -> bump i)
         intRet
+
 
     let RandomIntPermutations (rnd : Random) (len: int) (count:int) =
         let initialList = [|0 .. len-1|]                                
@@ -191,4 +193,5 @@ module Combinatorics_Types =
         let AllBinaryTestCases (order:int) =
             {0 .. (1 <<< order) - 1}
             |> Seq.map (fun i -> Combinatorics.Int_To_IntArray01 order i)
+            
 
