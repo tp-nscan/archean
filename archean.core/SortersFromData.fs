@@ -16,6 +16,8 @@ module SortersFromData =
     type RandSorterSwitches = {order:int; switchCount:int; randSwitchFill:RandSwitchFill;}
 
     type RefSorter =
+        | Order8Str
+        | Order10Str
         | Green16
         | End16
 
@@ -34,42 +36,44 @@ module SortersFromData =
 
     let To_PrefixStageCount (randGenerationMode:RandGenerationMode) =
          match randGenerationMode with
-         | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
-                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
+         | Prefixed ({refSorter=_; stageCount=refStageCount}, 
+                     _) ->
                         refStageCount
          | Pure _ -> 0
 
-    let RemoveLastRefStage (randGenerationMode:RandGenerationMode) =
+    let RemoveRandomStages (randGenerationMode:RandGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
-                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
-                     RandGenerationMode.Prefixed ({refSorter=refType; stageCount=refStageCount - 1}, 
-                                                  {order=order; stageCount=randStageCount + 1; randSwitchFill=randSwitchFill;})
+                     {order=order; stageCount=_; randSwitchFill=randSwitchFill;}) ->
+                     RandGenerationMode.Prefixed 
+                        ({refSorter=refType; stageCount=refStageCount}, 
+                        {order=order; stageCount=refStageCount; randSwitchFill=randSwitchFill;})
          | Pure { order=order; stageCount=randStageCount; randSwitchFill=rsf } -> 
-                    RandGenerationMode.Pure { order=order; stageCount= randStageCount; randSwitchFill=rsf }
+                    RandGenerationMode.Pure 
+                        { order=order; stageCount=0; randSwitchFill=rsf }
 
     let To_RefSorter_PrefixStages (randGenerationMode:RandGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
-                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
+                      _ ) ->
                      sprintf "%A\t%d" refType refStageCount
          | Pure _ -> "\t"
 
     let GetSorterStageCount (randGenerationMode:RandGenerationMode) =
         match randGenerationMode with
-         | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
-                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
-                     (refStageCount + randStageCount)
-         | Pure { order=order; stageCount=randStageCount; randSwitchFill=_ } ->
-                     randStageCount
+         | Prefixed ( _, 
+                     {order=order; stageCount=totalStageCount; randSwitchFill=_;}) ->
+                      totalStageCount * order / 2
+         | Pure { order=_; stageCount=totalStageCount; randSwitchFill=_ } ->
+                      totalStageCount / 2
 
     let GetSorterSwitchCount (randGenerationMode:RandGenerationMode) =
         match randGenerationMode with
-         | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
-                     {order=order; stageCount=randStageCount; randSwitchFill=randSwitchFill;}) ->
-                     ((refStageCount + randStageCount) * order )/2
-         | Pure { order=order; stageCount=randStageCount; randSwitchFill=_ } ->
-                     ( randStageCount * order ) / 2
+         | Prefixed (_, 
+                     {order=order; stageCount=totalStageCount; randSwitchFill=_;}) ->
+                     (totalStageCount * order )/2
+         | Pure { order=order; stageCount=totalStageCount; randSwitchFill=_ } ->
+                     ( totalStageCount * order ) / 2
 
     let ParseSorterStringToStages (stagesStr:string) =
 
@@ -96,6 +100,8 @@ module SortersFromData =
 
     let GetReferenceSorterInfo (refSorter:RefSorter) =
         match refSorter with
+        | Order8Str -> (SorterData.Order8Str, 8)
+        | Order10Str -> (SorterData.Order10Str, 10)
         | Green16 -> (SorterData.Order16_Green, 16)
         | End16 -> (SorterData.Order16_END, 16)
 
@@ -160,9 +166,13 @@ module SortersFromData =
         }
 
 
-    let CreatePrefixedRandomStagedSorter (totalSwitches: int) (prefixStageCount: int)
-                                         (prefixStagesString:string, order:int)
-                                         (randSwitchFill:RandSwitchFill) (rnd:Random) =
+    let CreatePrefixedRandomStagedSorter 
+                (totalSwitches: int) 
+                (prefixStageCount: int)
+                (prefixStagesString:string, order:int)
+                (randSwitchFill:RandSwitchFill) 
+                (rnd:Random) =
+
         let switchFiller = 
             match randSwitchFill with
             | LooseSwitches -> (SwitchSet.RandomSwitchesOfOrder order rnd)
@@ -227,7 +237,7 @@ module SortersFromData =
                                    switchTracker 
                                    prefixSorter 
                                    (SortableIntArray.SortableSeqAllBinary prefixSorter.order)
-        sortableRes |> Set.toSeq
+        sortableRes
 
 
     let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =

@@ -31,7 +31,7 @@ module SortingReports =
         let prefixedSorter = CreatePrefixedSorter randGenerationMode
         let prefixedSorterLength = prefixedSorter.switches.Length
         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases (randGenerationMode |> RemoveLastRefStage)) |> Seq.toArray
+        let testSortables = (SortableTestCases (randGenerationMode |> RemoveRandomStages)) |> Seq.toArray
 
         let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
             let res = StagedSorter.GetStagePerfAndSwitchUsage 
@@ -87,7 +87,7 @@ module SortingReports =
         let prefixedSorter = CreatePrefixedSorter randGenerationMode
         let prefixedSorterLength = prefixedSorter.switches.Length
         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases (randGenerationMode |> RemoveLastRefStage)) |> Seq.toArray
+        let testSortables = (SortableTestCases (randGenerationMode |> RemoveRandomStages)) |> Seq.toArray
         let TestSortablesSeq () =
             testSortables
                 |> Array.map(fun a -> (Array.copy a, 1))
@@ -133,15 +133,18 @@ module SortingReports =
                     (sorterCount:int) 
                     (seed : int) =
 
+        let rgmForFiltering = (randGenerationMode |> RemoveRandomStages)
+        let filteringSorter = CreatePrefixedSorter rgmForFiltering
+        let filteringSorterLength = filteringSorter.switches.Length
+
         let prefixedSorter = CreatePrefixedSorter randGenerationMode
-        let prefixedSorterLength = prefixedSorter.switches.Length
         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases (randGenerationMode |> RemoveLastRefStage)) 
+        let testSortables = (SortableTestCases rgmForFiltering) 
                             |> Seq.toArray
 
         let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
             let res = StagedSorter.GetStagePerfAndSwitchUsage 
-                        (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
+                        (SwitchTracker.MakePrefixed completeSorterLength filteringSorterLength)
                         stagedSorterDef
                         (randGenerationMode |> To_PrefixStageCount)
                         (SortableIntArray.WeightedSortableSeq testSortables)
