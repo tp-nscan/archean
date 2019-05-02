@@ -7,6 +7,7 @@ open archean.core.Sorter
 module SortingReports =
 
     type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
+    type HistoItem2 = {stageCount:int; switchCount:int; switchableCount:int; sorterCount:int}
 
     let MakeHistoItem 
             (stageCount:int) 
@@ -22,113 +23,73 @@ module SortingReports =
             sorterCount=aa.Length;
         }
 
+    let MakeHistoItem2 
+        (stageCount:int)
+        (switchCount:int)
+        (switchableCount:int)
+        (res:seq<int*SorterResult>) =
 
-    let MakeStagePerfHistogram8 
-                    (randGenerationMode : RandGenerationMode)
-                    (sorterCount:int) 
-                    (seed : int) =
+        let aa = res |> Seq.map(fun i -> (fst i)) |> Seq.toArray
+        {
+            stageCount=stageCount; 
+            switchCount=switchCount; 
+            switchableCount=switchableCount; 
+            sorterCount=aa.Length;
+        }
 
-        let prefixedSorter = CreatePrefixedSorter randGenerationMode
-        let prefixedSorterLength = prefixedSorter.switches.Length
-        let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases (randGenerationMode |> RemoveRandomStages)) |> Seq.toArray
-
-        let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
-            let res = StagedSorter.GetStagePerfAndSwitchUsage 
-                                (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
-                                stagedSorterDef
-                                ((randGenerationMode |> To_PrefixStageCount))
-                                (SortableIntArray.WeightedSortableSeq testSortables)
-            (res, stagedSorterDef)
-        
-        let MakeHistoLine (tt:HistoItem) = 
-            sprintf "%s\t%d\t%d\t%d\t%f\t%d"
-                    (randGenerationMode |> To_RefSorter_PrefixStages)  
-                    tt.stageCount tt.switchCount tt.minSwitchables tt.avgSwitchables
-                    tt.sorterCount
-
-        let rnd = new Random(seed)
-        let h1 =
-                {1 .. sorterCount}
-                    |> Seq.map(fun i -> (CreateRandomStagedSorterDef randGenerationMode rnd))
-                    |> Seq.toArray
-
-        let histogram = 
-            h1
-            |> Array.Parallel.map(fun stagedSorterDef -> MakeStagedSorterResults stagedSorterDef)
-            |> Seq.filter(fun ((success, _ ), _ ) -> success)
-            |> Seq.map(fun (( _ , switchUsages), stagedSorterDef) -> 
-                            (fst switchUsages.Value, SorterResult.MakeSorterResult stagedSorterDef.sorterDef (snd switchUsages.Value)))
-            |> Seq.groupBy(fun (searchableCount, sorterResult) -> SorterResult.SwitchAndStageCountsIn sorterResult.stageResults)
-            |> Seq.filter(fun ((stageCount, switchCount), sorterResults) -> (stageCount<14) && (switchCount < 65))
-            |> Seq.map(fun ((stageCount, switchCount), sorterResults) -> sorterResults |> Seq.map(fun sr-> snd sr))
-        
-        let rep = seq {for sh in histogram do yield! sh} 
-                    |> Seq.map(fun sr -> SorterResult.GetSwitchReport sr)
-                    |> Seq.toArray
-
-        ("ralph", rep)
-
-        //    |> Seq.map(fun ((stageCount, switchCount), sorterResults) -> MakeHistoItem stageCount switchCount sorterResults)
-        //    |> Seq.toArray
-   
-        //let summary = sprintf "order:%d sorterLen:%d randGenerationMode:%s seed:%d sorterCount:%d resultCount:%d" 
-        //                        prefixedSorter.order completeSorterLength (randGenerationMode |> To_RefSorter_PrefixStages) 
-        //                        seed sorterCount (histogram|>Array.sumBy(fun a -> a.sorterCount))
-        //(summary, histogram |> Array.map(fun i-> (MakeHistoLine i)))
-   
-
-
-    let MakeStagePerfHistogram0 
-                    (randGenerationMode : RandGenerationMode)
-                    (sorterCount:int) 
-                    (seed : int) =
-
-        let prefixedSorter = CreatePrefixedSorter randGenerationMode
-        let prefixedSorterLength = prefixedSorter.switches.Length
-        let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
-        let testSortables = (SortableTestCases (randGenerationMode |> RemoveRandomStages)) |> Seq.toArray
-        let TestSortablesSeq () =
-            testSortables
-                |> Array.map(fun a -> (Array.copy a, 1))
-                |> Array.toSeq
-
-        let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
-            let res = StagedSorter.GetStagePerfAndSwitchUsage 
-                        (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
-                        stagedSorterDef
-                        (randGenerationMode |> To_PrefixStageCount)
-                        (SortableIntArray.WeightedSortableSeq testSortables)
-            (res, stagedSorterDef)
-        
-        
-        let MakeHistoLine (tt:HistoItem) = 
-
-            sprintf "%s\t%d\t%d\t%d\t%f\t%d"
-                    (randGenerationMode |> To_RefSorter_PrefixStages)
-                    tt.stageCount tt.switchCount tt.minSwitchables tt.avgSwitchables
-                    tt.sorterCount
-
-        let rnd = new Random(seed)
-        let histogram =
-            {1 .. sorterCount}
-            |> Seq.map(fun i -> (CreateRandomSorterDef randGenerationMode rnd) |> StagedSorterDef.ToStagedSorterDef )
-            |> Seq.toArray
-            |> Array.Parallel.map(fun stagedSorterDef -> MakeStagedSorterResults stagedSorterDef)
-            |> Seq.filter(fun ((success, _ ), _ ) -> success)
-            |> Seq.map(fun (( _ , switchUsages), stagedSorterDef) -> 
-                            (fst switchUsages.Value, SorterResult.MakeSorterResult stagedSorterDef.sorterDef (snd switchUsages.Value)))
-            |> Seq.groupBy(fun (searchableCount, sorterResult) -> SorterResult.SwitchAndStageCountsIn sorterResult.stageResults)
-            |> Seq.map(fun ((stageCount, switchCount), sorterResults) -> MakeHistoItem stageCount switchCount sorterResults)
-            |> Seq.toArray
-   
-        let summary = sprintf "order:%d sorterLen:%d randGenerationMode:%s seed:%d sorterCount:%d resultCount:%d" 
-                                prefixedSorter.order completeSorterLength (randGenerationMode |> To_RefSorter_PrefixStages) 
-                                seed sorterCount (histogram|>Array.sumBy(fun a -> a.sorterCount))
-        (summary, histogram |> Array.map(fun i-> (MakeHistoLine i)))
-   
 
     let MakeStagePerfHistogram 
+                     (randGenerationMode : RandGenerationMode)
+                     (sorterCount:int) 
+                     (seed : int) =
+
+         let rgmForFiltering = (randGenerationMode |> RemoveRandomStages)
+         let filteringSorter = CreatePrefixedSorter rgmForFiltering
+         let filteringSorterLength = filteringSorter.switches.Length
+
+         let prefixedSorter = CreatePrefixedSorter randGenerationMode
+         let completeSorterLength = SortersFromData.GetSorterSwitchCount randGenerationMode
+         let testSortables = (SortableTestCases rgmForFiltering) 
+                             |> Seq.toArray
+
+         let MakeStagedSorterResults (stagedSorterDef:StagedSorterDef) =
+             let res = StagedSorter.GetStagePerfAndSwitchUsage 
+                         (SwitchTracker.MakePrefixed completeSorterLength filteringSorterLength)
+                         stagedSorterDef
+                         (randGenerationMode |> To_PrefixStageCount)
+                         (SortableIntArray.WeightedSortableSeq testSortables)
+             (res, stagedSorterDef)
+
+         let MakeHistoLine2 (tt:HistoItem2) = 
+             sprintf "%s\t%d\t%d\t%d\t%d"
+                     (randGenerationMode |> To_RefSorter_PrefixStages)
+                     tt.stageCount tt.switchCount tt.switchableCount
+                     tt.sorterCount
+
+         let rnd = new Random(seed)
+         let histogram =
+             {1 .. sorterCount}
+             |> Seq.map(fun i -> (CreateRandomStagedSorterDef randGenerationMode rnd))
+             |> Seq.toArray
+             |> Array.Parallel.map(fun stagedSorterDef -> MakeStagedSorterResults stagedSorterDef)
+             |> Seq.filter(fun ((success, _ ), _ ) -> success)
+             |> Seq.map(fun (( _ , switchUsages), stagedSorterDef) -> 
+                             (fst switchUsages.Value, SorterResult.MakeSorterResult stagedSorterDef.sorterDef (snd switchUsages.Value)))
+             |> Seq.groupBy(fun (switchableCount, sorterResult) -> ((SorterResult.SwitchAndStageCountsIn sorterResult.stageResults), switchableCount))
+             |> Seq.map(fun (((stageCount, switchCount), switchableCount), sorterResults) -> MakeHistoItem2 stageCount switchCount switchableCount sorterResults)
+             |> Seq.toArray
+
+         let summary = sprintf "order:%d sorterLen:%d randGenerationMode:%s seed:%d sorterCount:%d resultCount:%d" 
+                                 prefixedSorter.order completeSorterLength (randGenerationMode |> To_RefSorter_PrefixStages) 
+                                 seed sorterCount (histogram|>Array.sumBy(fun a -> a.sorterCount))
+         (summary, histogram |> Array.map(fun i-> (MakeHistoLine2 i)))
+
+
+
+
+
+
+    let MakeStagePerfHistogram2
                     (randGenerationMode : RandGenerationMode)
                     (sorterCount:int) 
                     (seed : int) =
@@ -165,7 +126,7 @@ module SortingReports =
             |> Seq.filter(fun ((success, _ ), _ ) -> success)
             |> Seq.map(fun (( _ , switchUsages), stagedSorterDef) -> 
                             (fst switchUsages.Value, SorterResult.MakeSorterResult stagedSorterDef.sorterDef (snd switchUsages.Value)))
-            |> Seq.groupBy(fun (searchableCount, sorterResult) -> SorterResult.SwitchAndStageCountsIn sorterResult.stageResults)
+            |> Seq.groupBy(fun (switchableCount, sorterResult) -> SorterResult.SwitchAndStageCountsIn sorterResult.stageResults)
             |> Seq.map(fun ((stageCount, switchCount), sorterResults) -> MakeHistoItem stageCount switchCount sorterResults)
             |> Seq.toArray
    
