@@ -14,22 +14,14 @@ module StagedSorter =
                 (sortableSeq: seq<int[]>) =
 
         let rs (sortable:int[]) = 
-            RunSwitchSequence
-                startPos 
-                (stagedSorterDef.sorterDef.switches.Length - 1)
+            RunSwitchSequenceOnSortable
                 stagedSorterDef.sorterDef 
-                switchTracker 
+                switchTracker
+                { startPos .. (stagedSorterDef.sorterDef.switches.Length - 1) }
                 sortable
             
-        //let allGood = sortableSeq |> Seq.map(rs)
-        //                          |> Seq.forall(Combinatorics.IsSorted)
-
-
-        let allGoodA = sortableSeq |> Seq.map(rs)
-                                   |> Seq.toArray
-
-        let allGood = allGoodA     |> Seq.forall(Combinatorics.IsSorted)
-
+        let allGood = sortableSeq |> Seq.map(rs)
+                                  |> Seq.forall(Combinatorics.IsSorted)
 
         if allGood then
              (allGood, Some (SwitchUsage.CollectTheUsedSwitches 
@@ -43,9 +35,9 @@ module StagedSorter =
                      (stageIndex:int) 
                      (sortableSeq: seq<int[] * int>) =
 
-            RunWeightedOnSwitches
-                         switchTracker 
+            RunSwitchSequenceOnWeightedSortableSeq
                          stagedSorterDef.sorterDef
+                         switchTracker 
                          (StagedSorterDef.GetSwitchIndexesForStage stagedSorterDef stageIndex)
                          sortableSeq
 

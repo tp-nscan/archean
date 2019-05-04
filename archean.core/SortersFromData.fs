@@ -34,12 +34,14 @@ module SortersFromData =
          | PrefixedRand of RefSorterSwitches * RandSorterSwitches
          | Rand of RandSorterSwitches
 
+
     let To_PrefixStageCount (randGenerationMode:RandGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=_; stageCount=refStageCount}, 
                      _) ->
                         refStageCount
          | Pure _ -> 0
+
 
     let RemoveRandomStages (randGenerationMode:RandGenerationMode) =
          match randGenerationMode with
@@ -233,9 +235,9 @@ module SortersFromData =
     let SortableTestCases (randGenerationMode:RandGenerationMode) =
         let prefixSorter = CreatePrefixedSorter randGenerationMode
         let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
-        let (_, sortableRes) = Sorter.RunSortables 
+        let (_, sortableRes) = Sorter.RunSorterOnSortableSeq
+                                   prefixSorter
                                    switchTracker 
-                                   prefixSorter 
                                    (SortableIntArray.SortableSeqAllBinary prefixSorter.order)
         sortableRes
 
@@ -243,8 +245,8 @@ module SortersFromData =
     let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =
         let prefixSorter = CreatePrefixedSorter randGenerationMode
         let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
-        let (_, sortableRes) = Sorter.RunWeightedSortables
-                                   switchTracker 
-                                   prefixSorter 
+        let (_, sortableRes) = Sorter.RunSorterOnWeightedSortableSeq
+                                   prefixSorter
+                                   switchTracker
                                    (SortableIntArray.WeightedSortableSeqAllBinary prefixSorter.order)
         sortableRes |> Array.toSeq

@@ -29,8 +29,11 @@ type SorterFixture () =
         let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
         let startPos = 5
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
-        let (res, switchTrack) = GetSwitchUsagesIfSorterAlwaysWorks switchTracker 
-                                        sorterDef startPos (SortableFunc order rnd sortableCount)
+        let (res, switchTrack) = GetSwitchUsagesIfSorterAlwaysWorks
+                                                        sorterDef
+                                                        switchTracker 
+                                                        startPos 
+                                                        (SortableFunc order rnd sortableCount)
 
         Assert.IsTrue (switchTrack.Value.Length > 0)
 
@@ -68,15 +71,17 @@ type SorterFixture () =
 
              
         let switchTracker = SwitchTracker.Make fullSorterDef.switches.Length
-        let (_, sortableRes) = RunWeightedSortables 
-                                    switchTracker 
-                                    prefixSorterDef 
+        let (_, sortableRes) = RunSorterOnWeightedSortableSeq
+                                    prefixSorterDef
+                                    switchTracker
                                     (SortableIntArray.WeightedSortableSeqAllBinary order)
                 
         let SortableFunc = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = RunWeightedSortables switchTracker 
-                                            fullSorterDef (SortableFunc)
+        let (switchTrack, sortableRes2) = RunSorterOnWeightedSortableSeq 
+                                                fullSorterDef 
+                                                switchTracker 
+                                                (SortableFunc)
 
         Assert.IsTrue (sortableRes2.Length = 17)
 
@@ -131,7 +136,7 @@ type SorterFixture () =
         let sorterDef = SortersFromData.ParseSorterStringToSorter
                                     bbub 16 9
 
-        let res = MapAllZeroOneSwitchables sorterDef
+        let res = CondenseAllZeroOneSortables sorterDef
         Assert.IsTrue (true)
 
 

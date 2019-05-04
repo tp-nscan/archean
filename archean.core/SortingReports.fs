@@ -85,10 +85,6 @@ module SortingReports =
          (summary, histogram |> Array.map(fun i-> (MakeHistoLine2 i)))
 
 
-
-
-
-
     let MakeStagePerfHistogram2
                     (randGenerationMode : RandGenerationMode)
                     (sorterCount:int) 
@@ -150,9 +146,9 @@ module SortingReports =
                             |> Seq.toArray
 
         let MakeSorterResults (sorterDef:SorterDef) =
-            let res = Sorter.GetSwitchUsagesIfSorterAlwaysWorks 
-                                (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
+            let res = Sorter.GetSwitchUsagesIfSorterAlwaysWorks
                                 sorterDef
+                                (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
                                 prefixedSorterLength
                                 (SortableIntArray.SortableSeq testSortables)
             (res, sorterDef)
