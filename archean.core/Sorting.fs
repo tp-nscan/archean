@@ -164,11 +164,11 @@ module Sorting =
 
     type StagedSorterDef = { sorterDef:SorterDef; stageIndexes:array<int>;}
     module StagedSorterDef =
-
-        let StageArrayToSwitchArray (sta: array<Stage>) =
+        
+        let StageArrayToSwitchArray (sta: seq<Stage>) =
             seq { for stg in sta do yield! (stg.switches |> List.toSeq)}
             |> Seq.toArray
-        
+
         let ToStagedSorterDef (sd:SorterDef) =
             let sia = sd.switches |> (Stage.GetStageIndexesFromSwitches sd.order) 
                                   |> Seq.toArray;

@@ -133,8 +133,8 @@ type SorterFixture () =
                     [(3,4),(5,6),(7,8),(9,10),(11,12)]
                     [(6,7),(8,9)]"
 
-        let sorterDef = SortersFromData.ParseSorterStringToSorter
-                                    bbub 16 9
+        let sorterDef = SortersFromData.RefSorter.ParseToSorter
+                                    yzkk 16 10
 
         let res = CondenseAllZeroOneSortables sorterDef
         Assert.IsTrue (true)

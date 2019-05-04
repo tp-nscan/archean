@@ -31,6 +31,7 @@ type SortingFixture () =
 
         Assert.IsTrue (switchset.Length = switchCount)
 
+
     [<TestMethod>]
     member this.TestMakeSwitchSet() =
         let res = SwitchSet.ForOrder 5
@@ -43,7 +44,7 @@ type SortingFixture () =
         let length = 29
         let order = 5
 
-        let res = TestData.MakeRandomSorter order length 123
+        let res = TestData.MakeRandomSorterDef order length 123
 
         Assert.IsTrue (res.order = order)
         Assert.IsTrue (res.switches.Length = length)
@@ -110,7 +111,7 @@ type SortingFixture () =
 
     [<TestMethod>]
     member this.TestToStagedSorterDef() =
-        let sorterDef = SortersFromData.CreateRefSorter RefSorter.End16 9
+        let sorterDef = SortersFromData.RefSorter.CreateRefSorter RefSorter.End16 9
             
         let stagedSorterDef = StagedSorterDef.ToStagedSorterDef sorterDef 
 
@@ -131,7 +132,7 @@ type SortingFixture () =
         let seed = 1234
 
         let stagedSorter = 
-                TestData.MakeRandomSorter order prefixLength seed
+                TestData.MakeRandomSorterDef order prefixLength seed
                 |> Sorting.StagedSorterDef.ToStagedSorterDef
         
         let switchSequence = 

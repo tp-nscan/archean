@@ -1,7 +1,6 @@
 ﻿namespace archean.core
 open Microsoft.FSharp.Collections
 open Sorting
-open Sorting.SortableIntArray
 
 module Sorter =
 
@@ -126,14 +125,13 @@ module Sorter =
                 { 0 .. (sorterDef.switches.Length - 1)}
                 weightedSortableSeq
 
-    
 
     // returns early if a sort fails on any of the sortables
     let GetSwitchUsagesIfSorterAlwaysWorks 
                 (sorterDef:SorterDef)
                 (switchTracker:SwitchTracker) 
                 (startPos:int)
-                (sortableGen: seq<int[]>) =
+                (sortableSeq: seq<int[]>) =
 
         let rs (sortable:int[]) = 
             RunSwitchSequenceOnSortable
@@ -142,8 +140,10 @@ module Sorter =
                 {startPos .. (sorterDef.switches.Length - 1)}
                 sortable
             
-        let allGood = sortableGen |> Seq.map(rs)
-                                  |> Seq.forall(Combinatorics.IsSorted)
+        let allGood = sortableSeq 
+                        |> Seq.map(rs)
+                        |> Seq.forall(Combinatorics.IsSorted)
+
         if allGood then
              (allGood, Some (SwitchUsage.CollectTheUsedSwitches sorterDef switchTracker))
         else (allGood, None)
@@ -176,6 +176,7 @@ module Sorter =
             sortedItemsList |> Seq.filter(fun stb -> not (Combinatorics.IsSorted stb))
         )
 
+
     let CondenseWeightedSortables 
         (sorterDef:SorterDef) 
         (sortableSeq:seq<int[]*int>) =
@@ -191,6 +192,7 @@ module Sorter =
             sortedItemsList |> Seq.filter(fun stb -> 
                         not (Combinatorics.IsSorted (fst stb)))
         )
+
 
     let CondenseAllZeroOneSortables 
                 (sorterDef:SorterDef) =

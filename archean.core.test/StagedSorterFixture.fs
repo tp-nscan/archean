@@ -10,11 +10,28 @@ open archean.core.SortersFromData
 [<TestClass>]
 type StagedSorterFixture () =
 
-
     [<TestMethod>]
     member this.TestParseSorterStringToStages() =
       let sd = SorterData.Order16_Green
-               |> SortersFromData.ParseSorterStringToStages 
+               |> SortersFromData.RefSorter.ParseToStages 
+               |> Seq.toArray
+
+      Assert.AreEqual(sd.Length, 10)
+
+
+    [<TestMethod>]
+    member this.TestTruncateStages() =
+      let remainingStageCount = 7
+      let stgs = TestData.StagedSorterDef
+      let trunked = stgs |> StagedSorter.TruncateStages remainingStageCount
+      Assert.AreEqual(trunked.stageIndexes.Length, remainingStageCount)
+      Assert.AreEqual(trunked.sorterDef.switches.Length, stgs.stageIndexes.[remainingStageCount])
+
+
+    [<TestMethod>]
+    member this.ParseSorterStringToStagedSorter() =
+      let sd = SorterData.Order16_Green
+               |> SortersFromData.RefSorter.ParseToStages 
                |> Seq.toArray
 
       Assert.AreEqual(sd.Length, 10)
@@ -28,7 +45,7 @@ type StagedSorterFixture () =
         let refSorter = RefSorter.Order10Str
         let stageToTest = 3
 
-        let (refStr, order) = SortersFromData.GetReferenceSorterInfo refSorter
+        let (refStr, order) = SortersFromData.RefSorter.GetStringAndOrder refSorter
         let rsst = {RandSorterStages.order=order; stageCount=order*16; randSwitchFill=RandSwitchFill.FullStage }
         let rspst = {RefSorterPrefixStages.refSorter=refSorter; stageCount = stageToTest; }
 

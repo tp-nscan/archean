@@ -6,6 +6,11 @@ open archean.core.Sorter
 
 module SortingReports =
 
+
+    let EvalRefSorter = 
+        true
+
+
     type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
     type HistoItem2 = {stageCount:int; switchCount:int; switchableCount:int; sorterCount:int}
 

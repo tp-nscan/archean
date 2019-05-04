@@ -12,7 +12,7 @@ type SortersFromDataFixture () =
     [<TestMethod>]
     member this.TestParseSorterStringToStages() =
       let sd = SorterData.Order16_Green
-               |> SortersFromData.ParseSorterStringToStages 
+               |> SortersFromData.RefSorter.ParseToStages 
                |> Seq.toArray
 
       Assert.AreEqual(sd.Length, 10)
@@ -20,7 +20,7 @@ type SortersFromDataFixture () =
 
     [<TestMethod>]
     member this.TestParseSorterStringToNStagesOfSwitches() =
-      let sd = SortersFromData.ParseSorterStringToNStagesOfSwitches SorterData.Order16_Green 8
+      let sd = SortersFromData.RefSorter.ParseToNStagesOfSwitches SorterData.Order16_Green 8
                |> Seq.toArray
 
       Assert.AreEqual(sd.Length, 53)
@@ -28,13 +28,14 @@ type SortersFromDataFixture () =
 
     [<TestMethod>]
     member this.TestParseSorterStringToStagedSorter() =
-      let stagedSorter = SortersFromData.ParseStagesStringToStagedSorter
-                                SorterData.Order16_Green 16 3
+      let stagedSorter = SortersFromData.RefSorter.ParseToStagedSorter
+                                SorterData.Order16_Green 16
+                         |> StagedSorter.TruncateStages 3
       Assert.AreEqual(stagedSorter.stageIndexes.Length , 3)
   
    
     [<TestMethod>]
     member this.TestParseSorterStringToSorter() =
-      let sorter = SortersFromData.ParseSorterStringToSorter
+      let sorter = SortersFromData.RefSorter.ParseToSorter
                                          SorterData.Order16_Green 16 3
       Assert.AreEqual(sorter.switches.Length, 24)

@@ -4,22 +4,123 @@ open archean.core
 open archean.core.Sorting
 
 module SortersFromData =
-    open archean.core
-
-    type RandSwitchFill = 
-         | LooseSwitches
-         | FullStage
-         | NoFill
-    
-    type RandSorterStages = {order:int; stageCount:int; randSwitchFill:RandSwitchFill;}
-    
-    type RandSorterSwitches = {order:int; switchCount:int; randSwitchFill:RandSwitchFill;}
 
     type RefSorter =
         | Order8Str
         | Order10Str
         | Green16
         | End16
+    
+    module RefSorter =
+
+        let GetStringAndOrder (refSorter:RefSorter) =
+            match refSorter with
+            | Order8Str -> (SorterData.Order8Str, 8)
+            | Order10Str -> (SorterData.Order10Str, 10)
+            | Green16 -> (SorterData.Order16_Green, 16)
+            | End16 -> (SorterData.Order16_END, 16)
+
+
+        let ParseToStages (stagesStr:string) =
+
+            let MakeSwitch (s:string) =
+                let pcs = s.Split([|',';|])
+                            |> Seq.map(fun i -> i |> int)
+                            |> Seq.toArray
+                { Switch.low = pcs.[0]; Switch.hi = pcs.[1]}
+
+            stagesStr.Split([|'[';  ']'; '\n'; '\r'; ' ';|], StringSplitOptions.RemoveEmptyEntries)
+                |> Seq.map(fun l -> l.Split([|'(';  ')';|], StringSplitOptions.RemoveEmptyEntries)
+                                    |> Seq.filter(fun pc -> pc <> ",")
+                                    |> Seq.map(fun pcs -> MakeSwitch pcs)
+                                    |> Seq.toList
+                            )
+                |> Seq.map(fun sws -> {Stage.switches = sws} )
+            
+
+        let ParseToNStagesOfSwitches (stagesStr:string) (stageCount:int) =
+            (ParseToStages stagesStr)
+            |> Seq.take stageCount
+            |> Seq.map(fun s -> s.switches |> List.toSeq)
+            |> Seq.concat
+
+
+        let ParseToSorter (sorterString:string) 
+                          (order:int) 
+                          (stageCount:int) =
+            {SorterDef.order=order; switches= ParseToNStagesOfSwitches sorterString stageCount
+                                                            |> Seq.toArray}
+            
+
+        let CreateRefSorter (refSorter:RefSorter) (definedStages: int) =
+            let (sorterString, order) = (GetStringAndOrder refSorter)
+            ParseToSorter sorterString order definedStages
+
+
+        let ParseToStagedSorter (stagesStr:string) 
+                                (order:int) =
+
+            let stagesArray = (ParseToStages stagesStr)
+                                |> Seq.toArray
+
+            let mutable curTotal = 0
+            let stageIndexes = seq { yield curTotal;
+                                        for i = 0 to stagesArray.Length - 1 do
+                                        curTotal <- curTotal + stagesArray.[i].switches.Length
+                                        yield curTotal }
+                                |> Seq.toArray
+ 
+            {
+                StagedSorterDef.sorterDef = 
+                    { SorterDef.order = order; 
+                      switches = stagesArray |> StagedSorterDef.StageArrayToSwitchArray};
+                StagedSorterDef.stageIndexes = stageIndexes
+            }
+
+
+        let CreateRefStagedSorter (refSorter:RefSorter) =
+                let (sorterString, order) = (GetStringAndOrder refSorter)
+                ParseToStagedSorter sorterString order
+
+
+        //let ParseToStagedSorter (stagesStr:string) 
+        //                        (order:int)
+        //                        (stageCount:int ) =
+        //    let stagesArray = (ParseToStages stagesStr)
+        //                        |> Seq.take stageCount
+        //                        |> Seq.toArray
+        //    let switchesArray = stagesArray
+        //                        |> Array.map(fun st -> st.switches |> List.toSeq)
+        //                        |> Seq.concat |> Seq.toArray
+
+        //    let mutable curTotal = 0
+        //    let stageIndexes = seq { yield curTotal;
+        //                                for i = 0 to stagesArray.Length - 1 do
+        //                                curTotal <- curTotal + stagesArray.[i].switches.Length
+        //                                yield curTotal }
+        //                        |> Seq.toArray
+                
+        //    { 
+        //        StagedSorterDef.sorterDef = 
+        //            { SorterDef.order = order; switches = switchesArray };
+        //        StagedSorterDef.stageIndexes = stageIndexes
+        //    }
+
+
+        //let CreateRefStagedSorter (refSorter:RefSorter) (definedStages: int) =
+        //        let (sorterString, order) = (GetStringAndOrder refSorter)
+        //        ParseToStagedSorter sorterString order definedStages
+
+
+
+    type RandSwitchFill = 
+         | LooseSwitches
+         | FullStage
+         | NoFill
+
+    type RandSorterStages = {order:int; stageCount:int; randSwitchFill:RandSwitchFill;}
+
+    type RandSorterSwitches = {order:int; switchCount:int; randSwitchFill:RandSwitchFill;}
 
     type RefSorterPrefixStages = {refSorter:RefSorter; stageCount:int}
 
@@ -54,12 +155,14 @@ module SortersFromData =
                     RandGenerationMode.Pure 
                         { order=order; stageCount=0; randSwitchFill=rsf }
 
+
     let To_RefSorter_PrefixStages (randGenerationMode:RandGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
                       _ ) ->
                      sprintf "%A\t%d" refType refStageCount
          | Pure _ -> "\t"
+
 
     let GetSorterStageCount (randGenerationMode:RandGenerationMode) =
         match randGenerationMode with
@@ -69,6 +172,7 @@ module SortersFromData =
          | Pure { order=_; stageCount=totalStageCount; randSwitchFill=_ } ->
                       totalStageCount / 2
 
+
     let GetSorterSwitchCount (randGenerationMode:RandGenerationMode) =
         match randGenerationMode with
          | Prefixed (_, 
@@ -76,77 +180,6 @@ module SortersFromData =
                      (totalStageCount * order )/2
          | Pure { order=order; stageCount=totalStageCount; randSwitchFill=_ } ->
                      ( totalStageCount * order ) / 2
-
-    let ParseSorterStringToStages (stagesStr:string) =
-
-        let MakeSwitch (s:string) =
-            let pcs = s.Split([|',';|])
-                        |> Seq.map(fun i -> i |> int)
-                        |> Seq.toArray
-            { Switch.low = pcs.[0]; Switch.hi = pcs.[1]}
-
-        stagesStr.Split([|'[';  ']'; '\n'; '\r'; ' ';|], StringSplitOptions.RemoveEmptyEntries)
-            |> Seq.map(fun l -> l.Split([|'(';  ')';|], StringSplitOptions.RemoveEmptyEntries)
-                                |> Seq.filter(fun pc -> pc <> ",")
-                                |> Seq.map(fun pcs -> MakeSwitch pcs)
-                                |> Seq.toList
-                        )
-            |> Seq.map(fun sws -> {Stage.switches = sws} )
-    
-
-    let ParseSorterStringToNStagesOfSwitches (stagesStr:string) (stageCount:int) =
-        (ParseSorterStringToStages stagesStr)
-        |> Seq.take stageCount
-        |> Seq.map(fun s -> s.switches|>List.toSeq)
-        |> Seq.concat
-
-    let GetReferenceSorterInfo (refSorter:RefSorter) =
-        match refSorter with
-        | Order8Str -> (SorterData.Order8Str, 8)
-        | Order10Str -> (SorterData.Order10Str, 10)
-        | Green16 -> (SorterData.Order16_Green, 16)
-        | End16 -> (SorterData.Order16_END, 16)
-
-
-    let ParseSorterStringToSorter (stagesStr:string) (order:int) 
-                                  (stageCount:int) =
-       let switches = stagesStr |> ParseSorterStringToStages
-                                |> Seq.take stageCount
-                                |> Seq.map(fun s -> s.switches|>List.toSeq)
-                                |> Seq.concat |> Seq.toArray
-       {SorterDef.order=order; switches=switches}
-    
-
-    let ParseStagesStringToStagedSorter (stagesStr:string) (order:int)
-                                        (stageCount:int ) =
-        let stagesArray = (ParseSorterStringToStages stagesStr)
-                            |> Seq.take stageCount
-                            |> Seq.toArray
-        let switchesArray = stagesArray
-                            |> Array.map(fun st -> st.switches |> List.toSeq)
-                            |> Seq.concat |> Seq.toArray
-
-        let mutable curTotal = 0
-        let stageIndexes = seq { yield curTotal;
-                                 for i = 0 to stagesArray.Length - 1 do
-                                    curTotal <- curTotal + stagesArray.[i].switches.Length
-                                    yield curTotal }
-                           |> Seq.toArray
-        
-        { 
-            StagedSorterDef.sorterDef = 
-                { SorterDef.order = order; switches = switchesArray };
-            StagedSorterDef.stageIndexes = stageIndexes
-        }
-
-
-    let CreateRefSorter (refSorter:RefSorter) (definedStages: int) =
-        let (sorterString, order) = (GetReferenceSorterInfo refSorter)
-        let switchesFromStages = (ParseSorterStringToNStagesOfSwitches sorterString definedStages)
-        {
-            SorterDef.order = order;
-            switches = switchesFromStages |> Seq.toArray
-        }
 
 
     let CreatePrefixedRandomSorter (totalSwitches: int) (prefixStageCount: int)
@@ -158,7 +191,7 @@ module SortersFromData =
             | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order)
             | NoFill -> Seq.empty
 
-        let switchesFromStages = (ParseSorterStringToNStagesOfSwitches prefixStagesString prefixStageCount)
+        let switchesFromStages = (RefSorter.ParseToNStagesOfSwitches prefixStagesString prefixStageCount)
         let randPadded = seq { yield! switchesFromStages; yield! switchFiller } 
         {
             SorterDef.order = order;
@@ -181,18 +214,20 @@ module SortersFromData =
             | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order)
             | NoFill -> Seq.empty
 
-        let prefixStagedSorter = ParseStagesStringToStagedSorter prefixStagesString order prefixStageCount
+        let prefixStagedSorter = RefSorter.ParseToStagedSorter prefixStagesString order
 
-        let retVal = prefixStagedSorter 
+        let retVal = prefixStagedSorter
+                    |> StagedSorter.TruncateStages prefixStageCount
                     |> StagedSorterDef.AppendSwitches 
                            (switchFiller
                            |> Seq.take (totalSwitches - prefixStagedSorter.sorterDef.switches.Length))
         retVal
 
+
     let CreatePrefixedSorter (randGenerationMode : RandGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStages}, _ ) ->
-                CreateRefSorter refType refStages
+                RefSorter.CreateRefSorter refType refStages
          | Pure { order=order; stageCount=_; randSwitchFill=_ } ->
                 {SorterDef.order = order; switches = Array.empty}
 
@@ -204,7 +239,7 @@ module SortersFromData =
                      {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;}) ->
             CreatePrefixedRandomSorter
                             (stageCount*order / 2) refStages 
-                            (GetReferenceSorterInfo refType) 
+                            (RefSorter.GetStringAndOrder refType) 
                             randSwitchFill rnd
          | Pure {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;} ->
             match randSwitchFill with
@@ -220,7 +255,7 @@ module SortersFromData =
                      {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;}) ->
             CreatePrefixedRandomStagedSorter
                             (stageCount*order / 2) refStages 
-                            (GetReferenceSorterInfo refType) 
+                            (RefSorter.GetStringAndOrder refType) 
                             randSwitchFill rnd
          | Pure {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;} ->
             match randSwitchFill with
@@ -233,20 +268,14 @@ module SortersFromData =
 
 
     let SortableTestCases (randGenerationMode:RandGenerationMode) =
-        let prefixSorter = CreatePrefixedSorter randGenerationMode
-        let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
-        let (_, sortableRes) = Sorter.RunSorterOnSortableSeq
-                                   prefixSorter
-                                   switchTracker 
-                                   (SortableIntArray.SortableSeqAllBinary prefixSorter.order)
+        let (_, sortableRes) = 
+            Sorter.CondenseAllZeroOneSortables
+                (CreatePrefixedSorter randGenerationMode)
         sortableRes
 
 
     let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =
-        let prefixSorter = CreatePrefixedSorter randGenerationMode
-        let switchTracker = SwitchTracker.Make prefixSorter.switches.Length
-        let (_, sortableRes) = Sorter.RunSorterOnWeightedSortableSeq
-                                   prefixSorter
-                                   switchTracker
-                                   (SortableIntArray.WeightedSortableSeqAllBinary prefixSorter.order)
-        sortableRes |> Array.toSeq
+        let (_, sortableRes) = 
+            Sorter.CondenseAllZeroOneWeightedSortables
+                (CreatePrefixedSorter randGenerationMode)
+        sortableRes

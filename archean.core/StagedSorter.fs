@@ -6,27 +6,36 @@ open Sorter
 
 module StagedSorter =
 
+    let TruncateStages 
+                    (remainingStageCount:int) 
+                    (stagedSorterDef:StagedSorterDef) =
+        { 
+            StagedSorterDef.sorterDef = 
+                {SorterDef.order = stagedSorterDef.sorterDef.order; 
+                 SorterDef.switches = stagedSorterDef.sorterDef.switches
+                                      |> Seq.take stagedSorterDef.stageIndexes.[remainingStageCount]
+                                      |> Seq.toArray
+                 };
+
+            StagedSorterDef.stageIndexes = stagedSorterDef.stageIndexes
+                                           |> Seq.take remainingStageCount
+                                           |> Seq.toArray
+
+        }
+        
+
     // returns early if a sort fails on any of the sortables
     let GetSwitchUsagesIfStagedSorterAlwaysWorks 
                 (switchTracker:SwitchTracker)
                 (stagedSorterDef:StagedSorterDef)
                 (startPos:int)
                 (sortableSeq: seq<int[]>) =
-
-        let rs (sortable:int[]) = 
-            RunSwitchSequenceOnSortable
-                stagedSorterDef.sorterDef 
-                switchTracker
-                { startPos .. (stagedSorterDef.sorterDef.switches.Length - 1) }
-                sortable
-            
-        let allGood = sortableSeq |> Seq.map(rs)
-                                  |> Seq.forall(Combinatorics.IsSorted)
-
-        if allGood then
-             (allGood, Some (SwitchUsage.CollectTheUsedSwitches 
-                                    stagedSorterDef.sorterDef switchTracker))
-        else (allGood, None)
+        
+        GetSwitchUsagesIfSorterAlwaysWorks
+            stagedSorterDef.sorterDef
+            switchTracker
+            startPos
+            sortableSeq
 
 
     let RunWeightedOnStage
@@ -43,7 +52,7 @@ module StagedSorter =
 
 
     let GetStagePerfAndSwitchUsage (switchTracker:SwitchTracker)
-                                   (stagedSorterDef:StagedSorterDef) 
+                                   (stagedSorterDef:StagedSorterDef)
                                    (stageIndexToTest:int)
                                    (sortableSeq: seq<int[] * int>) =
 
