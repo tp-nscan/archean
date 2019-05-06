@@ -92,13 +92,19 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.TestPermutationCreateRandom2() =
+    member this.TestPermutationCreateRandom() =
       let expectedCount = 9
       let permutes = Permutation.CreateRandom (new Random(123)) 16 
                       |> Seq.take expectedCount
                       |> Seq.toArray
       Assert.AreEqual(expectedCount, permutes.Length)
     
+    
+    [<TestMethod>]
+    member this.TestIsSorted() =
+        Assert.IsFalse (Combinatorics.IsSorted [|0; 1; 1; 0; 1; 0|])
+        Assert.IsTrue (Combinatorics.IsSorted [|0; 0; 0; 0; 1; 1|])
+
 
     [<TestMethod>]
     member this.TestMakeTwoCycleIntArray() =

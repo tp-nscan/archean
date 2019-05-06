@@ -36,13 +36,41 @@ type StagedSorterFixture () =
 
       Assert.AreEqual(sd.Length, 10)
 
+    [<TestMethod>]
+    member this.EvalRefStagedSorter() =
+      let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order24
+      let res = Sorter.Eval rfsst.sorterDef
+
+      Assert.AreEqual(10, 10)
+
+    [<TestMethod>]
+    member this.StageWiseEvalRefStagedSorter() =
+      let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order22
+      let res = StagedSorter.GetStageWiseWeightedPerf rfsst
+      let rep0 = (fst res).weights  |> Seq.map(fun a -> string a) |> String.concat ", "
+      let rep1 = (snd res) |> Seq.map(fun a -> string a) |> String.concat ", "
+      Console.WriteLine rep0
+      Console.WriteLine rep1
+      Assert.AreEqual(10, 10)
+
+    [<TestMethod>]
+    member this.StageWiseEvalRefStagedSorter0() =
+        let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order22
+        let res = StagedSorter.GetStageWisePerf rfsst
+        let rep0 = (fst res).weights  |> Seq.map(fun a -> string a) |> String.concat ", "
+        let rep1 = (snd res) |> Seq.map(fun a -> string a) |> String.concat ", "
+        Console.WriteLine rep0
+        Console.WriteLine rep1
+        Assert.AreEqual(10, 10)
+
+
 
     [<TestMethod>]
     member this.TestRandGenerationMode() =
         let sorterCount = 15
         let seed = 1234
         let rnd = new Random(seed)
-        let refSorter = RefSorter.Order10Str
+        let refSorter = RefSorter.Order10
         let stageToTest = 3
 
         let (refStr, order) = SortersFromData.RefSorter.GetStringAndOrder refSorter
@@ -84,7 +112,7 @@ type StagedSorterFixture () =
 
         let sorterResPlain =
             testSorters
-                |> Array.map(fun stagedSorterDef -> Sorter.EvalSorterDef stagedSorterDef.sorterDef)
+                |> Array.map(fun stagedSorterDef -> Sorter.Eval stagedSorterDef.sorterDef)
                 |> Array.map(fun res -> (snd res).Value)
 
         Assert.AreEqual(10, 10)

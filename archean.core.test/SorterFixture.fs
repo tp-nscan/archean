@@ -29,7 +29,7 @@ type SorterFixture () =
         let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
         let startPos = 5
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
-        let (res, switchTrack) = GetSwitchUsagesIfSorterAlwaysWorks
+        let (res, switchTrack) = UpdateSwitchUses
                                                         sorterDef
                                                         switchTracker 
                                                         startPos 
@@ -133,10 +133,10 @@ type SorterFixture () =
                     [(3,4),(5,6),(7,8),(9,10),(11,12)]
                     [(6,7),(8,9)]"
 
-        let sorterDef = SortersFromData.RefSorter.ParseToSorter
-                                    yzkk 16 10
+        let stagedSorterDef = SortersFromData.RefSorter.ParseToStagedSorter
+                                    yzkk 16
 
-        let res = CondenseAllZeroOneSortables sorterDef
+        let res = CondenseAllZeroOneSortables stagedSorterDef.sorterDef
         Assert.IsTrue (true)
 
 

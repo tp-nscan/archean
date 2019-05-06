@@ -7,8 +7,10 @@ open archean.core.Sorter
 module SortingReports =
 
 
-    let EvalRefSorter = 
-        true
+    let StageWisePerf (refSorter:RefSorter) = 
+        let rfsst = RefSorter.CreateRefStagedSorter refSorter
+        let res = StagedSorter.GetStageWiseWeightedPerf rfsst
+        res
 
 
     type HistoItem = {stageCount:int; switchCount:int; minSwitchables:int; avgSwitchables:float; sorterCount:int}
@@ -151,7 +153,7 @@ module SortingReports =
                             |> Seq.toArray
 
         let MakeSorterResults (sorterDef:SorterDef) =
-            let res = Sorter.GetSwitchUsagesIfSorterAlwaysWorks
+            let res = Sorter.UpdateSwitchUses
                                 sorterDef
                                 (SwitchTracker.MakePrefixed completeSorterLength prefixedSorterLength)
                                 prefixedSorterLength

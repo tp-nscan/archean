@@ -49,11 +49,6 @@ type SortingFixture () =
         Assert.IsTrue (res.order = order)
         Assert.IsTrue (res.switches.Length = length)
 
-    
-    [<TestMethod>]
-    member this.TestSortableIntArray_IsSorted() =
-        Assert.IsFalse (Combinatorics.IsSorted [|0; 1; 1; 0; 1; 0|])
-        Assert.IsTrue (Combinatorics.IsSorted [|0; 0; 0; 0; 1; 1|])
 
 
     [<TestMethod>]
@@ -111,10 +106,8 @@ type SortingFixture () =
 
     [<TestMethod>]
     member this.TestToStagedSorterDef() =
-        let sorterDef = SortersFromData.RefSorter.CreateRefSorter RefSorter.End16 9
-            
-        let stagedSorterDef = StagedSorterDef.ToStagedSorterDef sorterDef 
-
+        let stagedSorterDef = SortersFromData.RefSorter.CreateRefStagedSorter RefSorter.End16
+ 
         Assert.IsTrue (stagedSorterDef.stageIndexes.Length = 10)
 
 

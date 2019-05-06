@@ -117,20 +117,25 @@ module Sorting =
                 |> Array.map(fun a -> Array.copy a)
                 |> Array.toSeq
 
+
         let WeightedSortableSeq (sortables:int[][]) =
             sortables
-                |> Array.map(fun a -> (Array.copy a, 1))
-                |> Array.toSeq
+                |> Seq.map(fun a -> (Array.copy a, 1))
 
 
         let SortableSeqAllBinary (order:int) =
                 IntBits.AllBinaryTestCases order
 
+
         let WeightedSortableSeqAllBinary (order:int) =
                 IntBits.AllBinaryTestCases order
                 |> Seq.map(fun i -> (i, 1))
 
-         
+
+        let NormWeightedSortableSeq (weightedSortableSeq:seq<int[]*int>) = 
+                weightedSortableSeq 
+                    |> Seq.map(fun a -> (Array.copy (fst a), 1))
+    
 
 
     type SorterDef = {order:int; switches: array<Switch>}

@@ -34,7 +34,7 @@ module Sorter =
                 switchTracker.weights.[switchDex] + weight
 
 
-    let RunSwitchSequenceOnSortable 
+    let RunSwitchSeqOnSortable 
                     (sorterDef:SorterDef) 
                     (switchTracker:SwitchTracker)
                     (switchIndexes:seq<int>)
@@ -49,7 +49,7 @@ module Sorter =
         sortable
 
 
-    let RunSwitchSequenceOnWeightedSortable 
+    let RunSwitchSeqOnWeightedSortable 
                     (sorterDef:SorterDef) 
                     (switchTracker:SwitchTracker)
                     (switchIndexes:seq<int>)
@@ -69,11 +69,33 @@ module Sorter =
                 (switchTracker:SwitchTracker) 
                 (sortable:int[]) =
 
-            RunSwitchSequenceOnSortable
+            RunSwitchSeqOnSortable
                 sorterDef 
                 switchTracker
                 { 0 .. (sorterDef.switches.Length - 1) }             
                 sortable
+
+
+    let RunSwitchSeqOnSortableSeq
+                 (sorterDef:SorterDef) 
+                 (switchTracker:SwitchTracker) 
+                 (switchIndexes:seq<int>)
+                 (sortableSeq: seq<int[]>) = 
+
+        let rws (weightedSortable:int[]) = 
+            RunSwitchSeqOnSortable 
+                    sorterDef 
+                    switchTracker 
+                    switchIndexes
+                    weightedSortable
+    
+        let sortedItemsList = sortableSeq
+                                |> Seq.map(rws)
+                                |> Seq.countBy id
+                                |> Seq.map fst
+                                |> Seq.toArray
+
+        (switchTracker, sortedItemsList)
 
 
     let RunSorterOnSortableSeq 
@@ -81,25 +103,21 @@ module Sorter =
                 (switchTracker:SwitchTracker) 
                 (sortableSeq: seq<int[]>) = 
 
-        let rs (sortable:int[]) = 
-            RunSorterOnSortable sorterDef switchTracker sortable
+        RunSwitchSeqOnSortableSeq
+                    sorterDef
+                    switchTracker
+                    {0 .. (sorterDef.switches.Length - 1)}
+                    sortableSeq
 
-        let sortedItemsSet = sortableSeq
-                                |> Seq.map(rs)
-                                |> Set.ofSeq
-                                |> Set.toSeq
-
-        (switchTracker, sortedItemsSet)
-
-
-    let RunSwitchSequenceOnWeightedSortableSeq
+                    
+    let RunSwitchSeqOnWeightedSortableSeq
                  (sorterDef:SorterDef) 
                  (switchTracker:SwitchTracker) 
                  (switchIndexes:seq<int>)
                  (weightedSortableSeq: seq<int[] * int>) = 
 
         let rws (weightedSortable:int[]*int) = 
-            fst (RunSwitchSequenceOnWeightedSortable 
+            fst (RunSwitchSeqOnWeightedSortable 
                     sorterDef 
                     switchTracker 
                     switchIndexes
@@ -119,7 +137,7 @@ module Sorter =
                  (switchTracker:SwitchTracker)
                  (weightedSortableSeq: seq<int[] * int>) = 
 
-            RunSwitchSequenceOnWeightedSortableSeq
+            RunSwitchSeqOnWeightedSortableSeq
                 sorterDef
                 switchTracker
                 { 0 .. (sorterDef.switches.Length - 1)}
@@ -127,14 +145,14 @@ module Sorter =
 
 
     // returns early if a sort fails on any of the sortables
-    let GetSwitchUsagesIfSorterAlwaysWorks 
+    let UpdateSwitchUses 
                 (sorterDef:SorterDef)
                 (switchTracker:SwitchTracker) 
                 (startPos:int)
                 (sortableSeq: seq<int[]>) =
 
         let rs (sortable:int[]) = 
-            RunSwitchSequenceOnSortable
+            RunSwitchSeqOnSortable
                 sorterDef
                 switchTracker
                 {startPos .. (sorterDef.switches.Length - 1)}
@@ -149,12 +167,12 @@ module Sorter =
         else (allGood, None)
 
 
-    let EvalSorterDef 
+    let Eval 
             (sorterDef:SorterDef) =
         let startPos = 0
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
 
-        GetSwitchUsagesIfSorterAlwaysWorks
+        UpdateSwitchUses
                     sorterDef
                     switchTracker
                     startPos
