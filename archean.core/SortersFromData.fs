@@ -7,6 +7,7 @@ module SortersFromData =
 
     type RefSorter =
         | Order8
+        | Order8Prefix3
         | Order10
         | Green16
         | End16
@@ -17,6 +18,8 @@ module SortersFromData =
         | Order24
         | Order25
         | Order26
+        | Order28
+        | Order32
     
 
     module RefSorter =
@@ -24,6 +27,7 @@ module SortersFromData =
         let GetStringAndOrder (refSorter:RefSorter) =
             match refSorter with
             | Order8 -> (SorterData.Order8Str, 8)
+            | Order8Prefix3 -> (SorterData.Order8Prefix3Str, 8)
             | Order10 -> (SorterData.Order10Str, 10)
             | Green16 -> (SorterData.Order16_Green, 16)
             | End16 -> (SorterData.Order16_END, 16)
@@ -31,9 +35,12 @@ module SortersFromData =
             | Order20 -> (SorterData.Order20Str, 20)
             | Order22 -> (SorterData.Order22Str, 22)
             | Order23 -> (SorterData.Order23Str, 23)
-            | Order24 -> (SorterData.Order24Str, 24)
+            | Order24 -> (SorterData.Order24aStr, 24)
             | Order25 -> (SorterData.Order25Str, 25)
             | Order26 -> (SorterData.Order26Str, 26)
+            | Order28 -> (SorterData.Order28Str, 28)
+            | Order32 -> (SorterData.Order32Str, 32)
+            
 
 
         let ParseToStages (stagesStr:string) =
@@ -257,12 +264,5 @@ module SortersFromData =
     let SortableTestCases (randGenerationMode:RandGenerationMode) =
         let (_, sortableRes) = 
             Sorter.CondenseAllZeroOneSortables
-                (CreatePrefixedSorter randGenerationMode)
-        sortableRes
-
-
-    let WeightedSortableTestCases (randGenerationMode:RandGenerationMode) =
-        let (_, sortableRes) = 
-            Sorter.CondenseAllZeroOneWeightedSortables
                 (CreatePrefixedSorter randGenerationMode)
         sortableRes

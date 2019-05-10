@@ -9,7 +9,7 @@ module SortingReports =
 
     let StageWisePerf (refSorter:RefSorter) = 
         let rfsst = RefSorter.CreateRefStagedSorter refSorter
-        let res = StagedSorter.GetStageWiseWeightedPerf rfsst
+        let res = StagedSorter.StageWisePerf rfsst
         res
 
 
@@ -64,7 +64,7 @@ module SortingReports =
                          (SwitchTracker.MakePrefixed completeSorterLength filteringSorterLength)
                          stagedSorterDef
                          (randGenerationMode |> To_PrefixStageCount)
-                         (SortableIntArray.WeightedSortableSeq testSortables)
+                         (SortableIntArray.SortableSeq testSortables)
              (res, stagedSorterDef)
 
          let MakeHistoLine2 (tt:HistoItem2) = 
@@ -111,7 +111,7 @@ module SortingReports =
                         (SwitchTracker.MakePrefixed completeSorterLength filteringSorterLength)
                         stagedSorterDef
                         (randGenerationMode |> To_PrefixStageCount)
-                        (SortableIntArray.WeightedSortableSeq testSortables)
+                        (SortableIntArray.SortableSeq testSortables)
             (res, stagedSorterDef)
 
         let MakeHistoLine (tt:HistoItem) = 

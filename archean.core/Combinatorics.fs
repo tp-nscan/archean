@@ -4,6 +4,13 @@ open System
 
 module Combinatorics =
 
+    // Splits the sourceArray into segments using segBounds
+    let BreakIntoSegments (sourceArray : array<'a>) 
+                          (segBounds : array<int>) =
+        seq {1 .. (segBounds.Length - 1) }
+        |> Seq.map(fun i -> sourceArray.[segBounds.[i - 1] .. (segBounds.[i] - 1)])
+        |> Seq.toArray
+
     let FisherYatesShuffle (rnd : Random) (initialList : array<'a>) =
         let availableFlags = Array.init initialList.Length (fun i -> (i, true))
                                                           // Which items are available and their indices

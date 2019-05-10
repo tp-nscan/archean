@@ -22,20 +22,6 @@ module StagedSorter =
                                            |> Seq.toArray
         }
 
-
-    let RunWeightedOnStage
-                     (stagedSorterDef:StagedSorterDef) 
-                     (switchTracker:SwitchTracker) 
-                     (stageIndex:int) 
-                     (weightedsortableSeq: seq<int[] * int>) =
-
-            RunSwitchSeqOnWeightedSortableSeq
-                         stagedSorterDef.sorterDef
-                         switchTracker 
-                         (StagedSorterDef.GetSwitchIndexesForStage stagedSorterDef stageIndex)
-                         weightedsortableSeq
-
-
     let RunOnStage
                 (stagedSorterDef:StagedSorterDef) 
                 (switchTracker:SwitchTracker) 
@@ -52,16 +38,16 @@ module StagedSorter =
     let GetStagePerfAndSwitchUsage (switchTracker:SwitchTracker)
                                    (stagedSorterDef:StagedSorterDef)
                                    (stageIndexToTest:int)
-                                   (weightedSortableSeq: seq<int[] * int>) =
+                                   (weightedSortableSeq: seq<int[]>) =
 
-            let SeqFuncFromWghtedArray (wa:(int[]*int)[]) =
-                wa |> Array.map(fun a -> Array.copy (fst a))
+            let SeqFuncFromArray (wa:int[][]) =
+                wa |> Array.map(fun a -> Array.copy a)
                    |> Array.toSeq
 
             let (_, weightedRes) = 
-                RunWeightedOnStage stagedSorterDef switchTracker stageIndexToTest weightedSortableSeq 
+                RunOnStage stagedSorterDef switchTracker stageIndexToTest weightedSortableSeq 
 
-            let sortablesStage1 =  SeqFuncFromWghtedArray weightedRes
+            let sortablesStage1 =  SeqFuncFromArray weightedRes
             let suffixStart = stagedSorterDef.stageIndexes.[stageIndexToTest + 1]
 
             let res = Sorter.UpdateSwitchUses
@@ -75,16 +61,13 @@ module StagedSorter =
             | None -> (false, None)
 
 
-
-    let GetStageWisePerf (stagedSorterDef:StagedSorterDef) =
+    let StageWisePerf (stagedSorterDef:StagedSorterDef) (sortableSeq:seq<int[]>) =
 
         let switchTracker = SwitchTracker.Make stagedSorterDef.sorterDef.switches.Length
-        let sortableSeq = SortableIntArray.SortableSeqAllBinary 
-                                        stagedSorterDef.sorterDef.order
-
         let startState = (sortableSeq |> Seq.toArray, [])
 
-        let runStage ((wss, counts): seq<int[]> * int list) (stageDex:int) =
+        let runStage ((wss, counts): seq<int[]> * int list) 
+                     (stageDex:int) =
             let res = 
                 RunOnStage stagedSorterDef switchTracker stageDex wss
                     |> snd
@@ -98,50 +81,19 @@ module StagedSorter =
         (switchTracker, stageUseList |> List.rev)
 
 
-    let GetStageWiseWeightedPerf (stagedSorterDef:StagedSorterDef) =
-
-        let switchTracker = SwitchTracker.Make stagedSorterDef.sorterDef.switches.Length
-        let weightedSortableSeq = SortableIntArray.WeightedSortableSeqAllBinary 
+    let StageWisePerf0 (stagedSorterDef:StagedSorterDef) =
+        let sortableSeq = SortableIntArray.SortableSeqAllBinary 
                                         stagedSorterDef.sorterDef.order
-
-        let startState = (weightedSortableSeq |> Seq.toArray, [])
-
-        let runStage ((wss, counts): seq<int[]*int> * int list) (stageDex:int) =
-            let res = 
-                RunWeightedOnStage stagedSorterDef switchTracker stageDex wss
-                    |> snd
-                    |> Seq.toArray
-            (res, res.Length::counts)
-
-        let (sortables, stageUseList) = 
-            {0 .. (stagedSorterDef.stageIndexes.Length - 2)}
-                    |> Seq.fold(fun acc i -> runStage acc i) startState
-
-        (switchTracker, stageUseList |> List.rev)
+        StageWisePerf stagedSorterDef sortableSeq
 
 
-
-    let GetStageWisePerf0 (stagedSorterDef:StagedSorterDef) =
-        let switchTracker = SwitchTracker.Make stagedSorterDef.sorterDef.switches.Length
-        let weightedSortableSeq = SortableIntArray.WeightedSortableSeqAllBinary 
+    let StageWisePerf4 (stagedSorterDef:StagedSorterDef) =
+        let sortableSeq = ComboCounter.Filtered2Stage4BlockArrays 
                                         stagedSorterDef.sorterDef.order
+        StageWisePerf stagedSorterDef sortableSeq
 
-        let weightedRes = 
-                RunWeightedOnStage stagedSorterDef switchTracker 0 weightedSortableSeq
-                |> snd
-                |> SortableIntArray.NormWeightedSortableSeq
-                |> Seq.toArray
 
-        let weightedRes2 = 
-                RunWeightedOnStage stagedSorterDef switchTracker 1 weightedRes
-                |> snd
-                |> SortableIntArray.NormWeightedSortableSeq
-                |> Seq.toArray
-
-        let weightedRes3 = 
-                RunWeightedOnStage stagedSorterDef switchTracker 2 weightedRes2
-                |> snd
-                |> SortableIntArray.NormWeightedSortableSeq
-                |> Seq.toArray
-
-        true
+    let StageWisePerf8 (stagedSorterDef:StagedSorterDef) =
+        let sortableSeq = ComboCounter.Filtered3Stage8BlockArrays 
+                                        stagedSorterDef.sorterDef.order
+        StageWisePerf stagedSorterDef sortableSeq

@@ -39,7 +39,7 @@ type SorterFixture () =
 
 
     [<TestMethod>]
-    member this.TestRunWeightedSwitchesAndGetWeightedResults() =
+    member this.TestRunSwitchesAndGetResults() =
         let order = 16
         let prefixStageCount = 3
         let allStageCount = 10
@@ -71,14 +71,14 @@ type SorterFixture () =
 
              
         let switchTracker = SwitchTracker.Make fullSorterDef.switches.Length
-        let (_, sortableRes) = RunSorterOnWeightedSortableSeq
+        let (_, sortableRes) = Sorter.RunSorterOnSortableSeq
                                     prefixSorterDef
                                     switchTracker
-                                    (SortableIntArray.WeightedSortableSeqAllBinary order)
+                                    (SortableIntArray.SortableSeqAllBinary order)
                 
         let SortableFunc = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = RunSorterOnWeightedSortableSeq 
+        let (switchTrack, sortableRes2) = RunSorterOnSortableSeq 
                                                 fullSorterDef 
                                                 switchTracker 
                                                 (SortableFunc)
@@ -101,7 +101,7 @@ type SorterFixture () =
                     switchTracker 
                     stagedSorter
                     evalStageDex
-                    (SortableIntArray.WeightedSortableSeqAllBinary order)
+                    (SortableIntArray.SortableSeqAllBinary order)
                             
 
         Assert.IsTrue (true)

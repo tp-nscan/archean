@@ -173,11 +173,9 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.TestPrint() =
-        let count = 4
-        let yak ct =
-            {1 .. ct}
+    member this.TestBreakIntoSegments() =
+        let testArray = [|1; 2; 3; 4; 5; 6; 7; 8; 9|] 
+        let testBreaks = [|0; 2; 5; 9|] 
 
-        Console.Write ("{0}", yak 3)
-
-        Assert.IsTrue (true)
+        let yak = BreakIntoSegments testArray testBreaks
+        Assert.AreEqual (yak.Length, 3)

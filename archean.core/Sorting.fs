@@ -125,16 +125,6 @@ module Sorting =
 
         let SortableSeqAllBinary (order:int) =
                 IntBits.AllBinaryTestCases order
-
-
-        let WeightedSortableSeqAllBinary (order:int) =
-                IntBits.AllBinaryTestCases order
-                |> Seq.map(fun i -> (i, 1))
-
-
-        let NormWeightedSortableSeq (weightedSortableSeq:seq<int[]*int>) = 
-                weightedSortableSeq 
-                    |> Seq.map(fun a -> (Array.copy (fst a), 1))
     
 
 
@@ -210,6 +200,28 @@ module Sorting =
 
         let MakePrefixed (totalSwitches: int) (prefixSwitches: int) =
             {weights=Array.init totalSwitches (fun i -> if (i<prefixSwitches) then 1 else 0)}
+
+        let ToStageArrays (switchTracker:SwitchTracker) 
+                          (stagedSorterDef:StagedSorterDef) =
+
+            Combinatorics.BreakIntoSegments 
+                switchTracker.weights 
+                stagedSorterDef.stageIndexes
+
+
+        let ToStageReportString 
+                        (switchTracker:SwitchTracker) 
+                        (stagedSorterDef:StagedSorterDef) =
+
+            let ArrayToString(array:'a[]) =
+                sprintf "(%s)" (array |> Seq.map(fun a -> string a) |> String.concat ", ")
+
+            let NestedArrayToString (af: 'a[]->string) (nestedArray:'a[][]) =
+                sprintf "(%s)" (nestedArray |> Seq.map(fun a -> ArrayToString a) |> String.concat ", ")
+
+            NestedArrayToString ArrayToString (ToStageArrays switchTracker stagedSorterDef)
+
+
 
 
     type SwitchUsage = {switch:Switch; switchIndex:int; useCount:int}

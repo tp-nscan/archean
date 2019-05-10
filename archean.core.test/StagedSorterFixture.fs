@@ -43,24 +43,50 @@ type StagedSorterFixture () =
 
       Assert.AreEqual(10, 10)
 
-    [<TestMethod>]
-    member this.StageWiseEvalRefStagedSorter() =
-      let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order22
-      let res = StagedSorter.GetStageWiseWeightedPerf rfsst
-      let rep0 = (fst res).weights  |> Seq.map(fun a -> string a) |> String.concat ", "
-      let rep1 = (snd res) |> Seq.map(fun a -> string a) |> String.concat ", "
-      Console.WriteLine rep0
-      Console.WriteLine rep1
-      Assert.AreEqual(10, 10)
 
     [<TestMethod>]
-    member this.StageWiseEvalRefStagedSorter0() =
-        let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order22
-        let res = StagedSorter.GetStageWisePerf rfsst
-        let rep0 = (fst res).weights  |> Seq.map(fun a -> string a) |> String.concat ", "
-        let rep1 = (snd res) |> Seq.map(fun a -> string a) |> String.concat ", "
-        Console.WriteLine rep0
-        Console.WriteLine rep1
+    member this.TestCondenseAllZeroOneSortables() =
+    
+        let ArrayToString(array:'a[]) =
+            sprintf "[|%s|]" (array |> Seq.map(fun a -> string a) |> String.concat ";")
+
+        let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order8Prefix3
+        let res = Sorter.CondenseAllZeroOneSortables rfsst.sorterDef
+        let rep = (snd res)
+                  |> Seq.map(fun s-> ArrayToString s)
+                  |> String.concat ";"
+        
+        Console.WriteLine rep          
+        Assert.AreEqual(10, 10)
+
+
+    [<TestMethod>]
+    member this.TestStageWisePerf() =
+        let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order24
+        let res = StagedSorter.StageWisePerf0 rfsst
+        Console.WriteLine (SwitchTracker.ToStageReportString (fst res) rfsst)
+        Console.WriteLine ((snd res) |> List.map (string) |> (String.concat ", "))
+        Assert.AreEqual(10, 10)
+
+    [<TestMethod>]
+    member this.TestStageWisePerf4() =
+ 
+        let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order32
+        let res = StagedSorter.StageWisePerf4 rfsst
+        Console.WriteLine (SwitchTracker.ToStageReportString (fst res) rfsst)
+        Console.WriteLine ((snd res) |> List.map (string) |> (String.concat ", "))
+
+        Assert.AreEqual(10, 10)
+
+
+    [<TestMethod>]
+    member this.TestStageWisePerf8() =
+ 
+        let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order32
+        let res = StagedSorter.StageWisePerf8 rfsst
+        Console.WriteLine (SwitchTracker.ToStageReportString (fst res) rfsst)
+        Console.WriteLine ((snd res) |> List.map (string) |> (String.concat ", "))
+
         Assert.AreEqual(10, 10)
 
 
@@ -93,7 +119,7 @@ type StagedSorterFixture () =
                         (SwitchTracker.MakePrefixed completeSorterLength filteringSorterLength)
                         stagedSorterDef
                         ((randGenerationMode |> To_PrefixStageCount) - 1)
-                        (SortableIntArray.WeightedSortableSeq testSortables)
+                        (SortableIntArray.SortableSeq testSortables)
             (res, stagedSorterDef)
 
         let testSorters =

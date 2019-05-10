@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ComboCounter.fs" />
     <Compile Include="SorterData.fs" />
     <Compile Include="Rop.fs" />
     <Compile Include="Combinatorics.fs" />
