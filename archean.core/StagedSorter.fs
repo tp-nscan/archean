@@ -61,7 +61,7 @@ module StagedSorter =
             | None -> (false, None)
 
 
-    let StageWisePerf (stagedSorterDef:StagedSorterDef) (sortableSeq:seq<int[]>) =
+    let StageWisePerf (firstStage:int) (stagedSorterDef:StagedSorterDef) (sortableSeq:seq<int[]>) =
 
         let switchTracker = SwitchTracker.Make stagedSorterDef.sorterDef.switches.Length
         let startState = (sortableSeq |> Seq.toArray, [])
@@ -75,7 +75,7 @@ module StagedSorter =
             (res, res.Length::counts)
 
         let (sortables, stageUseList) = 
-            {0 .. (stagedSorterDef.stageIndexes.Length - 2)}
+            {firstStage .. (stagedSorterDef.stageIndexes.Length - 2)}
                     |> Seq.fold(fun acc i -> runStage acc i) startState
 
         (switchTracker, stageUseList |> List.rev)
@@ -84,16 +84,25 @@ module StagedSorter =
     let StageWisePerf0 (stagedSorterDef:StagedSorterDef) =
         let sortableSeq = SortableIntArray.SortableSeqAllBinary 
                                         stagedSorterDef.sorterDef.order
-        StageWisePerf stagedSorterDef sortableSeq
+        StageWisePerf 0 stagedSorterDef sortableSeq
 
 
     let StageWisePerf4 (stagedSorterDef:StagedSorterDef) =
         let sortableSeq = ComboCounter.Filtered2Stage4BlockArrays 
                                         stagedSorterDef.sorterDef.order
-        StageWisePerf stagedSorterDef sortableSeq
+        StageWisePerf 0 stagedSorterDef sortableSeq
 
 
     let StageWisePerf8 (stagedSorterDef:StagedSorterDef) =
         let sortableSeq = ComboCounter.Filtered3Stage8BlockArrays 
                                         stagedSorterDef.sorterDef.order
-        StageWisePerf stagedSorterDef sortableSeq
+        StageWisePerf 3 stagedSorterDef sortableSeq
+
+
+    let equalsOn f x (yobj:obj) =
+
+        match yobj with
+        | T as y -> (f x = f y)
+
+
+        | _ -> false

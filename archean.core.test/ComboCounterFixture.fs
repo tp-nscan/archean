@@ -60,5 +60,49 @@ type ComboCounterFixture () =
        let sortables = ComboCounter.Filtered2Stage4BlockArrays 8
                           |> Seq.toArray
 
-
        Assert.IsTrue(true)
+       
+       
+     [<TestMethod>]
+     member this.TestInitGroupAssigns() =
+        let max = 19
+        let start = 2
+        let res = GraphOps.InitGroupAssigns {start .. max}
+                    |> Seq.toArray
+
+        Assert.AreEqual(res.Length, max-start + 1)
+
+
+     [<TestMethod>]
+     member this.TestGetGroupFromItem() =
+         let max = 19
+         let start = 2
+         let item = 6
+         let res = GraphOps.InitGroupAssigns {start .. max}
+                     |> Seq.toArray
+
+         let g = GraphOps.GetGroupFromItem res item
+         Assert.AreEqual(item, g + start)
+
+
+     [<TestMethod>]
+     member this.TestMergeGroups() =
+        let max = 19
+        let start = 2
+        let item = 6
+        let groupAssigns = 
+            GraphOps.InitGroupAssigns {start .. max}
+                    |> Seq.toArray
+
+        let mg = GraphOps.MergeGroups groupAssigns item 2
+        let mg = GraphOps.MergeGroups groupAssigns 3 2
+        let mg = GraphOps.MergeGroups groupAssigns 5 7
+        let mg = GraphOps.MergeGroups groupAssigns 8 12
+        let mg = GraphOps.MergeGroups groupAssigns 8 7
+
+        let partitions = mg
+                         |> Seq.groupBy(fun ga-> ga.group)
+                         |> Seq.map(fun (key, vals) -> vals |> Seq.toArray)
+                         |> Seq.toArray
+
+        Assert.AreEqual(1, 1)

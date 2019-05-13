@@ -9,7 +9,7 @@ module SortingReports =
 
     let StageWisePerf (refSorter:RefSorter) = 
         let rfsst = RefSorter.CreateRefStagedSorter refSorter
-        let res = StagedSorter.StageWisePerf rfsst
+        let res = StagedSorter.StageWisePerf 0 rfsst
         res
 
 

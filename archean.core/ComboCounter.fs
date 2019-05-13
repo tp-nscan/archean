@@ -106,3 +106,36 @@ module ComboCounter =
         let wheelset = MakeUniformWheelSet spokes blockCount
 
         MakeAllArrays wheelset
+
+
+module GraphOps =
+
+    type GroupAssign<'TItem, 'TGroup when 'TItem:equality and 'TGroup:equality> 
+            = {item:'TItem; mutable group:'TGroup}
+
+    let InitGroupAssigns<'TItem when 'TItem:equality> 
+                    (items:seq<'TItem>) =
+        items |> Seq.mapi(fun dex item -> {GroupAssign.item=item; group=dex})
+        
+
+    let GetGroupFromItem<'TItem, 'TGroup when 'TItem:equality and 'TGroup:equality> 
+                    (groupAssigns:seq<GroupAssign<'TItem, 'TGroup>>) 
+                    (item:'TItem) =
+        let ga = groupAssigns
+                    |> Seq.find(fun ga-> ga.item=item)
+        ga.group
+
+
+    let MergeGroups<'TItem, 'TGroup when 'TItem:equality and 'TGroup:equality> 
+                    (groupAssigns:seq<GroupAssign<'TItem, 'TGroup>>) 
+                    (sourceItem:'TItem) (destitem:'TItem) =
+
+        let sourceGroup = GetGroupFromItem groupAssigns sourceItem
+        let destGroup = GetGroupFromItem groupAssigns destitem
+
+        groupAssigns
+                    |> Seq.iter(fun ga-> if ga.group = sourceGroup then
+                                            ga.group <- destGroup)
+           
+        groupAssigns
+
