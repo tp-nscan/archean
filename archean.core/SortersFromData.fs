@@ -101,9 +101,9 @@ module SortersFromData =
 
     type RefSorterSwitches = {refSorter:RefSorter; switchCount:int}
 
-    type RandGenerationMode = 
+    type SorterGenerationMode = 
          | Prefixed of RefSorterPrefixStages * RandSorterStages
-         | Pure of RandSorterStages
+         | Randy of RandSorterStages
     
     type StagedSorterType =
          | Ref of RefSorterSwitches
@@ -111,49 +111,49 @@ module SortersFromData =
          | Rand of RandSorterSwitches
 
 
-    let To_PrefixStageCount (randGenerationMode:RandGenerationMode) =
+    let To_PrefixStageCount (randGenerationMode:SorterGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=_; stageCount=refStageCount}, 
                      _) ->
                         refStageCount
-         | Pure _ -> 0
+         | Randy _ -> 0
 
 
-    let RemoveRandomStages (randGenerationMode:RandGenerationMode) =
+    let RemoveRandomStages (randGenerationMode:SorterGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
                      {order=order; stageCount=_; randSwitchFill=randSwitchFill;}) ->
-                     RandGenerationMode.Prefixed 
+                     SorterGenerationMode.Prefixed 
                         ({refSorter=refType; stageCount=refStageCount}, 
                         {order=order; stageCount=refStageCount; randSwitchFill=randSwitchFill;})
-         | Pure { order=order; stageCount=randStageCount; randSwitchFill=rsf } -> 
-                    RandGenerationMode.Pure 
+         | Randy { order=order; stageCount=randStageCount; randSwitchFill=rsf } -> 
+                    SorterGenerationMode.Randy 
                         { order=order; stageCount=0; randSwitchFill=rsf }
 
 
-    let To_RefSorter_PrefixStages (randGenerationMode:RandGenerationMode) =
+    let To_RefSorter_PrefixStages (randGenerationMode:SorterGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStageCount}, 
                       _ ) ->
                      sprintf "%A\t%d" refType refStageCount
-         | Pure _ -> "\t"
+         | Randy _ -> "\t"
 
 
-    let GetSorterStageCount (randGenerationMode:RandGenerationMode) =
+    let GetSorterStageCount (randGenerationMode:SorterGenerationMode) =
         match randGenerationMode with
          | Prefixed ( _, 
                      {order=order; stageCount=totalStageCount; randSwitchFill=_;}) ->
                       totalStageCount * order / 2
-         | Pure { order=_; stageCount=totalStageCount; randSwitchFill=_ } ->
+         | Randy { order=_; stageCount=totalStageCount; randSwitchFill=_ } ->
                       totalStageCount / 2
 
 
-    let GetSorterSwitchCount (randGenerationMode:RandGenerationMode) =
+    let GetSorterSwitchCount (randGenerationMode:SorterGenerationMode) =
         match randGenerationMode with
          | Prefixed (_, 
                      {order=order; stageCount=totalStageCount; randSwitchFill=_;}) ->
                      (totalStageCount * order )/2
-         | Pure { order=order; stageCount=totalStageCount; randSwitchFill=_ } ->
+         | Randy { order=order; stageCount=totalStageCount; randSwitchFill=_ } ->
                      ( totalStageCount * order ) / 2
 
 
@@ -218,15 +218,15 @@ module SortersFromData =
         ParseToSorter sorterString order definedStages
 
 
-    let CreatePrefixedSorter (randGenerationMode : RandGenerationMode) =
+    let CreatePrefixedSorter (randGenerationMode : SorterGenerationMode) =
          match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStages}, _ ) ->
                 CreateRefSorter refType refStages
-         | Pure { order=order; stageCount=_; randSwitchFill=_ } ->
+         | Randy { order=order; stageCount=_; randSwitchFill=_ } ->
                 {SorterDef.order = order; switches = Array.empty}
 
 
-    let CreateRandomSorterDef (randGenerationMode : RandGenerationMode) 
+    let CreateRandomSorterDef (randGenerationMode : SorterGenerationMode) 
                               (rnd : Random) =
         match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStages}, 
@@ -235,14 +235,14 @@ module SortersFromData =
                             (stageCount*order / 2) refStages 
                             (RefSorter.GetStringAndOrder refType) 
                             randSwitchFill rnd
-         | Pure {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;} ->
+         | Randy {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;} ->
             match randSwitchFill with
                 | LooseSwitches -> SorterDef.CreateRandom order (stageCount*order / 2) rnd
                 | FullStage -> SorterDef.CreateRandomPackedStages order (stageCount*order / 2) rnd
                 | NoFill -> {SorterDef.order = order; switches = Array.empty}
 
  
-    let CreateRandomStagedSorterDef (randGenerationMode : RandGenerationMode) 
+    let CreateRandomStagedSorterDef (randGenerationMode : SorterGenerationMode) 
                                     (rnd : Random) =
         match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStages}, 
@@ -251,7 +251,7 @@ module SortersFromData =
                             (stageCount*order / 2) refStages 
                             (RefSorter.GetStringAndOrder refType) 
                             randSwitchFill rnd
-         | Pure {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;} ->
+         | Randy {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;} ->
             match randSwitchFill with
                 | LooseSwitches -> (SorterDef.CreateRandom order (stageCount*order / 2) rnd) 
                                     |> StagedSorterDef.ToStagedSorterDef
@@ -261,7 +261,7 @@ module SortersFromData =
                                     |> StagedSorterDef.ToStagedSorterDef
 
 
-    let SortableTestCases (randGenerationMode:RandGenerationMode) =
+    let SortableTestCases (randGenerationMode:SorterGenerationMode) =
         let (_, sortableRes) = 
             Sorter.CondenseAllZeroOneSortables
                 (CreatePrefixedSorter randGenerationMode)

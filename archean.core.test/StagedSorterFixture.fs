@@ -104,7 +104,7 @@ type StagedSorterFixture () =
         let rspst = {RefSorterPrefixStages.refSorter=refSorter; stageCount = stageToTest; }
 
 
-        let randGenerationMode = RandGenerationMode.Prefixed (rspst, rsst)
+        let randGenerationMode = SorterGenerationMode.Prefixed (rspst, rsst)
 
         let rgmForFiltering = (randGenerationMode |> RemoveRandomStages)
         let filteringSorter = CreatePrefixedSorter rgmForFiltering

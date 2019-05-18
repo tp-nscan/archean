@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="SorterControls.View.Genome.GenomeEditorSwitchIndexControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:genome="clr-namespace:SorterControls.View.Genome"
+             xmlns:genome1="clr-namespace:SorterControls.DesignVms.Genome"
+             mc:Ignorable="d" 
+             d:DesignHeight="350"
+             d:DataContext="{d:DesignInstance genome1:DesignSwitchListEditVm, IsDesignTimeCreatable=True}">
+    <Grid Width="124">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+
+        <Grid Grid.Row="0" HorizontalAlignment="Left" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="44" />
+                <ColumnDefinition Width="32" />
+                <ColumnDefinition Width="30" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Index"/>
+            <TextBlock Grid.Column="1" Text="Low"/>
+            <TextBlock Grid.Column="2" Text="High"/>
+
+        </Grid>
+
+        <ListView Grid.Row="1"
+                  x:Name="SwitchListView"
+                  ItemsSource="{Binding SwitchEditVms}">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <genome:SwitchEditControl/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <Grid Grid.Row="1" Height="25" VerticalAlignment="Bottom">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Offset="0"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+        </Grid>
+
+        <Grid Grid.Row="2" HorizontalAlignment="Center">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60" />
+                <ColumnDefinition Width="60" />
+            </Grid.ColumnDefinitions>
+
+            <Button Height="20" Grid.Column="0"
+                   Command="{Binding InsertCommand}" 
+                   CommandParameter="{Binding SelectedItem, ElementName=SwitchListView}" 
+                 >
+                <TextBlock Text="+" Margin="0,-3,0,0"/>
+            </Button>
+
+            <Button Height="20"  Grid.Column="1"
+                   Command="{Binding DeleteCommand}" 
+                   CommandParameter="{Binding SelectedItem, ElementName=SwitchListView}" 
+                    >
+                <TextBlock Text="-" Margin="0,-3,0,0"/>
+            </Button>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

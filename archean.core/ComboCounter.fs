@@ -1,6 +1,5 @@
 ﻿namespace archean.core
 
-
 module ComboCounter = 
 
     type Wheel = {index:int; spokes:array<int[]>; offsets:int[]}

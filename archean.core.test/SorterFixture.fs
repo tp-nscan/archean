@@ -60,8 +60,8 @@ type SorterFixture () =
         let prefixSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=prefixStageCount}
         let fullSorterStages = {RefSorterPrefixStages.refSorter=End16; stageCount=allStageCount}
 
-        let prefixedSorterGenMode = RandGenerationMode.Prefixed(prefixSorterStages, randSorterStagesNoFill)
-        let fullSorterGenMode = RandGenerationMode.Prefixed(fullSorterStages, randSorterStagesFullStage)
+        let prefixedSorterGenMode = SorterGenerationMode.Prefixed(prefixSorterStages, randSorterStagesNoFill)
+        let fullSorterGenMode = SorterGenerationMode.Prefixed(fullSorterStages, randSorterStagesFullStage)
 
         let prefixSorterDef = SortersFromData.CreateRandomSorterDef 
                                 prefixedSorterGenMode rnd

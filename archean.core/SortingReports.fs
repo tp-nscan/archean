@@ -46,7 +46,7 @@ module SortingReports =
 
 
     let MakeStagePerfHistogram 
-                     (randGenerationMode : RandGenerationMode)
+                     (randGenerationMode : SorterGenerationMode)
                      (sorterCount:int) 
                      (seed : int) =
 
@@ -93,7 +93,7 @@ module SortingReports =
 
 
     let MakeStagePerfHistogram2
-                    (randGenerationMode : RandGenerationMode)
+                    (randGenerationMode : SorterGenerationMode)
                     (sorterCount:int) 
                     (seed : int) =
 
@@ -142,7 +142,7 @@ module SortingReports =
 
      //returns (NumStagesUsed, NumSwitchesUsed, Count)  
     let MakeStageAndSwitchUseHistogram 
-                        (randGenerationMode : RandGenerationMode)
+                        (randGenerationMode : SorterGenerationMode)
                         (sorterCount:int) 
                         (seed : int) =
 

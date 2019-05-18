@@ -1,4 +1,4 @@
-﻿namespace archean.mysql
+﻿namespace archean.mysql.Test
 {
     public static class ArcheanMySqlTest
     {

@@ -8,12 +8,13 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>archean</RootNamespace>
     <AssemblyName>archean.wpf</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -85,6 +86,31 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Common\BindableBase.cs" />
+    <Compile Include="Common\BText.cs" />
+    <Compile Include="Common\ColorEx.cs" />
+    <Compile Include="Common\Converters\AdditionConverter.cs" />
+    <Compile Include="Common\EnumerExt.cs" />
+    <Compile Include="Common\RelayCommand.cs" />
+    <Compile Include="Common\StringFormats.cs" />
+    <Compile Include="ViewModel\Pages\BenchmarkPageVm.cs" />
+    <Compile Include="ViewModel\Pages\SorterPageVm.cs" />
+    <Compile Include="ViewModel\Pages\StagePageVm.cs" />
+    <Compile Include="View\NavWindow.xaml.cs">
+      <DependentUpon>NavWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\BenchmarkPage.xaml.cs">
+      <DependentUpon>BenchmarkPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\MenuPage.xaml.cs">
+      <DependentUpon>MenuPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\SorterPage.xaml.cs">
+      <DependentUpon>SorterPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\StagePage.xaml.cs">
+      <DependentUpon>StagePage.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -98,6 +124,26 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\NavWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\BenchmarkPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\MenuPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\SorterPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\StagePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -129,6 +175,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\archean.controls\archean.controls.csproj">
+      <Project>{472be778-81e0-41c0-907f-820f47c8d5bf}</Project>
+      <Name>archean.controls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\archean.core\archean.core.fsproj">
       <Project>{7e79a0b9-d9ee-444f-aec4-c218cd69a854}</Project>
       <Name>archean.core</Name>

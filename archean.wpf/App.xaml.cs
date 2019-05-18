@@ -1,7 +1,8 @@
-﻿using log4net;
-using System.Windows;
+﻿using System.Windows;
+using archean.View;
+using log4net;
 
-namespace archean.wpf
+namespace archean
 {
     public partial class App : Application
     {
@@ -17,7 +18,7 @@ namespace archean.wpf
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
-            var mainWindow = new MainWindow();
+            var mainWindow = new NavWindow();
             mainWindow.Show();
         }
     }

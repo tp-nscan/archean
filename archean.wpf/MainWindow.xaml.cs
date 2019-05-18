@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using archean.mysql;
-using archean.core;
-using log4net;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Collections.Generic;
+using archean.core;
+using log4net;
 
-namespace archean.wpf
+namespace archean
 {
     public partial class MainWindow : Window
     {
@@ -29,7 +27,7 @@ namespace archean.wpf
                 var randSwitchFill = SortersFromData.RandSwitchFill.FullStage;
                 var randSorterStages = new SortersFromData.RandSorterStages(Order, totalStageCount - prefixStageCount * 2, randSwitchFill);
                 var refSorterPrefixStages = new SortersFromData.RefSorterPrefixStages(refSorter, prefixStageCount);
-                var randGenerationMode = SortersFromData.RandGenerationMode.NewPrefixed(
+                var randGenerationMode = SortersFromData.SorterGenerationMode.NewPrefixed(
                     refSorterPrefixStages, randSorterStages);
 
                 BatchArgsList.Add(new BatchArgs()
@@ -42,7 +40,7 @@ namespace archean.wpf
                 var randSwitchFill2 = SortersFromData.RandSwitchFill.FullStage;
                 var randSorterStages2 = new SortersFromData.RandSorterStages(Order, totalStageCount - prefixStageCount * 2, randSwitchFill2);
                 var refSorterPrefixStages2 = new SortersFromData.RefSorterPrefixStages(refSorter2, prefixStageCount);
-                var randGenerationMode2 = SortersFromData.RandGenerationMode.NewPrefixed(
+                var randGenerationMode2 = SortersFromData.SorterGenerationMode.NewPrefixed(
                     refSorterPrefixStages2, randSorterStages2);
 
                 BatchArgsList.Add(new BatchArgs()
@@ -103,7 +101,7 @@ namespace archean.wpf
 
         public class BatchArgs
         {
-            public SortersFromData.RandGenerationMode RandGenerationMode { get; set; }
+            public SortersFromData.SorterGenerationMode RandGenerationMode { get; set; }
             public int SorterCount { get; set; }
         }
 

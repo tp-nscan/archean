@@ -1,4 +1,4 @@
-﻿namespace archean.wpf
+﻿namespace archean
 {
     //public static class SimBuilder
     //{

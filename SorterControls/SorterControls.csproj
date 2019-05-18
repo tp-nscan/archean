@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0D0AD96F-FFA4-4508-A3D2-50A84E64F457}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SorterControls</RootNamespace>
+    <AssemblyName>SorterControls</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Core, Version=2.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DesignVms\Genome\DesignSwitchListEditVm.cs" />
+    <Compile Include="DesignVms\Sorter\DesignSorterVm.cs" />
+    <Compile Include="DesignVms\Sorter\DesignStageVm.cs" />
+    <Compile Include="TemplateSelectorsOld\SorterSelector.cs" />
+    <Compile Include="ViewModel\Genome\GenomeEditorSwitchIndexVm.cs" />
+    <Compile Include="DesignVms\SorterOld\DesignSorterEvalVm.cs" />
+    <Compile Include="DesignVms\SorterOld\DesignSorterVm.cs" />
+    <Compile Include="DesignVms\SorterOld\DesignStagedSorterVm.cs" />
+    <Compile Include="ViewModel\SorterOld\SorterEvalVm.cs" />
+    <Compile Include="ViewModel\SorterOld\SorterStageVm.cs" />
+    <Compile Include="ViewModel\SorterOld\SorterVm.cs" />
+    <Compile Include="ViewModel\SorterOld\SorterVmType.cs" />
+    <Compile Include="ViewModel\SorterOld\StagedSorterVm.cs" />
+    <Compile Include="ViewModel\SorterOld\SwitchGraphicVm.cs" />
+    <Compile Include="ViewModel\SorterOld\UnstagedSorterVm.cs" />
+    <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
+    <Compile Include="ViewModel\Sorter\SorterVm.cs" />
+    <Compile Include="ViewModel\Sorter\StageVm.cs" />
+    <Compile Include="ViewModel\Test\MakeSorterEvalVm.cs" />
+    <Compile Include="View\Common\BrushFactory.cs" />
+    <Compile Include="View\Common\BrushLegendControl.xaml.cs">
+      <DependentUpon>BrushLegendControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Common\StageLayout.cs" />
+    <Compile Include="View\Genome\GenomeEditorTemplateSelector.cs" />
+    <Compile Include="ViewModel\Genome\GenomeEditorType.cs" />
+    <Compile Include="ViewModel\Genome\ISorterGenomeEditorVm.cs" />
+    <Compile Include="View\Genome\DesignSorterGenomeControl.xaml.cs">
+      <DependentUpon>DesignSorterGenomeControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Genome\GenomeEditorSwitchIndexControl.xaml.cs">
+      <DependentUpon>GenomeEditorSwitchIndexControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SorterOld\DefaultControl.xaml.cs">
+      <DependentUpon>DefaultControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SorterOld\LineBrushFactory.cs" />
+    <Compile Include="View\SorterOld\SorterControl.xaml.cs">
+      <DependentUpon>SorterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SorterOld\StagedSorterControl.xaml.cs">
+      <DependentUpon>StagedSorterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SorterOld\SwitchVisual.cs" />
+    <Compile Include="View\SorterOld\UnstagedSorterControl.xaml.cs">
+      <DependentUpon>UnstagedSorterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter\LabeledSorterControl.xaml.cs">
+      <DependentUpon>LabeledSorterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter\SorterControl.xaml.cs">
+      <DependentUpon>SorterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter\StageControl.cs" />
+    <Compile Include="View\Test\MakeSorterEvalControl.xaml.cs">
+      <DependentUpon>MakeSorterEvalControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Test\TestSorterControl.xaml.cs">
+      <DependentUpon>TestSorterControl.xaml</DependentUpon>
+    </Compile>
+    <Page Include="TemplateSelectorsOld\SorterSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Common\BrushLegendControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Genome\DesignSorterGenomeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Genome\SwitchEditControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="DesignVms\Genome\DesignSwitchEditVm.cs" />
+    <Compile Include="ViewModel\Genome\PermutationEditorVm.cs" />
+    <Compile Include="ViewModel\Genome\SwitchEditorVm.cs" />
+    <Compile Include="ViewModel\Genome\GenomeValidationEx.cs" />
+    <Compile Include="View\Genome\SwitchEditControl.xaml.cs">
+      <DependentUpon>SwitchEditControl.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Genome\GenomeEditorSwitchIndexControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SorterOld\DefaultControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SorterOld\SorterControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SorterOld\StagedSorterControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SorterOld\UnstagedSorterControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Sorter\LabeledSorterControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Sorter\SorterControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Test\MakeSorterEvalControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Test\TestSorterControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FirstFloor.ModernUI\FirstFloor.ModernUI.csproj">
+      <Project>{9a653a28-fe46-40e8-a14f-48b0e325165d}</Project>
+      <Name>FirstFloor.ModernUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MathUtils\MathUtils.csproj">
+      <Project>{45d0ac20-8adf-4830-8ce9-37749385834f}</Project>
+      <Name>MathUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sorting\Sorting.csproj">
+      <Project>{e5827c97-e3d1-4f30-b493-7bea79dbd877}</Project>
+      <Name>Sorting</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

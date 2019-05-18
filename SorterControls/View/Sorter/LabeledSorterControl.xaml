@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="SorterControls.View.Sorter.LabeledSorterControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:sorter="clr-namespace:SorterControls.DesignVms.Sorter"
+             xmlns:sorter1="clr-namespace:SorterControls.View.Sorter"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance sorter:DesignSorterVm, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <DockPanel LastChildFill="True" 
+               Background="Transparent" 
+            DockPanel.Dock="Left">
+        <Viewbox Stretch="Uniform">
+            <ItemsControl Margin="0,0,5,10"
+            ItemsSource="{Binding KeyLabels}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock FontStyle="Italic" TextAlignment="Center" Margin="4" Text="{Binding}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </Viewbox>
+
+        <sorter1:SorterControl/>
+        
+    </DockPanel>
+    
+</UserControl>

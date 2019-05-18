@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="ComboCounter.fs" />
     <Compile Include="SorterData.fs" />
+    <Compile Include="Partition.fs" />
+    <Compile Include="ColorSets.fs" />
     <Compile Include="Rop.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="Sorting.fs" />
@@ -18,6 +20,11 @@
     <Compile Include="SorterGen.fs" />
     <Compile Include="SortingReports.fs" />
     <Compile Include="TestData.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
 
 </Project>

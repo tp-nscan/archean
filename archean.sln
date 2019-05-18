@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28822.285
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archean.mysql", "archean.mysql\archean.mysql.csproj", "{19316CAD-446F-43CD-9D80-E79406168FDF}"
 EndProject
@@ -9,9 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archean.datasource.Test", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archean.wpf", "archean.wpf\archean.wpf.csproj", "{DBD9F039-CFCB-432A-9F73-C53015F1EB2C}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "archean.core", "archean.core\archean.core.fsproj", "{7E79A0B9-D9EE-444F-AEC4-C218CD69A854}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "archean.core", "archean.core\archean.core.fsproj", "{7E79A0B9-D9EE-444F-AEC4-C218CD69A854}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "archean.core.test", "archean.core.test\archean.core.test.fsproj", "{19F71250-C916-40EF-8C9F-19E76588D55A}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "archean.core.test", "archean.core.test\archean.core.test.fsproj", "{19F71250-C916-40EF-8C9F-19E76588D55A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archean.controls", "archean.controls\archean.controls.csproj", "{472BE778-81E0-41C0-907F-820F47C8D5BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{19F71250-C916-40EF-8C9F-19E76588D55A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19F71250-C916-40EF-8C9F-19E76588D55A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19F71250-C916-40EF-8C9F-19E76588D55A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{472BE778-81E0-41C0-907F-820F47C8D5BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{472BE778-81E0-41C0-907F-820F47C8D5BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{472BE778-81E0-41C0-907F-820F47C8D5BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{472BE778-81E0-41C0-907F-820F47C8D5BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
