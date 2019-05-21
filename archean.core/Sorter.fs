@@ -53,7 +53,7 @@ module Sorter =
                  (switchIndexes:seq<int>)
                  (sortableSeq: seq<int[]>) = 
 
-        let rws (weightedSortable:int[]) = 
+        let rws (weightedSortable:int[]) =
             RunSwitchSeqOnSortable 
                     sorterDef 
                     switchTracker 
@@ -104,8 +104,7 @@ module Sorter =
         else (allGood, None)
 
 
-    let Eval 
-            (sorterDef:SorterDef) =
+    let Eval (sorterDef:SorterDef) =
         let startPos = 0
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
 

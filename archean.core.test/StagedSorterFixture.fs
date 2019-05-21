@@ -36,12 +36,20 @@ type StagedSorterFixture () =
 
       Assert.AreEqual(sd.Length, 10)
 
+
     [<TestMethod>]
     member this.EvalRefStagedSorter() =
-      let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order24
-      let res = Sorter.Eval rfsst.sorterDef
 
-      Assert.AreEqual(10, 10)
+      let ExtractUsage (data: SwitchUsage[] option) =
+          match data with
+            | Some d -> d.Length
+            | None -> 0
+
+      let rfsst = RefSorter.CreateRefStagedSorter RefSorter.Order10
+      let (success, data) = Sorter.Eval rfsst.sorterDef
+
+      Assert.AreEqual(rfsst.sorterDef.switches.Length, ExtractUsage data)
+      Assert.IsTrue(success)
 
 
     [<TestMethod>]

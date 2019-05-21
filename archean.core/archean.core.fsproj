@@ -19,6 +19,7 @@
     <Compile Include="SortersFromData.fs" />
     <Compile Include="SorterGen.fs" />
     <Compile Include="SortingReports.fs" />
+    <Compile Include="Benchmarks.fs" />
     <Compile Include="TestData.fs" />
   </ItemGroup>
 

@@ -113,7 +113,7 @@ namespace archean.controls.ViewModel.Sorter
                                            CultureInfo.CurrentCulture,
                                            FlowDirection.LeftToRight,
                                            SortableVm.Typeface,
-                                           radius, sortableVm.ForegroundBrush, 1.0);
+                                           radius, sortableVm.ForegroundBrush);
 
             var upLeft = new Point(center.X - txt.Width/2, center.Y - txt.Height/2);
             dc.DrawText(txt, upLeft);

@@ -14,6 +14,7 @@
     <Compile Include="SorterFixture.fs" />
     <Compile Include="StagedSorterFixture.fs" />
     <Compile Include="SortersFromDataFixture.fs" />
+    <Compile Include="SortingReportsFixture.fs" />
     <Compile Include="GeneratedSortableFixture.fs" />
   </ItemGroup>
 

@@ -170,7 +170,7 @@ module SortersFromData =
                                    (randSwitchFill:RandSwitchFill) (rnd:Random) =
         let switchFiller = 
             match randSwitchFill with
-            | LooseSwitches -> (SwitchSet.RandomSwitchesOfOrder order rnd)
+            | LooseSwitches -> (Switch.RandomSwitchesOfOrder order rnd)
             | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order)
             | NoFill -> Seq.empty
 
@@ -193,7 +193,7 @@ module SortersFromData =
 
         let switchFiller = 
             match randSwitchFill with
-            | LooseSwitches -> (SwitchSet.RandomSwitchesOfOrder order rnd)
+            | LooseSwitches -> (Switch.RandomSwitchesOfOrder order rnd)
             | FullStage -> (Stage.MakeStagePackedSwitchSeq rnd order)
             | NoFill -> Seq.empty
 
@@ -226,8 +226,8 @@ module SortersFromData =
                 {SorterDef.order = order; switches = Array.empty}
 
 
-    let CreateRandomSorterDef (randGenerationMode : SorterGenerationMode) 
-                              (rnd : Random) =
+    let CreateRandomSorterDef (randGenerationMode:SorterGenerationMode) 
+                              (rnd:Random) =
         match randGenerationMode with
          | Prefixed ({refSorter=refType; stageCount=refStages}, 
                      {order=order; stageCount=stageCount; randSwitchFill=randSwitchFill;}) ->

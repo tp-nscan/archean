@@ -8,6 +8,32 @@
       Title="BenchmarkPage">
 
     <Grid Background="Peru">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Margin="20,10" FontSize="14" Text="{Binding Result}" Width="100" Height="20"/>
+            <TextBlock Margin="20,10" FontSize="14" Text="{Binding Message}" Width="100" Height="20"/>
+            <CheckBox Margin="20,10"  FontSize="14" IsChecked="{Binding Parallel}">Parallel</CheckBox>
+        </StackPanel>
+
+        <Button
+            FontSize="14"
+            Command="{Binding StepCommand}"
+            Margin="10"
+            Height="30"
+            Width="70"
+            Grid.Row="1">Step</Button>
+
+        <TextBlock FontSize="14"
+                   Grid.Row="2" 
+                   Text="{Binding Time}" 
+                   Width="200" Height="100"/>
         
     </Grid>
+
 </Page>

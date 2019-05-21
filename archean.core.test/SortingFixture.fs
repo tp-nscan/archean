@@ -33,13 +33,6 @@ type SortingFixture () =
 
 
     [<TestMethod>]
-    member this.TestMakeSwitchSet() =
-        let res = SwitchSet.ForOrder 5
-        Assert.IsTrue (res.order = 5)
-        Assert.IsTrue (res.switches.Length = 10)
-
-    
-    [<TestMethod>]
     member this.TestMakeRandomSorterDef() =
         let length = 29
         let order = 5
@@ -116,6 +109,17 @@ type SortingFixture () =
         let order = { 11 .. 11 } |> Seq.iter(fun i -> Console.Write (SortableGen.GenN i))
         Assert.IsTrue (true)
 
+    [<TestMethod>]
+    member this.TestGetStages() =
+        let stagedSorter = RefSorter.CreateRefStagedSorter
+                                   RefSorter.End16
+
+        let res = StagedSorterDef.GetStages stagedSorter
+                  |> Seq.map(fun sq-> sq|>Seq.toArray)
+                  |> Seq.toArray
+
+        Assert.IsTrue (true)
+                                    
 
     [<TestMethod>]
     member this.TestStagedSorterDef_AppendSwitches() =

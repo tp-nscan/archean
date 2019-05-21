@@ -18,22 +18,19 @@ type SorterFixture () =
         let seed = 123
         let rnd = new Random(seed)
 
-        let MakeSortable = Array.init order (fun i -> order - i - 1)
-
         let SortableFunc (order:int) (rnd : Random) (count:int) =
             Permutation.CreateRandom rnd order
             |> Seq.map(fun i -> Permutation.value i )
             |> Seq.take count
 
-        let switchSet = SwitchSet.ForOrder order
-        let sorterDef = SorterDef.CreateRand switchSet sorterLen rnd
+        let sorterDef = SorterDef.CreateRandom order sorterLen rnd
         let startPos = 5
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
         let (res, switchTrack) = UpdateSwitchUses
-                                                        sorterDef
-                                                        switchTracker 
-                                                        startPos 
-                                                        (SortableFunc order rnd sortableCount)
+                                        sorterDef
+                                        switchTracker 
+                                        startPos 
+                                        (SortableFunc order rnd sortableCount)
 
         Assert.IsTrue (switchTrack.Value.Length > 0)
 

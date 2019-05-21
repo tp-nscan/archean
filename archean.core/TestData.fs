@@ -11,12 +11,11 @@ module TestData =
 
     let MakeRandomSorterDef (order:int) (length:int) (seed:int) =
         let rnd = new Random(seed)
-        let switchSet = SwitchSet.ForOrder order
-        SorterDef.CreateRand switchSet length rnd
+        SorterDef.CreateRandom order length rnd
 
     let SwitchSeq (order:int) (seed:int) = 
         let rnd = new Random(seed)
-        SwitchSet.RandomSwitchesOfOrder order rnd
+        Switch.RandomSwitchesOfOrder order rnd
 
     let StagedSorterDef = 
         RefSorter.CreateRefStagedSorter RefSorter.End16

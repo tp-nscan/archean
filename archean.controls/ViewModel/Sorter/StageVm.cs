@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace archean.controls.ViewModel.Sorter
 {
-    public partial class StageVm
+    public class StageVm
     {
         public StageVm(
             StageVmStep stageVmStep,
@@ -58,8 +58,47 @@ namespace archean.controls.ViewModel.Sorter
     }
 
 
-    public static class StageVmUpdate
+    public class StageVmStyles
     {
+        public Brush LineBrush { get; set; }
+        public Brush SwitchBrush { get; set; }
+        public double SwitchWidth { get; set; }
+        public double SwitchSpacing { get; set; }
+        public double LineThickness { get; set; }
+        public double LineSpacing { get; set; }
+        public double HPadding { get; set; }
+        public double VPadding { get; set; }
+        public Brush BackgroundBrush { get; set; }
+
+        static StageVmStyles _standard;
+        public static StageVmStyles Standard
+        {
+            get
+            {
+                return _standard ?? (_standard = new StageVmStyles
+                {
+                    LineBrush = Brushes.Blue,
+                    SwitchBrush = Brushes.Black,
+                    SwitchWidth = 1.0,
+                    SwitchSpacing = 2.0,
+                    LineThickness = 1.0,
+                    LineSpacing = 3.0,
+                    HPadding = 3.0,
+                    VPadding = 1.0,
+                    BackgroundBrush = Brushes.Black
+                });
+            }
+        }
+    }
+
+
+    public static class StageVmProcs
+    {
+        public static StageVm Make(StageVmStyles stageVmStyles, core.Sorting.Stage stage)
+        {
+            return null;
+        }
+
         public static StageVm ToNextStep(this StageVm stageVm)
         {
             switch (stageVm.StageVmStep)
@@ -133,9 +172,7 @@ namespace archean.controls.ViewModel.Sorter
                     throw new System.Exception($"{stageVm.StageVmStep} not handled");
             }
 
-
         }
-
 
 
 
