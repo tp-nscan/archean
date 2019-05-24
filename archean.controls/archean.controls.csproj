@@ -54,7 +54,11 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DesignVms\Sorter\SorterVmD.cs" />
     <Compile Include="DesignVms\Sorter\StageVmD.cs" />
+    <Compile Include="Utils\Converters\CoreLibConverters.cs" />
+    <Compile Include="Utils\Converters\FEconverters.cs" />
+    <Compile Include="Utils\Converters\MediaConverters.cs" />
     <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableVm.cs" />
     <Compile Include="ViewModel\Sorter\SorterVm.cs" />

@@ -320,26 +320,23 @@ module Sorting =
                         if (SwitchFits switchPad sw) then
                             switchPad <- AddSwitch switchPad sw
                         else
-                            yield switchPad.switches
+                            yield switchPad.switches |> Seq.toArray
                             switchPad <- InitSwitchPad order
                             switchPad <- AddSwitch switchPad sw
 
-                    yield switchPad.switches
+                    yield switchPad.switches |> Seq.toArray
                 }
                 |> Seq.toArray
 
 
         let LayoutRandomStage (order:int) (rnd:Random) =
             let switches = Stage.MakeStagePackedSwitchSeq rnd order |> Seq.take (order / 2)
-            let fsharpy = LayoutSwitches order switches
-            fsharpy |> Array.map(fun l -> l.ToArray())
-                    |> Array.toSeq
+            LayoutSwitches order switches
 
 
         let LayoutStagedSorter (ssd:StagedSorterDef) =
-            let fsharpy = StagedSorterDef.GetStages ssd
-                             |> Seq.map(fun sq -> LayoutSwitches ssd.sorterDef.order sq )
-            fsharpy |> Seq.map(fun d -> d|> Array.map(fun l -> l.ToArray()))
+                StagedSorterDef.GetStages ssd
+                     |> Seq.map(fun sq -> LayoutSwitches ssd.sorterDef.order sq )
 
 
     module SortableGen =

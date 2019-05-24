@@ -9,7 +9,8 @@ namespace archean.controls.ViewModel.Sorter
     {
         Left,
         Center,
-        Right
+        Right,
+        Missing
     }
 
     public class SortableVm
@@ -141,6 +142,19 @@ namespace archean.controls.ViewModel.Sorter
                 );
         }
 
+        public static SortableVm ToMissingSortableVm(this SortableVm sortableVm)
+        {
+            return new SortableVm(
+                    backgroundBrush: sortableVm.BackgroundBrush,
+                    foregroundBrush: sortableVm.ForegroundBrush,
+                    stageSection: 0,
+                    stagePos: StagePos.Missing,
+                    keyLinePos: sortableVm.KeyLinePos,
+                    label: sortableVm.Label,
+                    sortableValue: sortableVm.SortableValue
+                );
+        }
+
 
         public static SortableVm[] ToLeftStep(this SortableVm[] sortableVms)
         {
@@ -166,6 +180,12 @@ namespace archean.controls.ViewModel.Sorter
                               .ToArray();
         }
 
+        public static SortableVm[] ToMissingStep(this SortableVm[] sortableVms)
+        {
+            return sortableVms.Select(svm => svm.ToMissingSortableVm())
+                              .ToArray();
+        }
+
         public static void SortWithAKeyPairVm(this SortableVm[] sortableVms, KeyPairVm keyPairVm)
         {
             var swL = sortableVms.FirstOrDefault(
@@ -174,11 +194,14 @@ namespace archean.controls.ViewModel.Sorter
             var swH = sortableVms.FirstOrDefault(
                                     swm => (swm.KeyLinePos == keyPairVm.HiKey));
 
-            if(swL.SortableValue > swH.SortableValue)
+            if ((swL == null) || (swH == null)) return;
+
+                if (swL.SortableValue > swH.SortableValue)
             {
                 var lv = swL.KeyLinePos;
                 swL.KeyLinePos = swH.KeyLinePos;
                 swH.KeyLinePos = lv;
+                keyPairVm.KeyPairUse = KeyPairUse.InUse;
             }
         }
 

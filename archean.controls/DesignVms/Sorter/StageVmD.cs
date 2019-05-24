@@ -1,7 +1,5 @@
 ﻿using archean.controls.ViewModel.Sorter;
-using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
 
 namespace archean.controls.DesignVms.Sorter
 {
@@ -10,55 +8,32 @@ namespace archean.controls.DesignVms.Sorter
         public StageVmD() :
             base(
                     stageVmStep: StageVmStep.Left,
-                    keyLineBrush: StageVmStyles.Standard.LineBrush,
+                    stageVmStyle: StageVmStyle.StandardE,
                     keyCount: _KeyCount,
-                    switchLineWidth: StageVmStyles.Standard.SwitchWidth,
-                    switchSpacing: StageVmStyles.Standard.SwitchSpacing,
-                    lineThickness: StageVmStyles.Standard.LineThickness,
-                    keyLineSpacing: StageVmStyles.Standard.LineSpacing,
-                    hPadding: StageVmStyles.Standard.HPadding,
-                    vPadding: StageVmStyles.Standard.VPadding,
-                    backgroundBrush: StageVmStyles.Standard.BackgroundBrush,
-                    keyPairVms: _KeyPairVms,
-                    sortableVms: SortableVmExt.StartingPositionInts(
-                                                        _KeyCount, 
-                                                        ScramblePos(_KeyCount))
+                    keyPairVms: StageVmStyle.StandardE.ToRandomKeyPairVms(_KeyCount),
+                    sortableVms: StageVmProcs.ScrambledSortableVms(_KeyCount)
                 )
         {
         }
 
-        public static int[] ScramblePos(int order)
+        public static int _KeyCount = 32;
+
+    }
+
+    public class StageVmD2 : StageVm
+    {
+        public StageVmD2() :
+            base(
+                    stageVmStep: StageVmStep.Left,
+                    stageVmStyle: StageVmStyle.Standard0,
+                    keyCount: _KeyCount,
+                    keyPairVms: StageVmStyle.Standard0.ToRandomKeyPairVms(_KeyCount),
+                    sortableVms: new SortableVm[0]
+                )
         {
-            return
-                core.Combinatorics.FisherYatesShuffle(
-                new System.Random(),
-                Enumerable.Range(0, order).ToArray()
-                ).ToArray();
         }
 
-        public static int _KeyCount = 16;
-
-
-        public static IEnumerable<KeyPairVm> _KeyPairVms
-        {
-            get
-            {
-               var stbs = core.Sorting.StageLayout.LayoutRandomStage(_KeyCount, new System.Random()).ToArray();
-
-                for(var i=0; i < stbs.Length; i++)
-                {
-                    var swb = stbs[i].ToArray();
-                    for(var j=0; j< swb.Length; j++)
-                    {
-                        yield return new KeyPairVm(
-                            brush: StageVmStyles.Standard.SwitchBrush, 
-                            orderInStage: i, 
-                            hiKey: swb[j].hi, 
-                            lowKey: swb[j].low);
-                    }
-                }
-            }
-        }
+        public static int _KeyCount = 32;
 
     }
 }

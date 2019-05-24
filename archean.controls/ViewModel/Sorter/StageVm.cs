@@ -8,28 +8,22 @@ namespace archean.controls.ViewModel.Sorter
     {
         public StageVm(
             StageVmStep stageVmStep,
-            Brush keyLineBrush, 
+            StageVmStyle stageVmStyle,
             int keyCount,
-            double switchLineWidth,
-            double switchSpacing,
-            double lineThickness,
-            double keyLineSpacing,
-            double hPadding,
-            double vPadding,
-            Brush backgroundBrush, 
             IEnumerable<KeyPairVm> keyPairVms,
             SortableVm[] sortableVms)
         {
             StageVmStep = stageVmStep;
-            KeyLineBrush = keyLineBrush;
+            StageVmStyle = stageVmStyle;
+            KeyLineBrush = StageVmStyle.KeyLineBrush;
             KeyCount = keyCount;
-            SwitchLineWidth = switchLineWidth;
-            SwitchSpacing = switchSpacing;
-            KeyLineThickness = lineThickness;
-            KeyLineSpacing = keyLineSpacing;
-            HPadding = hPadding;
-            VPadding = vPadding;
-            BackgroundBrush = backgroundBrush;
+            SwitchLineWidth = StageVmStyle.SwitchLineWidth;
+            SwitchSpacing = StageVmStyle.SwitchSpacing;
+            KeyLineThickness = StageVmStyle.KeyLineThickness;
+            KeyLineSpacing = StageVmStyle.KeyLineSpacing;
+            HPadding = StageVmStyle.HPadding;
+            VPadding = StageVmStyle.VPadding;
+            BackgroundBrush = StageVmStyle.BackgroundBrush;
             _keyPairVms = keyPairVms.ToList();
             SortableVms = sortableVms;
             SectionCount = _keyPairVms.Max(vm => vm.StageSection) + 1;
@@ -48,55 +42,127 @@ namespace archean.controls.ViewModel.Sorter
         public double VPadding { get; }
         public Brush BackgroundBrush { get; }
         public SortableVm[] SortableVms { get; }
-
+        public StageVmStyle StageVmStyle { get; }
         readonly List<KeyPairVm> _keyPairVms;
         public IEnumerable<KeyPairVm> KeyPairVms { get { return _keyPairVms; } }
 
         public int SectionCount { get; }
         public double VmHeight { get; }
         public double VmWidth { get; }
+        public double WidthToHeight { get { return (VmHeight > 0) ? VmWidth / VmHeight : 0.0;  } }
     }
 
 
-    public class StageVmStyles
+    public class StageVmStyle
     {
-        public Brush LineBrush { get; set; }
-        public Brush SwitchBrush { get; set; }
-        public double SwitchWidth { get; set; }
+        public Brush KeyLineBrush { get; set; }
+        public Brush SwitchBrushNotUsed { get; set; }
+        public Brush SwitchBrushInUse { get; set; }
+        public Brush SwitchBrushWasUsed { get; set; }
+        public double SwitchLineWidth { get; set; }
         public double SwitchSpacing { get; set; }
-        public double LineThickness { get; set; }
-        public double LineSpacing { get; set; }
+        public double KeyLineThickness { get; set; }
+        public double KeyLineSpacing { get; set; }
         public double HPadding { get; set; }
         public double VPadding { get; set; }
         public Brush BackgroundBrush { get; set; }
 
-        static StageVmStyles _standard;
-        public static StageVmStyles Standard
+        static StageVmStyle _standardE;
+        static StageVmStyle _standard0;
+        public static StageVmStyle StandardE
         {
             get
             {
-                return _standard ?? (_standard = new StageVmStyles
+                return _standardE ?? (_standardE = new StageVmStyle
                 {
-                    LineBrush = Brushes.Blue,
-                    SwitchBrush = Brushes.Black,
-                    SwitchWidth = 1.0,
+                    KeyLineBrush = Brushes.Blue,
+                    SwitchBrushNotUsed = Brushes.Black,
+                    SwitchBrushInUse = Brushes.LightBlue,
+                    SwitchBrushWasUsed = Brushes.DarkBlue,
+                    SwitchLineWidth = 1.0,
                     SwitchSpacing = 2.0,
-                    LineThickness = 1.0,
-                    LineSpacing = 3.0,
+                    KeyLineThickness = 1.0,
+                    KeyLineSpacing = 3.0,
                     HPadding = 3.0,
                     VPadding = 1.0,
-                    BackgroundBrush = Brushes.Black
+                    BackgroundBrush = Brushes.White
                 });
             }
         }
+
+        public static StageVmStyle Standard0
+        {
+            get
+            {
+                return _standard0 ?? (_standard0 = new StageVmStyle
+                {
+                    KeyLineBrush = Brushes.Blue,
+                    SwitchBrushNotUsed = Brushes.Black,
+                    SwitchBrushInUse = Brushes.LightBlue,
+                    SwitchBrushWasUsed = Brushes.DarkBlue,
+                    SwitchLineWidth = 1.0,
+                    SwitchSpacing = 2.0,
+                    KeyLineThickness = 1.0,
+                    KeyLineSpacing = 3.0,
+                    HPadding = 3.0,
+                    VPadding = 1.0,
+                    BackgroundBrush = Brushes.Lavender
+                });
+            }
+        }
+
     }
 
 
     public static class StageVmProcs
     {
-        public static StageVm Make(StageVmStyles stageVmStyles, core.Sorting.Stage stage)
+        public static StageVm StageToStageVm(this core.Sorting.Stage stage,
+                                                  StageVmStyle stageVmStyle, 
+                                                  int order)
         {
-            return null;
+            var swLayout = core.Sorting.StageLayout.LayoutSwitches(order, stage.switches);
+            var kpVms = swLayout.ToKeyPairVms(stageVmStyle);
+            return new StageVm(
+                    stageVmStep: StageVmStep.Left,
+                    stageVmStyle: stageVmStyle,
+                    keyCount: order,
+                    keyPairVms: kpVms,
+                    sortableVms: new SortableVm[0]
+                 );
+        }
+
+
+        public static StageVm SwitchBlocksToStageVm(
+                            this core.Sorting.Switch[][] switchBlocks,
+                            StageVmStyle stageVmStyle, 
+                            int order,
+                            SortableVm[] sortableVms)
+        {
+            var kpVms = switchBlocks.ToKeyPairVms(stageVmStyle);
+            return new StageVm(
+                    stageVmStep: StageVmStep.Left,
+                    stageVmStyle: stageVmStyle,
+                    keyCount: order,
+                    keyPairVms: kpVms,
+                    sortableVms: sortableVms
+                 );
+        }
+
+
+        public static SortableVm[] ScrambledSortableVms(int keyCount)
+        {
+            return
+                SortableVmExt.StartingPositionInts(keyCount, ScramblePos(keyCount));
+        }
+
+
+        public static int[] ScramblePos(int order)
+        {
+            return
+                    core.Combinatorics.FisherYatesShuffle(
+                    new System.Random(),
+                    Enumerable.Range(0, order).ToArray()
+                ).ToArray();
         }
 
         public static StageVm ToNextStep(this StageVm stageVm)
@@ -106,15 +172,8 @@ namespace archean.controls.ViewModel.Sorter
                 case StageVmStep.Left:
                     return new StageVm(
                             stageVmStep: StageVmStep.Presort,
-                            keyLineBrush: stageVm.KeyLineBrush,
+                            stageVmStyle: StageVmStyle.StandardE,
                             keyCount: stageVm.KeyCount,
-                            switchLineWidth: stageVm.SwitchLineWidth,
-                            switchSpacing: stageVm.SwitchSpacing,
-                            lineThickness: stageVm.KeyLineThickness,
-                            keyLineSpacing: stageVm.KeyLineSpacing,
-                            hPadding: stageVm.HPadding,
-                            vPadding: stageVm.VPadding,
-                            backgroundBrush: stageVm.BackgroundBrush,
                             keyPairVms: stageVm.KeyPairVms,
                             sortableVms: stageVm.SortableVms.ToPreSortStep(stageVm.KeyPairVms.ToArray())
                          );
@@ -126,47 +185,35 @@ namespace archean.controls.ViewModel.Sorter
 
                     return new StageVm(
                             stageVmStep: StageVmStep.PostSort,
-                            keyLineBrush: stageVm.KeyLineBrush,
+                            stageVmStyle: StageVmStyle.StandardE,
                             keyCount: stageVm.KeyCount,
-                            switchLineWidth: stageVm.SwitchLineWidth,
-                            switchSpacing: stageVm.SwitchSpacing,
-                            lineThickness: stageVm.KeyLineThickness,
-                            keyLineSpacing: stageVm.KeyLineSpacing,
-                            hPadding: stageVm.HPadding,
-                            vPadding: stageVm.VPadding,
-                            backgroundBrush: stageVm.BackgroundBrush,
                             keyPairVms: stageVm.KeyPairVms,
                             sortableVms: stageVm.SortableVms.ToPostSortStep(stageVm.KeyPairVms.ToArray())
                          );
                 case StageVmStep.PostSort:
+
+                    foreach(var kpvm in stageVm.KeyPairVms)
+                    {
+                        if (kpvm.KeyPairUse == KeyPairUse.InUse)
+                        {
+                            kpvm.KeyPairUse = KeyPairUse.WasUsed;
+                        }
+                    }
+
                     return new StageVm(
                             stageVmStep: StageVmStep.Right,
-                            keyLineBrush: stageVm.KeyLineBrush,
+                            stageVmStyle: StageVmStyle.StandardE,
                             keyCount: stageVm.KeyCount,
-                            switchLineWidth: stageVm.SwitchLineWidth,
-                            switchSpacing: stageVm.SwitchSpacing,
-                            lineThickness: stageVm.KeyLineThickness,
-                            keyLineSpacing: stageVm.KeyLineSpacing,
-                            hPadding: stageVm.HPadding,
-                            vPadding: stageVm.VPadding,
-                            backgroundBrush: stageVm.BackgroundBrush,
                             keyPairVms: stageVm.KeyPairVms,
                             sortableVms: stageVm.SortableVms.ToRightStep()
                          );
                 case StageVmStep.Right:
                     return new StageVm(
                             stageVmStep: StageVmStep.Right,
-                            keyLineBrush: stageVm.KeyLineBrush,
+                            stageVmStyle: StageVmStyle.StandardE,
                             keyCount: stageVm.KeyCount,
-                            switchLineWidth: stageVm.SwitchLineWidth,
-                            switchSpacing: stageVm.SwitchSpacing,
-                            lineThickness: stageVm.KeyLineThickness,
-                            keyLineSpacing: stageVm.KeyLineSpacing,
-                            hPadding: stageVm.HPadding,
-                            vPadding: stageVm.VPadding,
-                            backgroundBrush: stageVm.BackgroundBrush,
                             keyPairVms: stageVm.KeyPairVms,
-                            sortableVms: stageVm.SortableVms.ToRightStep()
+                            sortableVms: stageVm.SortableVms.ToMissingStep()
                          );
                 default:
                     throw new System.Exception($"{stageVm.StageVmStep} not handled");

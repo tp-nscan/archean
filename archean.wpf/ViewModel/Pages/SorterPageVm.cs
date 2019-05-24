@@ -10,14 +10,14 @@ namespace archean.ViewModel.Pages
 
         public SorterPageVm()
         {
-            StageVm = new StageVmD();
+            SorterVm = new SorterVmD();
         }
 
-        StageVm _stageVm;
-        public StageVm StageVm
+        SorterVm _sorterVm;
+        public SorterVm SorterVm
         {
-            get => _stageVm;
-            set => SetProperty(ref _stageVm, value);
+            get => _sorterVm;
+            set => SetProperty(ref _sorterVm, value);
         }
 
 
@@ -32,7 +32,7 @@ namespace archean.ViewModel.Pages
 
         private void DoStep()
         {
-            StageVm = StageVm.ToNextStep();
+           // StageVm = StageVm.ToNextStep();
         }
 
         bool CanStep()

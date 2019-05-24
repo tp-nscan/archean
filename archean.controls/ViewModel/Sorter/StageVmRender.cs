@@ -87,6 +87,15 @@ namespace archean.controls.ViewModel.Sorter
                                                   SortableVm sortableVm,
                                                   double stageRenderWidth, double stageRenderHeight)
         {
+            if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
+            {
+                return;
+            }
+            if (sortableVm.StagePos == StagePos.Missing)
+            {
+                return;
+            }
+
             var renderY = stageVm.KeyRenderYc(sortableVm.KeyLinePos, stageRenderHeight);
             var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
 
@@ -113,16 +122,18 @@ namespace archean.controls.ViewModel.Sorter
                                            CultureInfo.CurrentCulture,
                                            FlowDirection.LeftToRight,
                                            SortableVm.Typeface,
-                                           radius, sortableVm.ForegroundBrush);
+                                           radius, sortableVm.ForegroundBrush, 1.0);
 
             var upLeft = new Point(center.X - txt.Width/2, center.Y - txt.Height/2);
             dc.DrawText(txt, upLeft);
         }
 
         public static void DrawSortableValues(this DrawingContext dc, StageVm stageVm, 
-                                                    double stageRenderWidth, double stageRenderHeight)
+                                                   double stageRenderWidth, double stageRenderHeight)
         {
-            foreach(var sortableVm in stageVm.SortableVms)
+            if (stageVm.SortableVms == null) return;
+
+            foreach (var sortableVm in stageVm.SortableVms)
             {
                 dc.DrawSortableValue(stageVm, sortableVm, stageRenderWidth, stageRenderHeight);
             }

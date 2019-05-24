@@ -13,19 +13,20 @@ namespace archean.controls.View.Sorter
         public StageControl()
         {
             InitializeComponent();
+            SizeChanged += StageControl_SizeChanged;
         }
 
         void StageControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
 
             Dispatcher.BeginInvoke(
-                DispatcherPriority.Input,
+                DispatcherPriority.Normal,
                 new Action(() =>
                 {
+                    Width = ActualHeight * StageVm.WidthToHeight;
                     InvalidateVisual();
                 }));
         }
-
 
 
         protected override void OnRender(DrawingContext dc)
@@ -34,18 +35,16 @@ namespace archean.controls.View.Sorter
             {
                 return;
             }
+            var aw = ActualWidth;
+            dc.DrawRectangle(StageVm.BackgroundBrush, null, new Rect(0.0, 0.0, ActualWidth, ActualHeight));
 
-            dc.DrawKeyLines(StageVm, ActualWidth, ActualHeight);
+            dc.DrawKeyLines(StageVm, aw, ActualHeight);
 
             foreach(var kvm in StageVm.KeyPairVms)
             {
-                dc.DrawSwitch(StageVm, kvm, ActualWidth, ActualHeight);
+                dc.DrawSwitch(StageVm, kvm, aw, ActualHeight);
             }
-            dc.DrawSortableValues(StageVm, ActualWidth, ActualHeight);
-            //Point center = new Point(ActualWidth/2, ActualHeight/2);
-            //Typeface typeface = new Typeface("Segoe UI");
-            //double em_size = 140;
-            //dc.DrawText(new FormattedText("yark", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, em_size, Brushes.Aqua, 1.0), center);
+            dc.DrawSortableValues(StageVm, aw, ActualHeight);
         }
 
 
@@ -62,14 +61,11 @@ namespace archean.controls.View.Sorter
             DependencyProperty.Register("StageVm", typeof(StageVm), typeof(StageControl),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnStageVmPropertyChanged));
 
-        //public static readonly DependencyProperty StageVmProperty =
-        //    DependencyProperty.Register("StageVm", typeof(StageVm), typeof(StageControl));
-
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var sorterControl = (StageControl)d;
-            //sorterControl.Width = sorterControl.StageWidth.Value;
-            sorterControl.InvalidateVisual();
+            var stageControl = (StageControl)d;
+           // stageControl.Width = stageControl.ActualHeight * stageControl.StageVm.WidthToHeight;
+            stageControl.InvalidateVisual();
         }
 
         #endregion

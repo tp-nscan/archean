@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace archean.controls.ViewModel.Sorter
 {
@@ -29,5 +27,31 @@ namespace archean.controls.ViewModel.Sorter
             return new SorterVm(Enumerable.Empty<StageVm>());
         }
 
+
+        public static IEnumerable<Func<core.Sorting.Switch[][], StageVm>> StageVmMaps(
+                                            int order, SortableVm[] sortableVms)
+        {
+
+            yield return
+                switchblocks => switchblocks.SwitchBlocksToStageVm(StageVmStyle.StandardE, order, sortableVms);
+
+            while (true)
+                {
+                    yield return
+                        switchblocks => switchblocks.SwitchBlocksToStageVm(StageVmStyle.Standard0, order, new SortableVm[0]);
+                    yield return
+                        switchblocks => switchblocks.SwitchBlocksToStageVm(StageVmStyle.StandardE, order, new SortableVm[0]);
+            };
+        }
+
+        public static IEnumerable<StageVm> ToStageVms(this core.Sorting.StagedSorterDef stagedSorterDef)
+        {
+            var keyCount = stagedSorterDef.sorterDef.order;
+            var stm = core.Sorting.StageLayout.LayoutStagedSorter(stagedSorterDef);
+
+            return stm.Zip(StageVmMaps(keyCount, StageVmProcs.ScrambledSortableVms(keyCount)), 
+                                    (s, m) => m(s));
+
+        }
     }
 }
