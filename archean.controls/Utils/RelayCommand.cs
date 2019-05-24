@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace archean.Common
+namespace archean.controls.Utils
 {
     /// <summary>
     /// A command whose sole purpose is to relay its functionality 

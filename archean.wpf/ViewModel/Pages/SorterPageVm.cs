@@ -1,7 +1,7 @@
-﻿using archean.Common;
-using archean.controls.DesignVms.Sorter;
+﻿using archean.controls.DesignVms.Sorter;
 using archean.controls.ViewModel.Sorter;
 using System.Windows.Input;
+using archean.controls.Utils;
 
 namespace archean.ViewModel.Pages
 {

@@ -47,12 +47,8 @@ namespace archean.controls.ViewModel.Sorter
     {
 
 
-        public static SortableVm[] StartingPositionInts(int order, int[] positions)
+        public static SortableVm[] ToRedBlueSortableVms(this int[] positions, int order)
         {
-            var csF = ColorSets.ColorSpan(order, Colors.Red, Colors.Blue)
-                                    .Select(c=> new SolidColorBrush(c))
-                                    .ToArray();
-
             var csB = ColorSets.ColorSpan(order, Colors.Blue, Colors.Red)
                                     .Select(c => new SolidColorBrush(c))
                                     .ToArray();

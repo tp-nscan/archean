@@ -46,7 +46,7 @@ type SortingReportsFixture () =
 
 
          let res = StageLayout.LayoutSwitches order switchSeq
-                   |> Array.maxBy(fun l->l.Count)
+                   |> Array.maxBy(fun l->l.Length)
 
          Assert.AreEqual(10, 10)
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 
 namespace archean.controls.ViewModel.Sorter
 {
@@ -13,6 +14,29 @@ namespace archean.controls.ViewModel.Sorter
         }
 
         public ObservableCollection<StageVm> StageVms { get; set; }
+
+        public int ActiveStageIndex { get; }
+
+        #region StepCommand
+
+        //RelayCommand _stepCommand;
+
+        //public ICommand StepCommand => _stepCommand ?? (_stepCommand = new RelayCommand(
+        //    DoStep,
+        //    CanStep
+        //    ));
+
+        private void DoStep()
+        {
+          //  StageVm = StageVm.ToNextStep();
+        }
+
+        bool CanStep()
+        {
+            return true;
+        }
+
+        #endregion // StepCommand
     }
 
     public static class SorterVmExt

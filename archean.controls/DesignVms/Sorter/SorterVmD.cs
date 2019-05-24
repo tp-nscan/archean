@@ -1,5 +1,5 @@
 ﻿using archean.controls.ViewModel.Sorter;
-using System.Collections.Generic;
+
 
 namespace archean.controls.DesignVms.Sorter
 {

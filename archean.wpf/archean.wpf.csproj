@@ -80,13 +80,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Common\BindableBase.cs" />
-    <Compile Include="Common\BText.cs" />
-    <Compile Include="Common\ColorEx.cs" />
-    <Compile Include="Common\Converters\AdditionConverter.cs" />
-    <Compile Include="Common\EnumerExt.cs" />
-    <Compile Include="Common\RelayCommand.cs" />
-    <Compile Include="Common\StringFormats.cs" />
     <Compile Include="ViewModel\Pages\BenchmarkPageVm.cs" />
     <Compile Include="ViewModel\Pages\SorterPageVm.cs" />
     <Compile Include="ViewModel\Pages\StagePageVm.cs" />

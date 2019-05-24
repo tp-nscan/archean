@@ -152,7 +152,7 @@ namespace archean.controls.ViewModel.Sorter
         public static SortableVm[] ScrambledSortableVms(int keyCount)
         {
             return
-                SortableVmExt.StartingPositionInts(keyCount, ScramblePos(keyCount));
+                ScramblePos(keyCount).ToRedBlueSortableVms(keyCount);
         }
 
 
@@ -164,6 +164,7 @@ namespace archean.controls.ViewModel.Sorter
                     Enumerable.Range(0, order).ToArray()
                 ).ToArray();
         }
+
 
         public static StageVm ToNextStep(this StageVm stageVm)
         {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace archean.Common
+namespace archean.controls.Utils
 {
     public static class StringFormats
     {
