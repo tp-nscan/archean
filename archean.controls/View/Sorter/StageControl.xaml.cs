@@ -1,6 +1,7 @@
 ﻿using archean.controls.ViewModel.Sorter;
 using System;
 using System.ComponentModel;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,9 +11,14 @@ namespace archean.controls.View.Sorter
 {
     public partial class StageControl : UserControl
     {
+        readonly Timer renderTimer = null;
+        private const double DEFAULT_INTERVAL = 60;
+
         public StageControl()
         {
             InitializeComponent();
+            renderTimer = new Timer(DEFAULT_INTERVAL);
+            renderTimer.Elapsed += OnRenderTimerElapsed;
             SizeChanged += StageControl_SizeChanged;
         }
 
@@ -29,22 +35,60 @@ namespace archean.controls.View.Sorter
         }
 
 
+        private void StartTimer()
+        {
+            if ((renderTimer == null) || (renderTimer.Enabled))
+                return;
+            renderTimer.Enabled = true;
+        }
+
+        /// <summary>
+        /// Stop the Tick Control rotation
+        /// </summary>
+        private void StopTimer()
+        {
+            if (renderTimer != null)
+            {
+                renderTimer.Enabled = false;
+            }
+        }
+
+        private int ticks = 0;
+        async void OnRenderTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                ticks++;
+                if(ticks == 3)
+                {
+                    ticks = 0;
+                    StopTimer();
+                }
+                // Force re-rendering of control
+                InvalidateVisual();
+            });
+        }
+
+
+
         protected override void OnRender(DrawingContext dc)
         {
             if (StageVm == null)
             {
                 return;
             }
-            var aw = ActualWidth;
             dc.DrawRectangle(StageVm.BackgroundBrush, null, new Rect(0.0, 0.0, ActualWidth, ActualHeight));
 
-            dc.DrawKeyLines(StageVm, aw, ActualHeight);
+            dc.DrawKeyLines(StageVm, ActualWidth, ActualHeight);
 
             foreach(var kvm in StageVm.KeyPairVms)
             {
-                dc.DrawSwitch(StageVm, kvm, aw, ActualHeight);
+                dc.DrawSwitch(StageVm, kvm, ActualWidth, ActualHeight);
             }
-            dc.DrawSortableValues(StageVm, aw, ActualHeight);
+            if(ticks %2 == 0)
+            {
+                StageVm.DrawSortableValues(dc, ActualWidth, ActualHeight);
+            }
         }
 
 
@@ -64,10 +108,26 @@ namespace archean.controls.View.Sorter
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var stageControl = (StageControl)d;
-           // stageControl.Width = stageControl.ActualHeight * stageControl.StageVm.WidthToHeight;
-            stageControl.InvalidateVisual();
+            if(stageControl.StageVm.SortableVms.Length > 0)
+            {
+                stageControl.StartTimer();
+            }
+           // stageControl.InvalidateVisual();
         }
 
         #endregion
+
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+                return;
+            if (renderTimer != null)
+            {
+                renderTimer.Elapsed -= OnRenderTimerElapsed;
+                renderTimer.Dispose();
+            }		
+        }
+
     }
 }

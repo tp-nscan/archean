@@ -1,5 +1,4 @@
 ﻿using archean.controls.ViewModel.Sorter;
-using System.Linq;
 
 namespace archean.controls.DesignVms.Sorter
 {
@@ -8,10 +7,11 @@ namespace archean.controls.DesignVms.Sorter
         public StageVmD() :
             base(
                     stageVmStep: StageVmStep.Left,
-                    stageVmStyle: StageVmStyle.StandardE,
+                    indexInSorter:0,
+                    stageVmStyle: StageVmStyle.Standard(false),
                     keyCount: _KeyCount,
-                    keyPairVms: StageVmStyle.StandardE.ToRandomKeyPairVms(_KeyCount),
-                    sortableVms: StageVmProcs.ScrambledSortableVms(_KeyCount)
+                    keyPairVms: StageVmStyle.Standard(false).ToRandomKeyPairVms(_KeyCount),
+                    sortableVms: StageVmProcs.ScrambledSortableVms(_KeyCount, true)
                 )
         {
         }
@@ -20,20 +20,4 @@ namespace archean.controls.DesignVms.Sorter
 
     }
 
-    public class StageVmD2 : StageVm
-    {
-        public StageVmD2() :
-            base(
-                    stageVmStep: StageVmStep.Left,
-                    stageVmStyle: StageVmStyle.Standard0,
-                    keyCount: _KeyCount,
-                    keyPairVms: StageVmStyle.Standard0.ToRandomKeyPairVms(_KeyCount),
-                    sortableVms: new SortableVm[0]
-                )
-        {
-        }
-
-        public static int _KeyCount = 32;
-
-    }
 }

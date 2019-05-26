@@ -20,26 +20,5 @@ namespace archean.ViewModel.Pages
             set => SetProperty(ref _sorterVm, value);
         }
 
-
-        #region StepCommand
-
-        RelayCommand _stepCommand;
-
-        public ICommand StepCommand => _stepCommand ?? (_stepCommand = new RelayCommand(
-            DoStep,
-            CanStep
-            ));
-
-        private void DoStep()
-        {
-           // StageVm = StageVm.ToNextStep();
-        }
-
-        bool CanStep()
-        {
-            return true;
-        }
-
-        #endregion // StepCommand
     }
 }

@@ -5,7 +5,8 @@
         Left,
         Presort,
         PostSort,
-        Right
+        Right,
+        None
     }
 
     public static class StageVmStepExt
@@ -21,7 +22,9 @@
                 case StageVmStep.PostSort:
                     return StageVmStep.Right;
                 case StageVmStep.Right:
-                    return StageVmStep.Right;
+                    return StageVmStep.None;
+                case StageVmStep.None:
+                    return StageVmStep.None;
                 default:
                     throw new System.Exception($"{stageVmStep} not handled");
             }

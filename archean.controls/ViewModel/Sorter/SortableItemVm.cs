@@ -13,19 +13,21 @@ namespace archean.controls.ViewModel.Sorter
         Missing
     }
 
-    public class SortableVm
+    public class SortableItemVm
     {
-        public SortableVm(
+        public SortableItemVm(
             Brush backgroundBrush,
             Brush foregroundBrush,
             int stageSection,
             StagePos stagePos,
             int keyLinePos,
+            bool showLabel,
             int label, 
             int sortableValue)
         {
             BackgroundBrush = backgroundBrush;
             ForegroundBrush = foregroundBrush;
+            ShowLabel = showLabel;
             StageSection = stageSection;
             StagePos = stagePos;
             KeyLinePos = keyLinePos;
@@ -35,6 +37,7 @@ namespace archean.controls.ViewModel.Sorter
 
         public Brush BackgroundBrush { get; }
         public Brush ForegroundBrush { get; }
+        public bool ShowLabel { get; }
         public int Label { get; }
         public int StageSection { get; }
         public StagePos StagePos { get; }
@@ -47,7 +50,7 @@ namespace archean.controls.ViewModel.Sorter
     {
 
 
-        public static SortableVm[] ToRedBlueSortableVms(this int[] positions, int order)
+        public static SortableItemVm[] ToRedBlueSortableVms(this int[] positions, int order, bool showLabel)
         {
             var csB = ColorSets.ColorSpan(order, Colors.Blue, Colors.Red)
                                     .Select(c => new SolidColorBrush(c))
@@ -56,9 +59,10 @@ namespace archean.controls.ViewModel.Sorter
             return
                 Enumerable.Range(0, order).Select
                 (i =>
-                   new SortableVm(
+                   new SortableItemVm(
                         backgroundBrush: csB[i],
                         foregroundBrush: Brushes.White,
+                        showLabel: showLabel,
                         stageSection: -1,
                         stagePos: StagePos.Left,
                         keyLinePos: positions[i],
@@ -68,13 +72,14 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableVm ToLeftSortableVm(this SortableVm sortableVm)
+        public static SortableItemVm ToLeftSortableVm(this SortableItemVm sortableVm)
         {
-            return new SortableVm(
+            return new SortableItemVm(
                     backgroundBrush: sortableVm.BackgroundBrush,
                     foregroundBrush: sortableVm.ForegroundBrush,
+                    showLabel: sortableVm.ShowLabel,
                     stageSection: -1,
-                    stagePos: sortableVm.StagePos,
+                    stagePos: StagePos.Left,
                     keyLinePos: sortableVm.KeyLinePos,
                     label: sortableVm.Label,
                     sortableValue: sortableVm.SortableValue
@@ -83,7 +88,7 @@ namespace archean.controls.ViewModel.Sorter
 
 
         public static Tuple<StagePos, int> ToStageSection(
-            this SortableVm sortableVm, KeyPairVm[] keyPairVms)
+            this SortableItemVm sortableVm, KeyPairVm[] keyPairVms)
         {
             var swH = keyPairVms.FirstOrDefault(
                 kpv => (kpv.HiKey == sortableVm.KeyLinePos)
@@ -96,12 +101,14 @@ namespace archean.controls.ViewModel.Sorter
             return new Tuple<StagePos, int>(StagePos.Right, 0);
         }
 
-        public static SortableVm ToPresortSortableVm(this SortableVm sortableVm, KeyPairVm[] keyPairVms)
+
+        public static SortableItemVm ToPresortSortableVm(this SortableItemVm sortableVm, KeyPairVm[] keyPairVms)
         {
             var tup = sortableVm.ToStageSection(keyPairVms);
-            return new SortableVm(
+            return new SortableItemVm(
                     backgroundBrush: sortableVm.BackgroundBrush,
                     foregroundBrush: sortableVm.ForegroundBrush,
+                    showLabel: sortableVm.ShowLabel,
                     stageSection: tup.Item2,
                     stagePos: tup.Item1,
                     keyLinePos: sortableVm.KeyLinePos,
@@ -111,12 +118,13 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableVm ToPostSortSortableVm(this SortableVm sortableVm, KeyPairVm[] keyPairVms)
+        public static SortableItemVm ToPostSortSortableVm(this SortableItemVm sortableVm, KeyPairVm[] keyPairVms)
         {
             var tup = sortableVm.ToStageSection(keyPairVms);
-            return new SortableVm(
+            return new SortableItemVm(
                     backgroundBrush: sortableVm.BackgroundBrush,
                     foregroundBrush: sortableVm.ForegroundBrush,
+                    showLabel: sortableVm.ShowLabel,
                     stageSection: tup.Item2,
                     stagePos: tup.Item1,
                     keyLinePos: sortableVm.KeyLinePos,
@@ -125,11 +133,12 @@ namespace archean.controls.ViewModel.Sorter
                 );
         }
 
-        public static SortableVm ToRightSortableVm(this SortableVm sortableVm)
+        public static SortableItemVm ToRightSortableVm(this SortableItemVm sortableVm)
         {
-            return new SortableVm(
+            return new SortableItemVm(
                     backgroundBrush: sortableVm.BackgroundBrush,
                     foregroundBrush: sortableVm.ForegroundBrush,
+                    showLabel: sortableVm.ShowLabel,
                     stageSection: 0,
                     stagePos: StagePos.Right,
                     keyLinePos: sortableVm.KeyLinePos,
@@ -138,11 +147,12 @@ namespace archean.controls.ViewModel.Sorter
                 );
         }
 
-        public static SortableVm ToMissingSortableVm(this SortableVm sortableVm)
+        public static SortableItemVm ToMissingSortableVm(this SortableItemVm sortableVm)
         {
-            return new SortableVm(
+            return new SortableItemVm(
                     backgroundBrush: sortableVm.BackgroundBrush,
                     foregroundBrush: sortableVm.ForegroundBrush,
+                    showLabel: sortableVm.ShowLabel,
                     stageSection: 0,
                     stagePos: StagePos.Missing,
                     keyLinePos: sortableVm.KeyLinePos,
@@ -152,37 +162,37 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableVm[] ToLeftStep(this SortableVm[] sortableVms)
+        public static SortableItemVm[] ToLeftStep(this SortableItemVm[] sortableVms)
         {
             return sortableVms.Select(svm => svm.ToLeftSortableVm())
                               .ToArray();
         }
 
-        public static SortableVm[] ToPreSortStep(this SortableVm[] sortableVms, KeyPairVm[] keyPairVms)
+        public static SortableItemVm[] ToPreSortStep(this SortableItemVm[] sortableVms, KeyPairVm[] keyPairVms)
         {
             return sortableVms.Select(svm => svm.ToPresortSortableVm(keyPairVms))
                               .ToArray();
         }
 
-        public static SortableVm[] ToPostSortStep(this SortableVm[] sortableVms, KeyPairVm[] keyPairVms)
+        public static SortableItemVm[] ToPostSortStep(this SortableItemVm[] sortableVms, KeyPairVm[] keyPairVms)
         {
             return sortableVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms))
                               .ToArray();
         }
 
-        public static SortableVm[] ToRightStep(this SortableVm[] sortableVms)
+        public static SortableItemVm[] ToRightStep(this SortableItemVm[] sortableVms)
         {
             return sortableVms.Select(svm => svm.ToRightSortableVm())
                               .ToArray();
         }
 
-        public static SortableVm[] ToMissingStep(this SortableVm[] sortableVms)
+        public static SortableItemVm[] ToMissingStep(this SortableItemVm[] sortableVms)
         {
             return sortableVms.Select(svm => svm.ToMissingSortableVm())
                               .ToArray();
         }
 
-        public static void SortWithAKeyPairVm(this SortableVm[] sortableVms, KeyPairVm keyPairVm)
+        public static void SortWithAKeyPairVm(this SortableItemVm[] sortableVms, KeyPairVm keyPairVm)
         {
             var swL = sortableVms.FirstOrDefault(
                                     swm => (swm.KeyLinePos == keyPairVm.LowKey));
@@ -201,7 +211,7 @@ namespace archean.controls.ViewModel.Sorter
             }
         }
 
-        public static void SortTheSortableVms(this SortableVm[] sortableVms, KeyPairVm[] keyPairVms)
+        public static void SortTheSortableVms(this SortableItemVm[] sortableVms, KeyPairVm[] keyPairVms)
         {
             foreach(var kpvm in keyPairVms)
             {

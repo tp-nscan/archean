@@ -5,7 +5,7 @@ namespace archean.controls.DesignVms.Sorter
 {
     public class SorterVmD : SorterVm
     {
-        public SorterVmD() : base(StagedSorterDef.ToStageVms())
+        public SorterVmD() : base(StagedSorterDef.ToStageVms(true))
         {
         }
 
@@ -14,7 +14,7 @@ namespace archean.controls.DesignVms.Sorter
             get
             {
                 return core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
-                            core.SortersFromData.RefSorter.Order32);
+                            core.SortersFromData.RefSorter.Order8);
             }
         }
     }

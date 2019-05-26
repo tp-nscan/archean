@@ -25,7 +25,7 @@
         </Border>
 
         <Button 
-            Command="{Binding StepCommand}"
+            Command="{Binding SorterVm.StepCommand}"
             Margin="10" 
             Height="30" 
             Width="70" 
