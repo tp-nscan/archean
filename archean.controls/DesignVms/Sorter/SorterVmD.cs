@@ -14,7 +14,7 @@ namespace archean.controls.DesignVms.Sorter
             get
             {
                 return core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
-                            core.SortersFromData.RefSorter.Order8);
+                            core.SortersFromData.RefSorter.Order32);
             }
         }
     }

@@ -73,6 +73,7 @@
     <Compile Include="Utils\Converters\CoreLibConverters.cs" />
     <Compile Include="Utils\Converters\FEconverters.cs" />
     <Compile Include="Utils\Converters\MediaConverters.cs" />
+    <Compile Include="Utils\GraphicsFuncs.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="Utils\StringFormats.cs" />
     <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />

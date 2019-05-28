@@ -46,9 +46,21 @@ namespace archean.controls.ViewModel.Sorter
         public static Typeface Typeface = new Typeface("Segoe UI");
     }
 
-    public static class SortableVmExt
+    public static class SortableItemVmExt
     {
-
+        public static SortableItemVm Copy(this SortableItemVm sortableItemVm)
+        {
+            return new SortableItemVm(
+                    backgroundBrush: sortableItemVm.BackgroundBrush,
+                    foregroundBrush: sortableItemVm.ForegroundBrush,
+                    stageSection: sortableItemVm.StageSection,
+                    stagePos: sortableItemVm.StagePos,
+                    keyLinePos: sortableItemVm.KeyLinePos,
+                    showLabel: sortableItemVm.ShowLabel,
+                    label: sortableItemVm.Label,
+                    sortableValue: sortableItemVm.SortableValue
+                );
+        }
 
         public static SortableItemVm[] ToRedBlueSortableVms(this int[] positions, int order, bool showLabel)
         {
@@ -162,42 +174,42 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableItemVm[] ToLeftStep(this SortableItemVm[] sortableVms)
+        public static SortableItemVm[] ToLeftStep(this SortableItemVm[] sortableItemVms)
         {
-            return sortableVms.Select(svm => svm.ToLeftSortableVm())
+            return sortableItemVms.Select(svm => svm.ToLeftSortableVm())
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToPreSortStep(this SortableItemVm[] sortableVms, KeyPairVm[] keyPairVms)
+        public static SortableItemVm[] ToPreSortStep(this SortableItemVm[] sortableItemVms, KeyPairVm[] keyPairVms)
         {
-            return sortableVms.Select(svm => svm.ToPresortSortableVm(keyPairVms))
+            return sortableItemVms.Select(svm => svm.ToPresortSortableVm(keyPairVms))
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToPostSortStep(this SortableItemVm[] sortableVms, KeyPairVm[] keyPairVms)
+        public static SortableItemVm[] ToPostSortStep(this SortableItemVm[] sortableItemVms, KeyPairVm[] keyPairVms)
         {
-            return sortableVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms))
+            return sortableItemVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms))
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToRightStep(this SortableItemVm[] sortableVms)
+        public static SortableItemVm[] ToRightStep(this SortableItemVm[] sortableItemVms)
         {
-            return sortableVms.Select(svm => svm.ToRightSortableVm())
+            return sortableItemVms.Select(svm => svm.ToRightSortableVm())
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToMissingStep(this SortableItemVm[] sortableVms)
+        public static SortableItemVm[] ToMissingStep(this SortableItemVm[] sortableItemVms)
         {
-            return sortableVms.Select(svm => svm.ToMissingSortableVm())
+            return sortableItemVms.Select(svm => svm.ToMissingSortableVm())
                               .ToArray();
         }
 
-        public static void SortWithAKeyPairVm(this SortableItemVm[] sortableVms, KeyPairVm keyPairVm)
+        public static void SortWithAKeyPairVm(this SortableItemVm[] sortableItemVms, KeyPairVm keyPairVm)
         {
-            var swL = sortableVms.FirstOrDefault(
+            var swL = sortableItemVms.FirstOrDefault(
                                     swm => (swm.KeyLinePos == keyPairVm.LowKey));
 
-            var swH = sortableVms.FirstOrDefault(
+            var swH = sortableItemVms.FirstOrDefault(
                                     swm => (swm.KeyLinePos == keyPairVm.HiKey));
 
             if ((swL == null) || (swH == null)) return;
@@ -211,11 +223,11 @@ namespace archean.controls.ViewModel.Sorter
             }
         }
 
-        public static void SortTheSortableVms(this SortableItemVm[] sortableVms, KeyPairVm[] keyPairVms)
+        public static void SortTheSortableVms(this SortableItemVm[] sortableItemVms, KeyPairVm[] keyPairVms)
         {
             foreach(var kpvm in keyPairVms)
             {
-                SortWithAKeyPairVm(sortableVms, kpvm);
+                SortWithAKeyPairVm(sortableItemVms, kpvm);
             }
         }
     }

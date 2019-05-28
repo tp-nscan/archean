@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media;
 using System.Globalization;
 using System.Windows;
+using archean.controls.Utils;
 
 namespace archean.controls.ViewModel.Sorter
 {
@@ -84,30 +85,30 @@ namespace archean.controls.ViewModel.Sorter
             }
         }
 
-        public static Point GetSortablePosition(this StageVm stageVm,
-                                                     SortableItemVm sortableVm,
+        public static Point GetSortableItemPosition(this StageVm stageVm,
+                                                     SortableItemVm sortableItemVm,
                                                      double stageRenderWidth, double stageRenderHeight)
         {
             if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
             {
                 return new Point(0, 0);
             }
-            if (sortableVm.StagePos == StagePos.Missing)
+            if (sortableItemVm.StagePos == StagePos.Missing)
             {
                 return new Point(0, 0);
             }
 
-            var renderY = stageVm.KeyRenderYc(sortableVm.KeyLinePos, stageRenderHeight);
+            var renderY = stageVm.KeyRenderYc(sortableItemVm.KeyLinePos, stageRenderHeight);
             var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
 
             var renderX = 0.0;
-            switch (sortableVm.StagePos)
+            switch (sortableItemVm.StagePos)
             {
                 case StagePos.Left:
                     renderX = radius * -1.0;
                     break;
                 case StagePos.Center:
-                    renderX = stageVm.SectionRenderX(sortableVm.StageSection, stageRenderWidth);
+                    renderX = stageVm.SectionRenderX(sortableItemVm.StageSection, stageRenderWidth);
                     break;
                 case StagePos.Right:
                     renderX = stageRenderWidth - radius * 1.2;
@@ -135,7 +136,7 @@ namespace archean.controls.ViewModel.Sorter
 
             var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
 
-            var center = stageVm.GetSortablePosition(sortableVm, stageRenderWidth, stageRenderHeight);
+            var center = stageVm.GetSortableItemPosition(sortableVm, stageRenderWidth, stageRenderHeight);
             dc.DrawEllipse(sortableVm.BackgroundBrush, null, center, radius, radius);
 
             if(sortableVm.ShowLabel)
@@ -155,14 +156,80 @@ namespace archean.controls.ViewModel.Sorter
         public static void DrawSortableValues(this StageVm stageVm, DrawingContext dc, 
                                                    double stageRenderWidth, double stageRenderHeight)
         {
-            if (stageVm.SortableVms == null) return;
+            if (stageVm.SortableItemVms == null) return;
 
-            foreach (var sortableVm in stageVm.SortableVms)
+            foreach (var sortableVm in stageVm.SortableItemVms)
             {
                 stageVm.DrawSortableValue(dc, sortableVm, stageRenderWidth, stageRenderHeight);
             }
         }
 
+        public static void DrawSortableValue2(this StageVm stageVm,
+                SortableItemVm sortableItemVmOld,
+                double pctAlong,
+                DrawingContext dc,
+                SortableItemVm sortableItemVm,
+                double stageRenderWidth, 
+                double stageRenderHeight)
+        {
+            if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
+            {
+                return;
+            }
+            if (sortableItemVm.StagePos == StagePos.Missing)
+            {
+                return;
+            }
+
+            var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
+
+            var centerO = stageVm.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
+            var centerN = stageVm.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
+
+            if(sortableItemVmOld.KeyLinePos != sortableItemVm.KeyLinePos)
+            {
+                var s = "S";
+            }
+
+            var center = centerO.Interpolate(centerN, pctAlong);
+
+            dc.DrawEllipse(sortableItemVm.BackgroundBrush, null, center, radius, radius);
+
+            if (sortableItemVm.ShowLabel)
+            {
+                var txt = new FormattedText(sortableItemVm.Label.ToString(),
+                                               CultureInfo.CurrentCulture,
+                                               FlowDirection.LeftToRight,
+                                               SortableItemVm.Typeface,
+                                               radius, sortableItemVm.ForegroundBrush, 1.0);
+
+                var upLeft = new Point(center.X - txt.Width / 2, center.Y - txt.Height / 2);
+                dc.DrawText(txt, upLeft);
+            }
+        }
+
+        public static void DrawSortableValues2(
+            this StageVm stageVm, 
+            StageVm stageVmOld,
+            double pctAlong,
+            DrawingContext dc,
+            double stageRenderWidth, 
+            double stageRenderHeight)
+        {
+            if (stageVm.SortableItemVms == null) return;
+
+            for(var i=0; i< stageVm.SortableItemVms.Length; i++)
+            {
+                stageVm.DrawSortableValue2(
+                    stageVmOld.SortableItemVms[i], 
+                    pctAlong, 
+                    dc, 
+                    stageVm.SortableItemVms[i], 
+                    stageRenderWidth, 
+                    stageRenderHeight);
+            }
+
+        }
 
     }
 

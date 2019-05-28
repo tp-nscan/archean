@@ -17,20 +17,6 @@ namespace archean.controls.ViewModel.Sorter
 
         public ObservableCollection<StageVm> StageVms { get; set; }
 
-        //public int ActiveStageIndex { get; private set; }
-
-        //StageVm CurrentStageVm
-        //{
-        //    get
-        //    {
-        //        return StageVms[ActiveStageIndex];
-        //    }
-        //    set
-        //    {
-        //        StageVms[ActiveStageIndex] = value;
-        //    }
-        //}
-
         StageVm _currentStageVm;
         StageVm CurrentStageVm
         {
@@ -41,8 +27,20 @@ namespace archean.controls.ViewModel.Sorter
             set
             {
                 _currentStageVm = value;
+                if(subscription != null)
+                {
+                    subscription.Dispose();
+                }
+                subscription = _currentStageVm.OnAnimationFinished.Subscribe(AnimationFinished);
                 StageVms[value.IndexInSorter] = value;
             }
+        }
+
+        IDisposable subscription;
+
+        void AnimationFinished(StageVm stageVm)
+        {
+            DoStep();
         }
 
         #region StepCommand
@@ -59,11 +57,13 @@ namespace archean.controls.ViewModel.Sorter
 
             if(CurrentStageVm.StageVmStep == StageVmStep.Right)
             {
-                var sortableVms = CurrentStageVm.SortableVms;
+                var sortableVms = CurrentStageVm.SortableItemVms;
                 CurrentStageVm = CurrentStageVm.ToNextStep();
-                if (CurrentStageVm.IndexInSorter > StageVms.Count - 1) return;
+                if (CurrentStageVm.IndexInSorter + 1 > StageVms.Count - 1) return;
+
                 CurrentStageVm = StageVms[CurrentStageVm.IndexInSorter + 1]
                                     .ToNextStep(sortableVms.ToLeftStep());
+                DoStep();
             }
             else
             {
@@ -111,14 +111,14 @@ namespace archean.controls.ViewModel.Sorter
                             indexInSorter: indexInSorter++,
                             stageVmStyle: StageVmStyle.Standard(true),
                             keyCount: keyCount,
-                            sortableVms: new SortableItemVm[0],
+                            sortableVms: null,
                             stageVmStep: StageVmStep.None);
                     yield return
                         switchblocks => switchblocks.SwitchBlocksToStageVm(
                             indexInSorter: indexInSorter++,
                             stageVmStyle: StageVmStyle.Standard(false),
                             keyCount: keyCount,
-                            sortableVms: new SortableItemVm[0],
+                            sortableVms: null,
                             stageVmStep: StageVmStep.None);
             };
         }

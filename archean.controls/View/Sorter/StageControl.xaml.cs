@@ -12,7 +12,8 @@ namespace archean.controls.View.Sorter
     public partial class StageControl : UserControl
     {
         readonly Timer renderTimer = null;
-        private const double DEFAULT_INTERVAL = 60;
+        private const double DEFAULT_INTERVAL = 10;
+        private const double DEFAULT_TICS_PER_STEP = 15;
 
         public StageControl()
         {
@@ -53,19 +54,23 @@ namespace archean.controls.View.Sorter
             }
         }
 
-        private int ticks = 0;
+        private double ticks = 0;
         async void OnRenderTimerElapsed(object sender, ElapsedEventArgs e)
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                ticks++;
-                if(ticks == 3)
+                InvalidateVisual();
+
+                if(ticks == TicsPerStep)
                 {
                     ticks = 0;
                     StopTimer();
+                    StageVm.RaiseAnimationFinished();
                 }
-                // Force re-rendering of control
-                InvalidateVisual();
+                else
+                {
+                    ticks++;
+                }
             });
         }
 
@@ -85,12 +90,19 @@ namespace archean.controls.View.Sorter
             {
                 dc.DrawSwitch(StageVm, kvm, ActualWidth, ActualHeight);
             }
-            if(ticks %2 == 0)
+
+            if(renderTimer.Enabled)
+            {
+                StageVm.DrawSortableValues2(StageVmOld, (ticks / TicsPerStep), dc, ActualWidth, ActualHeight);
+            }
+            else
             {
                 StageVm.DrawSortableValues(dc, ActualWidth, ActualHeight);
             }
         }
 
+        public StageVm StageVmOld;
+        public double TicsPerStep = DEFAULT_TICS_PER_STEP;
 
         #region StageVm
 
@@ -108,11 +120,18 @@ namespace archean.controls.View.Sorter
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var stageControl = (StageControl)d;
-            if(stageControl.StageVm.SortableVms.Length > 0)
+            stageControl.StageVmOld = (StageVm)e.OldValue;
+            stageControl.TicsPerStep = (stageControl.StageVmOld == null) ? 0: DEFAULT_TICS_PER_STEP;
+            if ((stageControl.StageVm.SortableItemVms != null ) && 
+                (stageControl.StageVmOld != null) &&
+                (stageControl.StageVmOld.SortableItemVms != null))
             {
-                stageControl.StartTimer();
+                    stageControl.StartTimer();
             }
-           // stageControl.InvalidateVisual();
+            else
+            {
+                stageControl.InvalidateVisual();
+            }
         }
 
         #endregion
