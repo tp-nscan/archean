@@ -300,11 +300,13 @@ module Sorting =
                 |> Seq.forall(fun i -> switchPad.keyUsage.[i] = 1)
 
 
+        let SwitchPrint (switch:Switch) (position:int) (current:int) =
+            if  ((position >= switch.low) && (position <= switch.hi)) then
+                0 else current
+        
+
         let AddSwitch (switchPad:SwitchPad) (switch:Switch) =
-            let SwitchPrint (switch:Switch) (position:int) (current:int) =
-                if  ((position >= switch.low) && (position <= switch.hi)) then
-                    0 else current
-            
+
             switchPad.switches.Add switch
             { 
                 switches = switchPad.switches; 
@@ -313,7 +315,7 @@ module Sorting =
             }
 
 
-        let LayoutSwitches (order:int) (switches:seq<Switch>) = 
+        let LayoutSwitchesLoose (order:int) (switches:seq<Switch>) = 
             let mutable switchPad = InitSwitchPad order
             seq {
                     for sw in switches do
@@ -329,14 +331,54 @@ module Sorting =
                 |> Seq.toArray
 
 
+        let AddSwitchTight (order:int) (switchPads: SwitchPad list) (switch:Switch) =
+            let revList = switchPads |> List.rev
+
+            let rec spM (prefix: SwitchPad list) suffix =
+                match suffix with
+                | head :: tail -> 
+                    if (SwitchFits head switch) then
+                        tail |> List.append [(AddSwitch head switch)]
+                               |> List.append prefix
+                               |> List.rev
+                    else
+                        spM ([head] |> List.append prefix) tail
+                | [] -> let switchPad = InitSwitchPad order
+                        let mody = (AddSwitch switchPad switch) 
+                        [mody] |> (List.append prefix)
+                        |> List.rev
+
+            spM [] revList
+
+
+        let LayoutSwitchesTight (order:int) (switches:seq<Switch>) = 
+            let mutable switchPads = [InitSwitchPad order]
+            seq {
+                    for sw in switches do
+                        switchPads <- AddSwitchTight order switchPads sw
+                }
+                |> Seq.toArray |> ignore
+            switchPads |> List.map(fun swp -> swp.switches |> Seq.toArray)
+                       |> List.toArray
+
+                
         let LayoutRandomStage (order:int) (rnd:Random) =
             let switches = Stage.MakeStagePackedSwitchSeq rnd order |> Seq.take (order / 2)
-            LayoutSwitches order switches
+            LayoutSwitchesLoose order switches
 
 
-        let LayoutStagedSorter (ssd:StagedSorterDef) =
+        let LayoutStagedSorter (ssd:StagedSorterDef) (switchLayout:int->seq<Switch>->Switch[][]) =
                 StagedSorterDef.GetStages ssd
-                     |> Seq.map(fun sq -> LayoutSwitches ssd.sorterDef.order sq )
+                     |> Seq.map(fun sq -> switchLayout ssd.sorterDef.order sq )
+
+                     
+        let LayoutStagedSorterLoose (ssd:StagedSorterDef) =
+                LayoutStagedSorter ssd LayoutSwitchesLoose
+
+
+        let LayoutStagedSorterTight (ssd:StagedSorterDef) =
+                LayoutStagedSorter ssd LayoutSwitchesTight
+
 
 
     module SortableGen =

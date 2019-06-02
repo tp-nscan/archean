@@ -12,6 +12,19 @@
 
     <Page.Resources>
         <Converters:PassThruConverter x:Key="PassThruConverter"/>
+        
+        <Style x:Key="btnStyleBigPanel" TargetType="Button">
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+        
+        <Style x:Key="btnStyleMedPanel" TargetType="Button">
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+        
     </Page.Resources>
 
     <Grid Background="BlanchedAlmond">
@@ -24,11 +37,48 @@
             <sorter:SorterControl Margin="5" DataContext="{Binding SorterVm}" />
         </Border>
 
-        <Button 
-            Command="{Binding SorterVm.StepCommand}"
-            Margin="10" 
-            Height="30" 
-            Width="70" 
-            Grid.Row="1" Content="Step"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding SorterVm.StepCommand}"
+                Content="Step"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding SorterVm.RunCommand}"
+                Content="Run"/>
+            
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding SorterVm.ClearCommand}"
+                Content="Clear"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding SorterVm.ResetCommand}"
+                Content="Reset"/>
+
+            <GroupBox Margin="30,10" BorderBrush="Black" BorderThickness="2" Header="Stage packing"  HorizontalAlignment="Center">
+                
+                <StackPanel Orientation="Horizontal">
+
+                    <Button Style="{StaticResource btnStyleMedPanel}"
+                        Command="{Binding SorterVm.PackCommand}"
+                        CommandParameter="Single"
+                        Content="Single"/>
+
+                    <Button Style="{StaticResource btnStyleMedPanel}"
+                        Command="{Binding SorterVm.PackCommand}"
+                        CommandParameter="Loose"
+                        Content="Loose"/>
+
+                    <Button Style="{StaticResource btnStyleMedPanel}"
+                        Command="{Binding SorterVm.PackCommand}"
+                        CommandParameter="Tight"
+                        Content="Tight"/>
+                    
+                </StackPanel>
+                
+            </GroupBox>
+            
+        </StackPanel>
+
+        
     </Grid>
 </Page>

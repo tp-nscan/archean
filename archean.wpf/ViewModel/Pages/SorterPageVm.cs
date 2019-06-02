@@ -19,6 +19,5 @@ namespace archean.ViewModel.Pages
             get => _sorterVm;
             set => SetProperty(ref _sorterVm, value);
         }
-
     }
 }

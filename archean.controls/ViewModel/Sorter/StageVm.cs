@@ -100,7 +100,7 @@ namespace archean.controls.ViewModel.Sorter
                                                   StageVmStyle stageVmStyle, 
                                                   int keyCount)
         {
-            var swLayout = core.Sorting.StageLayout.LayoutSwitches(keyCount, stage.switches);
+            var swLayout = core.Sorting.StageLayout.LayoutSwitchesLoose(keyCount, stage.switches);
             var kpVms = swLayout.ToKeyPairVms(stageVmStyle);
             return new StageVm(
                     stageVmStep: StageVmStep.None,
@@ -133,18 +133,18 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableItemVm[] ScrambledSortableVms(int keyCount, bool showLabels)
+        public static SortableItemVm[] ScrambledSortableVms(int keyCount, int seed, bool showLabels)
         {
             return
-                ScramblePos(keyCount).ToRedBlueSortableVms(keyCount, showLabels);
+                ScramblePos(keyCount, seed).ToRedBlueSortableVms(keyCount, showLabels);
         }
 
 
-        public static int[] ScramblePos(int order)
+        public static int[] ScramblePos(int order, int seed)
         {
             return
                     core.Combinatorics.FisherYatesShuffle(
-                    new System.Random(),
+                    new Random(seed),
                     Enumerable.Range(0, order).ToArray()
                 ).ToArray();
         }

@@ -4,18 +4,37 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using archean.core;
 
 namespace archean.controls.ViewModel.Sorter
 {
-    public class SorterVm
+    public class SorterVm : BindableBase
     {
-        public SorterVm(IEnumerable<StageVm> stageVms)
+        public SorterVm(Sorting.StagedSorterDef stagedSorterDef, SortableItemVm[] sortableItemVms)
         {
-            StageVms = new ObservableCollection<StageVm>(stageVms);
+            StagedSorterDef = stagedSorterDef;
+            SortableItemVms = sortableItemVms;
+            SetupStageVms();
+        }
+
+        void SetupStageVms()
+        {
+            StageVms = new ObservableCollection<StageVm>(
+                                StagedSorterDef.ToStageVms(
+                                SortableItemVms));
             CurrentStageVm = StageVms[0];
         }
 
-        public ObservableCollection<StageVm> StageVms { get; set; }
+        public Sorting.StagedSorterDef StagedSorterDef { get; }
+
+        public SortableItemVm[] SortableItemVms { get; private set; }
+
+        ObservableCollection<StageVm> _stageVms;
+        public ObservableCollection<StageVm> StageVms
+        {
+            get => _stageVms;
+            set => SetProperty(ref _stageVms, value);
+        }
 
         StageVm _currentStageVm;
         StageVm CurrentStageVm
@@ -40,8 +59,13 @@ namespace archean.controls.ViewModel.Sorter
 
         void AnimationFinished(StageVm stageVm)
         {
-            DoStep();
+            if (KeepGoing)
+            {
+                MakeStep();
+            }
         }
+
+        bool KeepGoing { get; set; }
 
         #region StepCommand
 
@@ -54,20 +78,11 @@ namespace archean.controls.ViewModel.Sorter
 
         private void DoStep()
         {
-
-            if(CurrentStageVm.StageVmStep == StageVmStep.Right)
+            KeepGoing = false;
+            MakeStep();
+            if (CurrentStageVm.StageVmStep == StageVmStep.Right)
             {
-                var sortableVms = CurrentStageVm.SortableItemVms;
-                CurrentStageVm = CurrentStageVm.ToNextStep();
-                if (CurrentStageVm.IndexInSorter + 1 > StageVms.Count - 1) return;
-
-                CurrentStageVm = StageVms[CurrentStageVm.IndexInSorter + 1]
-                                    .ToNextStep(sortableVms.ToLeftStep());
-                DoStep();
-            }
-            else
-            {
-                CurrentStageVm = CurrentStageVm.ToNextStep();
+                MakeStep();
             }
         }
 
@@ -77,21 +92,125 @@ namespace archean.controls.ViewModel.Sorter
         }
 
         #endregion // StepCommand
+
+
+        #region RunCommand
+
+        RelayCommand _runCommand;
+
+        public ICommand RunCommand => _runCommand ?? (_runCommand = new RelayCommand(
+                DoRun,
+                CanRun
+            ));
+
+        private void DoRun()
+        {
+            KeepGoing = true;
+            MakeStep();
+        }
+
+        bool CanRun()
+        {
+            return (CurrentStageVm != null) && (CurrentStageVm.IndexInSorter < StageVms.Count);
+        }
+
+        #endregion // RunCommand
+
+
+        void MakeStep()
+        {
+            if (CurrentStageVm.StageVmStep == StageVmStep.Right)
+            {
+                var sortableVms = CurrentStageVm.SortableItemVms;
+                if (CurrentStageVm.IndexInSorter + 1 > StageVms.Count - 1) return;
+
+                CurrentStageVm = CurrentStageVm.ToNextStep();
+
+                CurrentStageVm = StageVms[CurrentStageVm.IndexInSorter + 1]
+                                    .ToNextStep(sortableVms.ToLeftStep());
+                if(KeepGoing)
+                {
+                    MakeStep();
+                }
+            }
+            else
+            {
+                CurrentStageVm = CurrentStageVm.ToNextStep();
+            }
+        }
+
+
+        #region ClearCommand
+
+        RelayCommand _clearCommand;
+
+        public ICommand ClearCommand => _clearCommand ?? (_clearCommand = new RelayCommand(
+                DoClear,
+                CanClear
+            ));
+
+        private void DoClear()
+        {
+
+        }
+
+        bool CanClear()
+        {
+            return (CurrentStageVm != null) && (CurrentStageVm.IndexInSorter < StageVms.Count);
+        }
+
+        #endregion // ClearCommand
+
+
+        #region PackCommand
+
+        RelayCommand<string> _packCommand;
+
+        public ICommand PackCommand => _packCommand ?? (_packCommand = new RelayCommand<string>(
+                DoPack,
+                CanPack
+            ));
+
+        private void DoPack(string param)
+        {
+
+        }
+
+        bool CanPack(string param)
+        {
+            return (CurrentStageVm != null) && (CurrentStageVm.IndexInSorter < StageVms.Count);
+        }
+
+        #endregion // PackCommand
+
+
+        #region ResetCommand
+
+        RelayCommand<string> _resetCommand;
+
+        public ICommand ResetCommand => _resetCommand ?? (_resetCommand = new RelayCommand<string>(
+                DoReset,
+                CanReset
+            ));
+
+        private void DoReset(string param)
+        {
+            SortableItemVms = StageVmProcs.ScrambledSortableVms(StagedSorterDef.sorterDef.order, DateTime.Now.Millisecond, true);
+            SetupStageVms();
+        }
+
+        bool CanReset(string param)
+        {
+            return (CurrentStageVm != null) && (CurrentStageVm.IndexInSorter < StageVms.Count);
+        }
+
+        #endregion // ResetCommand
+
+
     }
 
     public static class SorterVmExt
     {
-        public static SorterVm MakeEmpty()
-        {
-            return new SorterVm(Enumerable.Empty<StageVm>());
-        }
-
-        public static SorterVm MakeEmpty2(core.Sorting.StagedSorterDef stagedSorter)
-        {
-            return new SorterVm(Enumerable.Empty<StageVm>());
-        }
-
-
         public static IEnumerable<Func<core.Sorting.Switch[][], StageVm>> StageVmMaps(
                                             int keyCount, SortableItemVm[] sortableVms)
         {
@@ -123,13 +242,16 @@ namespace archean.controls.ViewModel.Sorter
             };
         }
 
-        public static IEnumerable<StageVm> ToStageVms(this core.Sorting.StagedSorterDef stagedSorterDef, bool showLabels)
+        public static IEnumerable<StageVm> ToStageVms(this core.Sorting.StagedSorterDef stagedSorterDef, SortableItemVm[] sortableItemVms)
         {
             var keyCount = stagedSorterDef.sorterDef.order;
-            var stm = core.Sorting.StageLayout.LayoutStagedSorter(stagedSorterDef);
-
-            return stm.Zip(StageVmMaps(keyCount, StageVmProcs.ScrambledSortableVms(keyCount, showLabels)), 
-                                    (s, m) => m(s));
+            var switchBlockSets = core.Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
+            //StageVmProcs.ScrambledSortableVms(keyCount, showLabels)
+            return switchBlockSets.Zip
+                (
+                    StageVmMaps(keyCount, sortableItemVms), 
+                    (s, m) => m(s)
+                 );
 
         }
     }

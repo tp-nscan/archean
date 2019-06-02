@@ -11,7 +11,7 @@ namespace archean.controls.DesignVms.Sorter
                     stageVmStyle: StageVmStyle.Standard(false),
                     keyCount: _KeyCount,
                     keyPairVms: StageVmStyle.Standard(false).ToRandomKeyPairVms(_KeyCount),
-                    sortableItemVms: StageVmProcs.ScrambledSortableVms(_KeyCount, true)
+                    sortableItemVms: StageVmProcs.ScrambledSortableVms(_KeyCount, System.DateTime.Now.Millisecond, true)
                 )
         {
         }

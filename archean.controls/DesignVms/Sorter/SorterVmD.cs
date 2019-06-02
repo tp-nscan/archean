@@ -5,16 +5,20 @@ namespace archean.controls.DesignVms.Sorter
 {
     public class SorterVmD : SorterVm
     {
-        public SorterVmD() : base(StagedSorterDef.ToStageVms(true))
+        public SorterVmD() : base(
+            StagedSorterDefD, 
+            StageVmProcs.ScrambledSortableVms(StagedSorterDefD.sorterDef.order, System.DateTime.Now.Millisecond, true))
         {
         }
 
-        public static core.Sorting.StagedSorterDef StagedSorterDef
+        static core.Sorting.StagedSorterDef _stagedSorterDefD;
+
+        public static core.Sorting.StagedSorterDef StagedSorterDefD
         {
             get
             {
-                return core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
-                            core.SortersFromData.RefSorter.Order32);
+                return _stagedSorterDefD ?? (_stagedSorterDefD = core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
+                            core.SortersFromData.RefSorter.Order8));
             }
         }
     }
