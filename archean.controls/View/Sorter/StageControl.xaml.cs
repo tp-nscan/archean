@@ -93,7 +93,7 @@ namespace archean.controls.View.Sorter
 
             if(renderTimer.Enabled)
             {
-                StageVm.DrawSortableValues2(StageVmOld, (ticks / TicsPerStep), dc, ActualWidth, ActualHeight);
+                StageVm.DrawSortableValuesAnimate(StageVmOld, (ticks / TicsPerStep), dc, ActualWidth, ActualHeight);
             }
             else
             {

@@ -26,7 +26,7 @@ namespace archean.controls.ViewModel.Sorter
             _keyPairVms = keyPairVms.ToList();
             SortableItemVms = sortableItemVms;
             SectionCount = _keyPairVms.Max(vm => vm.StageSection) + 1;
-            VmWidth = 2 * HPadding + (SwitchSpacing) * SectionCount;
+            VmWidth = StageVmStyle.StageRightMargin + (SwitchSpacing) * SectionCount;
             VmHeight = 2 * VPadding + (KeyLineThickness + KeyLineSpacing) * KeyCount + KeyLineSpacing;
         }
 
@@ -43,7 +43,6 @@ namespace archean.controls.ViewModel.Sorter
         public double SwitchSpacing => StageVmStyle.SwitchHSpacing;
         public double KeyLineThickness => StageVmStyle.KeyLineThickness;
         public double KeyLineSpacing => StageVmStyle.KeyLineSpacing;
-        public double HPadding => StageVmStyle.HPadding;
         public double VPadding => StageVmStyle.VPadding;
         public Brush BackgroundBrush => StageVmStyle.BackgroundBrush;
         public SortableItemVm[] SortableItemVms { get; }
@@ -65,10 +64,10 @@ namespace archean.controls.ViewModel.Sorter
         public Brush SwitchBrushInUse { get; set; }
         public Brush SwitchBrushWasUsed { get; set; }
         public double SwitchLineWidth { get; set; }
+        public double StageRightMargin { get; set; }
         public double SwitchHSpacing { get; set; }
         public double KeyLineThickness { get; set; }
         public double KeyLineSpacing { get; set; }
-        public double HPadding { get; set; }
         public double VPadding { get; set; }
         public Brush BackgroundBrush { get; set; }
 
@@ -82,9 +81,9 @@ namespace archean.controls.ViewModel.Sorter
                 SwitchBrushWasUsed = Brushes.GreenYellow,
                 SwitchLineWidth = 1.0,
                 SwitchHSpacing = 3.25,
+                StageRightMargin = 3.25,
                 KeyLineThickness = 1.0,
                 KeyLineSpacing = 3.0,
-                HPadding = 1.0,
                 VPadding = 1.0,
                 BackgroundBrush = oddStep ? Brushes.Lavender : Brushes.White
             };
@@ -226,6 +225,18 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-
+        public static StageVm ClearSwitchUses(this StageVm stageVm)
+        {
+            return new StageVm(
+                    stageVmStep: stageVm.StageVmStep,
+                    indexInSorter: stageVm.IndexInSorter,
+                    stageVmStyle: stageVm.StageVmStyle,
+                    keyCount: stageVm.KeyCount,
+                    keyPairVms: stageVm.KeyPairVms.Select(
+                        stvm => { stvm.KeyPairUse = KeyPairUse.NotUsed;
+                                  return stvm; }),
+                    sortableItemVms: stageVm.SortableItemVms
+                 );
+        }
     }
 }

@@ -8,6 +8,13 @@ using archean.core;
 
 namespace archean.controls.ViewModel.Sorter
 {
+    public enum StageLayout
+    {
+        Single,
+        Loose,
+        Tight
+    }
+
     public class SorterVm : BindableBase
     {
         public SorterVm(Sorting.StagedSorterDef stagedSorterDef, SortableItemVm[] sortableItemVms)
@@ -20,9 +27,20 @@ namespace archean.controls.ViewModel.Sorter
         void SetupStageVms()
         {
             StageVms = new ObservableCollection<StageVm>(
-                                StagedSorterDef.ToStageVms(
+                                StagedSorterDef.ToStageVms(StageLayout,
                                 SortableItemVms));
             CurrentStageVm = StageVms[0];
+        }
+
+        StageLayout _stageLayout;
+        public StageLayout StageLayout
+        {
+            get => _stageLayout;
+            private set
+            {
+                _stageLayout = value;
+                SetupStageVms();
+            }
         }
 
         public Sorting.StagedSorterDef StagedSorterDef { get; }
@@ -151,7 +169,9 @@ namespace archean.controls.ViewModel.Sorter
 
         private void DoClear()
         {
-
+            StageVms = new ObservableCollection<StageVm>(
+                    StageVms.Select(stvm=>stvm.ClearSwitchUses())
+                    );
         }
 
         bool CanClear()
@@ -173,7 +193,18 @@ namespace archean.controls.ViewModel.Sorter
 
         private void DoPack(string param)
         {
-
+            if(param == "Tight")
+            {
+                StageLayout = StageLayout.Tight;
+            }
+            else if (param == "Loose")
+            {
+                StageLayout = StageLayout.Loose;
+            }
+            else
+            {
+                StageLayout = StageLayout.Single;
+            }
         }
 
         bool CanPack(string param)
@@ -195,8 +226,11 @@ namespace archean.controls.ViewModel.Sorter
 
         private void DoReset(string param)
         {
-            SortableItemVms = StageVmProcs.ScrambledSortableVms(StagedSorterDef.sorterDef.order, DateTime.Now.Millisecond, true);
-            SetupStageVms();
+            SortableItemVms = StageVmProcs.ScrambledSortableVms(
+                StagedSorterDef.sorterDef.order, DateTime.Now.Millisecond, true);
+            StageVms = new ObservableCollection<StageVm>(
+                     StageVms.ResetSortables(SortableItemVms));
+            CurrentStageVm = StageVms[0];
         }
 
         bool CanReset(string param)
@@ -211,7 +245,7 @@ namespace archean.controls.ViewModel.Sorter
 
     public static class SorterVmExt
     {
-        public static IEnumerable<Func<core.Sorting.Switch[][], StageVm>> StageVmMaps(
+        public static IEnumerable<Func<Sorting.Switch[][], StageVm>> StageVmMaps(
                                             int keyCount, SortableItemVm[] sortableVms)
         {
             var indexInSorter = 0;
@@ -242,11 +276,29 @@ namespace archean.controls.ViewModel.Sorter
             };
         }
 
-        public static IEnumerable<StageVm> ToStageVms(this core.Sorting.StagedSorterDef stagedSorterDef, SortableItemVm[] sortableItemVms)
+        public static IEnumerable<StageVm> ToStageVms(
+            this Sorting.StagedSorterDef stagedSorterDef,
+            StageLayout stageLayout,
+            SortableItemVm[] sortableItemVms)
         {
             var keyCount = stagedSorterDef.sorterDef.order;
-            var switchBlockSets = core.Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
-            //StageVmProcs.ScrambledSortableVms(keyCount, showLabels)
+            IEnumerable<Sorting.Switch[][]> switchBlockSets = Enumerable.Empty<Sorting.Switch[][]>();
+
+            switch (stageLayout)
+            {
+                case StageLayout.Single:
+                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterSingle(stagedSorterDef);
+                    break;
+                case StageLayout.Loose:
+                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterLoose(stagedSorterDef);
+                    break;
+                case StageLayout.Tight:
+                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
+                    break;
+                default:
+                    break;
+            }
+
             return switchBlockSets.Zip
                 (
                     StageVmMaps(keyCount, sortableItemVms), 
@@ -254,5 +306,38 @@ namespace archean.controls.ViewModel.Sorter
                  );
 
         }
+
+
+        public static IEnumerable<StageVm> ResetSortables(this IEnumerable<StageVm> stageVms, SortableItemVm[] sortableItemVms)
+        {
+            foreach(var stvm in stageVms)
+            {
+                if(stvm.IndexInSorter==0)
+                {
+                    yield return new StageVm(
+                        stageVmStep: StageVmStep.Left,
+                        indexInSorter: stvm.IndexInSorter,
+                        stageVmStyle: stvm.StageVmStyle,
+                        keyCount: stvm.KeyCount,
+                        keyPairVms: stvm.KeyPairVms,
+                        sortableItemVms: sortableItemVms
+                    );
+                }
+                else
+                {
+                    yield return new StageVm(
+                        stageVmStep: StageVmStep.None,
+                        indexInSorter: stvm.IndexInSorter,
+                        stageVmStyle: stvm.StageVmStyle,
+                        keyCount: stvm.KeyCount,
+                        keyPairVms: stvm.KeyPairVms,
+                        sortableItemVms: null
+                    );
+                }
+            }
+        }
+
+
+
     }
 }

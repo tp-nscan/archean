@@ -37,8 +37,7 @@ namespace archean.controls.ViewModel.Sorter
 
         public static double SectionRenderX(this StageVm vm, int sectionDex, double stageRenderWidth)
         {
-        //    var vmX =  vm.HPadding + (sectionDex + 0.5 ) * (vm.SwitchLineWidth + vm.SwitchSpacing);
-            var vmX = vm.HPadding + (sectionDex + 0.5) * (vm.SwitchSpacing);
+            var vmX = (sectionDex + 0.5) * (vm.SwitchSpacing);
             return vm.RenderWidth(vmX, stageRenderWidth);
         }
 
@@ -105,7 +104,7 @@ namespace archean.controls.ViewModel.Sorter
             switch (sortableItemVm.StagePos)
             {
                 case StagePos.Left:
-                    renderX = radius * -1.0;
+                    renderX = radius * -1.2;
                     break;
                 case StagePos.Center:
                     renderX = stageVm.SectionRenderX(sortableItemVm.StageSection, stageRenderWidth);
@@ -164,7 +163,7 @@ namespace archean.controls.ViewModel.Sorter
             }
         }
 
-        public static void DrawSortableValue2(this StageVm stageVm,
+        public static void DrawSortableValueAnimate(this StageVm stageVm,
                 SortableItemVm sortableItemVmOld,
                 double pctAlong,
                 DrawingContext dc,
@@ -186,11 +185,6 @@ namespace archean.controls.ViewModel.Sorter
             var centerO = stageVm.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
             var centerN = stageVm.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
 
-            if(sortableItemVmOld.KeyLinePos != sortableItemVm.KeyLinePos)
-            {
-                var s = "S";
-            }
-
             var center = centerO.Interpolate(centerN, pctAlong);
 
             dc.DrawEllipse(sortableItemVm.BackgroundBrush, null, center, radius, radius);
@@ -208,7 +202,7 @@ namespace archean.controls.ViewModel.Sorter
             }
         }
 
-        public static void DrawSortableValues2(
+        public static void DrawSortableValuesAnimate(
             this StageVm stageVm, 
             StageVm stageVmOld,
             double pctAlong,
@@ -220,7 +214,7 @@ namespace archean.controls.ViewModel.Sorter
 
             for(var i=0; i< stageVm.SortableItemVms.Length; i++)
             {
-                stageVm.DrawSortableValue2(
+                stageVm.DrawSortableValueAnimate(
                     stageVmOld.SortableItemVms[i], 
                     pctAlong, 
                     dc, 

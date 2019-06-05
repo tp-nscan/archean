@@ -16,34 +16,29 @@
     </UserControl.Resources>
 
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" >
-            <Border HorizontalAlignment="Center"
-                    CornerRadius="8" BorderBrush="Black" BorderThickness="1">
-                <Border Margin="3">
-                    <ItemsControl x:Name="StageCol" ItemsSource="{Binding StageVms}" 
+        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Visible" >
+            <Border Margin="50,0" HorizontalAlignment="Center">
+                <ItemsControl x:Name="StageCol" ItemsSource="{Binding StageVms}" 
                                   ItemTemplate="{DynamicResource StageTemplate}">
 
-                        <ItemsControl.Resources>
-                            <DataTemplate x:Key="StageTemplate">
-                                <local:StageControl
+                    <ItemsControl.Resources>
+                        <DataTemplate x:Key="StageTemplate">
+                            <local:StageControl
                                     d:DesignHeight="250"
                                     Margin="-1,0"
                                     StageVm="{Binding Mode=OneWay}"
                              />
-                            </DataTemplate>
-                        </ItemsControl.Resources>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
 
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                    </ItemsControl>
-                </Border>
+                </ItemsControl>
             </Border>
-
-
         </ScrollViewer>
     </Grid>
 </UserControl>

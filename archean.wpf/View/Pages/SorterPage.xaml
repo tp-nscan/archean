@@ -34,7 +34,7 @@
         </Grid.RowDefinitions>
 
         <Border Margin="20" BorderBrush="Black" BorderThickness="1">
-            <sorter:SorterControl Margin="5" DataContext="{Binding SorterVm}" />
+            <sorter:SorterControl DataContext="{Binding SorterVm}" />
         </Border>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">

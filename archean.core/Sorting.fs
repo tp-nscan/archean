@@ -360,24 +360,29 @@ module Sorting =
                 |> Seq.toArray |> ignore
             switchPads |> List.map(fun swp -> swp.switches |> Seq.toArray)
                        |> List.toArray
+                       
 
-                
         let LayoutRandomStage (order:int) (rnd:Random) =
             let switches = Stage.MakeStagePackedSwitchSeq rnd order |> Seq.take (order / 2)
             LayoutSwitchesLoose order switches
 
 
-        let LayoutStagedSorter (ssd:StagedSorterDef) (switchLayout:int->seq<Switch>->Switch[][]) =
+        let LayoutStagedSorter (ssd:StagedSorterDef) (switchLayout:seq<Switch>->Switch[][]) =
                 StagedSorterDef.GetStages ssd
-                     |> Seq.map(fun sq -> switchLayout ssd.sorterDef.order sq )
+                     |> Seq.map(fun sq -> switchLayout sq )
 
                      
+        let LayoutStagedSorterSingle (ssd:StagedSorterDef) =
+                ssd.sorterDef.switches
+                    |> Seq.map(fun sw -> [|[|sw|]|] )
+          
+
         let LayoutStagedSorterLoose (ssd:StagedSorterDef) =
-                LayoutStagedSorter ssd LayoutSwitchesLoose
+                LayoutStagedSorter ssd (LayoutSwitchesLoose ssd.sorterDef.order)
 
 
         let LayoutStagedSorterTight (ssd:StagedSorterDef) =
-                LayoutStagedSorter ssd LayoutSwitchesTight
+                LayoutStagedSorter ssd (LayoutSwitchesTight ssd.sorterDef.order)
 
 
 
