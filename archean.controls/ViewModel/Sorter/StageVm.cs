@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Media;
 using System.Linq;
 using System.Reactive.Subjects;
 using System;
@@ -26,8 +25,11 @@ namespace archean.controls.ViewModel.Sorter
             _keyPairVms = keyPairVms.ToList();
             SortableItemVms = sortableItemVms;
             SectionCount = _keyPairVms.Max(vm => vm.StageSection) + 1;
-            VmWidth = StageVmStyle.StageRightMargin + (SwitchSpacing) * SectionCount;
-            VmHeight = 2 * VPadding + (KeyLineThickness + KeyLineSpacing) * KeyCount + KeyLineSpacing;
+            VmWidth = StageVmStyle.StageRightMargin + 
+                      StageVmStyle.SwitchHSpacing * SectionCount;
+            VmHeight = 2 * StageVmStyle.VPadding + 
+                      StageVmStyle.KeyLineHeight * KeyCount + 
+                      StageVmStyle.KeyLineHeight;
         }
 
         public void RaiseAnimationFinished()
@@ -37,14 +39,7 @@ namespace archean.controls.ViewModel.Sorter
 
         public int IndexInSorter { get; }
         public StageVmStep StageVmStep { get; }
-        public Brush KeyLineBrush => StageVmStyle.KeyLineBrush;
         public int KeyCount { get; }
-        public double SwitchLineWidth => StageVmStyle.SwitchLineWidth;
-        public double SwitchSpacing => StageVmStyle.SwitchHSpacing;
-        public double KeyLineThickness => StageVmStyle.KeyLineThickness;
-        public double KeyLineSpacing => StageVmStyle.KeyLineSpacing;
-        public double VPadding => StageVmStyle.VPadding;
-        public Brush BackgroundBrush => StageVmStyle.BackgroundBrush;
         public SortableItemVm[] SortableItemVms { get; }
         public StageVmStyle StageVmStyle { get; }
         readonly List<KeyPairVm> _keyPairVms;
@@ -54,41 +49,6 @@ namespace archean.controls.ViewModel.Sorter
         public double VmHeight { get; }
         public double VmWidth { get; }
         public double WidthToHeight { get { return (VmHeight > 0) ? VmWidth / VmHeight : 0.0;  } }
-    }
-
-
-    public class StageVmStyle
-    {
-        public Brush KeyLineBrush { get; set; }
-        public Brush SwitchBrushNotUsed { get; set; }
-        public Brush SwitchBrushInUse { get; set; }
-        public Brush SwitchBrushWasUsed { get; set; }
-        public double SwitchLineWidth { get; set; }
-        public double StageRightMargin { get; set; }
-        public double SwitchHSpacing { get; set; }
-        public double KeyLineThickness { get; set; }
-        public double KeyLineSpacing { get; set; }
-        public double VPadding { get; set; }
-        public Brush BackgroundBrush { get; set; }
-
-        public static StageVmStyle Standard(bool oddStep)
-        {
-            return new StageVmStyle
-            {
-                KeyLineBrush = Brushes.Blue,
-                SwitchBrushNotUsed = Brushes.Black,
-                SwitchBrushInUse = Brushes.Yellow,
-                SwitchBrushWasUsed = Brushes.GreenYellow,
-                SwitchLineWidth = 1.0,
-                SwitchHSpacing = 3.25,
-                StageRightMargin = 3.25,
-                KeyLineThickness = 1.0,
-                KeyLineSpacing = 3.0,
-                VPadding = 1.0,
-                BackgroundBrush = oddStep ? Brushes.Lavender : Brushes.White
-            };
-        }
-
     }
 
 
@@ -238,5 +198,18 @@ namespace archean.controls.ViewModel.Sorter
                     sortableItemVms: stageVm.SortableItemVms
                  );
         }
+
+        public static StageVm SetStageVmStyle(this StageVm stageVm, StageVmStyle stageVmStyle)
+        {
+            return new StageVm(
+                    stageVmStep: stageVm.StageVmStep,
+                    indexInSorter: stageVm.IndexInSorter,
+                    stageVmStyle: stageVmStyle,
+                    keyCount: stageVm.KeyCount,
+                    keyPairVms: stageVm.KeyPairVms,
+                    sortableItemVms: stageVm.SortableItemVms
+                 );
+        }
+
     }
 }

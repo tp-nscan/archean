@@ -19,38 +19,43 @@ namespace archean.controls.ViewModel.Sorter
 
         public static double KeyRenderYc(this StageVm vm, int keyDex, double stageRenderHeight)
         {
-            var vmHeight = vm.VPadding + (vm.KeyCount - keyDex) * (vm.KeyLineSpacing + vm.KeyLineThickness);
+            var vmHeight = vm.StageVmStyle.VPadding + 
+                          (vm.KeyCount - keyDex) * vm.StageVmStyle.KeyLineHeight;
             return vm.RenderHeight(vmHeight, stageRenderHeight);
         }
 
         public static double KeyRenderYh(this StageVm vm, int keyDex, double stageRenderHeight)
         {
-            var vmHeight = vm.VPadding + (vm.KeyCount - keyDex) * (vm.KeyLineSpacing + vm.KeyLineThickness) - vm.KeyLineThickness / 2;
+            var vmHeight = vm.StageVmStyle.VPadding + 
+                          (vm.KeyCount - keyDex) * vm.StageVmStyle.KeyLineHeight - 
+                          vm.StageVmStyle.KeyLineThickness / 2;
             return vm.RenderHeight(vmHeight, stageRenderHeight);
         }
 
         public static double KeyRenderYl(this StageVm vm, int keyDex, double stageRenderHeight)
         {
-            var vmHeight = vm.VPadding + (vm.KeyCount - keyDex) * (vm.KeyLineSpacing + vm.KeyLineThickness) + vm.KeyLineThickness/2;
+            var vmHeight = vm.StageVmStyle.VPadding + 
+                          (vm.KeyCount - keyDex) * vm.StageVmStyle.KeyLineHeight + 
+                           vm.StageVmStyle.KeyLineThickness / 2;
             return vm.RenderHeight(vmHeight, stageRenderHeight);
         }
 
         public static double SectionRenderX(this StageVm vm, int sectionDex, double stageRenderWidth)
         {
-            var vmX = (sectionDex + 0.5) * (vm.SwitchSpacing);
+            var vmX = (sectionDex + 0.5) * (vm.StageVmStyle.SwitchHSpacing);
             return vm.RenderWidth(vmX, stageRenderWidth);
         }
 
         public static Pen SwitchLinePen(this StageVm stageVm, KeyPairVm keyPairVm, double stageRenderWidth)
         {
-            var brushWidth = stageVm.RenderWidth(stageVm.SwitchLineWidth, stageRenderWidth);
+            var brushWidth = stageVm.RenderWidth(stageVm.StageVmStyle.SwitchLineWidth, stageRenderWidth);
             return new Pen(keyPairVm.Brush, brushWidth);
         }
 
         public static Pen KeyLinePen(this StageVm stageVm, double stageRenderHeight)
         {
-            var brushHeight = stageVm.RenderHeight(stageVm.KeyLineThickness, stageRenderHeight);
-            return new Pen(stageVm.KeyLineBrush, brushHeight);
+            var brushHeight = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness, stageRenderHeight);
+            return new Pen(stageVm.StageVmStyle.KeyLineBrush, brushHeight);
         }
 
         public static void DrawSwitch(this DrawingContext dc, StageVm stageVm, KeyPairVm keyPairVm, 
@@ -98,7 +103,7 @@ namespace archean.controls.ViewModel.Sorter
             }
 
             var renderY = stageVm.KeyRenderYc(sortableItemVm.KeyLinePos, stageRenderHeight);
-            var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
+            var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
 
             var renderX = 0.0;
             switch (sortableItemVm.StagePos)
@@ -133,7 +138,7 @@ namespace archean.controls.ViewModel.Sorter
                 return;
             }
 
-            var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
+            var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
 
             var center = stageVm.GetSortableItemPosition(sortableVm, stageRenderWidth, stageRenderHeight);
             dc.DrawEllipse(sortableVm.BackgroundBrush, null, center, radius, radius);
@@ -180,7 +185,7 @@ namespace archean.controls.ViewModel.Sorter
                 return;
             }
 
-            var radius = stageVm.RenderHeight(stageVm.KeyLineThickness * 1.5, stageRenderHeight);
+            var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
 
             var centerO = stageVm.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
             var centerN = stageVm.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
@@ -222,7 +227,6 @@ namespace archean.controls.ViewModel.Sorter
                     stageRenderWidth, 
                     stageRenderHeight);
             }
-
         }
 
     }

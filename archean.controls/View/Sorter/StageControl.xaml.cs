@@ -1,4 +1,5 @@
-﻿using archean.controls.ViewModel.Sorter;
+﻿using archean.controls.ViewModel;
+using archean.controls.ViewModel.Sorter;
 using System;
 using System.ComponentModel;
 using System.Timers;
@@ -11,15 +12,12 @@ namespace archean.controls.View.Sorter
 {
     public partial class StageControl : UserControl
     {
-        readonly Timer renderTimer = null;
         private const double DEFAULT_INTERVAL = 10;
-        private const double DEFAULT_TICS_PER_STEP = 15;
+        private const double DEFAULT_TICS_PER_STEP = 5;
 
         public StageControl()
         {
             InitializeComponent();
-            renderTimer = new Timer(DEFAULT_INTERVAL);
-            renderTimer.Elapsed += OnRenderTimerElapsed;
             SizeChanged += StageControl_SizeChanged;
         }
 
@@ -35,22 +33,35 @@ namespace archean.controls.View.Sorter
                 }));
         }
 
-
-        private void StartTimer()
+        Timer _renderTimer;
+        public Timer RenderTimer
         {
-            if ((renderTimer == null) || (renderTimer.Enabled))
-                return;
-            renderTimer.Enabled = true;
+            get { return _renderTimer; }
+            set
+            {
+                if(_renderTimer != null)
+                {
+                    _renderTimer.Elapsed -= OnRenderTimerElapsed;
+                }
+                _renderTimer = value;
+                _renderTimer.Elapsed += OnRenderTimerElapsed;
+            }
         }
 
-        /// <summary>
-        /// Stop the Tick Control rotation
-        /// </summary>
+        private void StartTimer(double renderInterval)
+        {
+            if ((RenderTimer != null) && (RenderTimer.Enabled))
+                return;
+
+            RenderTimer = new Timer(renderInterval);
+            RenderTimer.Enabled = true;
+        }
+
         private void StopTimer()
         {
-            if (renderTimer != null)
+            if (RenderTimer != null)
             {
-                renderTimer.Enabled = false;
+                RenderTimer.Enabled = false;
             }
         }
 
@@ -82,7 +93,7 @@ namespace archean.controls.View.Sorter
             {
                 return;
             }
-            dc.DrawRectangle(StageVm.BackgroundBrush, null, new Rect(0.0, 0.0, ActualWidth, ActualHeight));
+            dc.DrawRectangle(StageVm.StageVmStyle.BackgroundBrush, null, new Rect(0.0, 0.0, ActualWidth, ActualHeight));
 
             dc.DrawKeyLines(StageVm, ActualWidth, ActualHeight);
 
@@ -91,7 +102,7 @@ namespace archean.controls.View.Sorter
                 dc.DrawSwitch(StageVm, kvm, ActualWidth, ActualHeight);
             }
 
-            if(renderTimer.Enabled)
+            if((RenderTimer != null) && (RenderTimer.Enabled))
             {
                 StageVm.DrawSortableValuesAnimate(StageVmOld, (ticks / TicsPerStep), dc, ActualWidth, ActualHeight);
             }
@@ -103,6 +114,8 @@ namespace archean.controls.View.Sorter
 
         public StageVm StageVmOld;
         public double TicsPerStep = DEFAULT_TICS_PER_STEP;
+        public double RenderInterval = DEFAULT_TICS_PER_STEP;
+
 
         #region StageVm
 
@@ -119,14 +132,19 @@ namespace archean.controls.View.Sorter
 
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var stageControl = (StageControl)d;
+            //    (stageControl.StageVmOld != null) &&
+           // (stageControl.StageVmOld.SortableItemVms != null) &&
+
+       var stageControl = (StageControl)d;
             stageControl.StageVmOld = (StageVm)e.OldValue;
-            stageControl.TicsPerStep = (stageControl.StageVmOld == null) ? 0: DEFAULT_TICS_PER_STEP;
-            if ((stageControl.StageVm.SortableItemVms != null ) && 
+
+            if ((stageControl.StageVm.SortableItemVms != null ) &&
                 (stageControl.StageVmOld != null) &&
-                (stageControl.StageVmOld.SortableItemVms != null))
+                (stageControl.StageVmOld.SortableItemVms != null) &&
+                (stageControl.StageVm.StageVmStyle.AnimationSpeed != AnimationSpeed.None))
             {
-                    stageControl.StartTimer();
+                    stageControl.StartTimer(stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateFrequency());
+                    stageControl.TicsPerStep = stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateSteps();
             }
             else
             {
@@ -141,10 +159,10 @@ namespace archean.controls.View.Sorter
         {
             if (!disposing)
                 return;
-            if (renderTimer != null)
+            if (RenderTimer != null)
             {
-                renderTimer.Elapsed -= OnRenderTimerElapsed;
-                renderTimer.Dispose();
+                _renderTimer.Elapsed -= OnRenderTimerElapsed;
+                _renderTimer.Dispose();
             }		
         }
 

@@ -1,7 +1,6 @@
 ﻿using archean.controls.DesignVms.Sorter;
-using archean.controls.ViewModel.Sorter;
-using System.Windows.Input;
 using archean.controls.Utils;
+using archean.controls.ViewModel.Sorter;
 
 namespace archean.ViewModel.Pages
 {
@@ -19,5 +18,6 @@ namespace archean.ViewModel.Pages
             get => _sorterVm;
             set => SetProperty(ref _sorterVm, value);
         }
+
     }
 }

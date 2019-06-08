@@ -37,48 +37,11 @@
             <sorter:SorterControl DataContext="{Binding SorterVm}" />
         </Border>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Style="{StaticResource btnStyleBigPanel}"
-                Command="{Binding SorterVm.StepCommand}"
-                Content="Step"/>
 
-            <Button Style="{StaticResource btnStyleBigPanel}"
-                Command="{Binding SorterVm.RunCommand}"
-                Content="Run"/>
-            
-            <Button Style="{StaticResource btnStyleBigPanel}"
-                Command="{Binding SorterVm.ClearCommand}"
-                Content="Clear"/>
-
-            <Button Style="{StaticResource btnStyleBigPanel}"
-                Command="{Binding SorterVm.ResetCommand}"
-                Content="Reset"/>
-
-            <GroupBox Margin="30,10" BorderBrush="Black" BorderThickness="2" Header="Stage packing"  HorizontalAlignment="Center">
-                
-                <StackPanel Orientation="Horizontal">
-
-                    <Button Style="{StaticResource btnStyleMedPanel}"
-                        Command="{Binding SorterVm.PackCommand}"
-                        CommandParameter="Single"
-                        Content="Single"/>
-
-                    <Button Style="{StaticResource btnStyleMedPanel}"
-                        Command="{Binding SorterVm.PackCommand}"
-                        CommandParameter="Loose"
-                        Content="Loose"/>
-
-                    <Button Style="{StaticResource btnStyleMedPanel}"
-                        Command="{Binding SorterVm.PackCommand}"
-                        CommandParameter="Tight"
-                        Content="Tight"/>
-                    
-                </StackPanel>
-                
-            </GroupBox>
-            
-        </StackPanel>
-
+        <sorter:SorterControlControl Grid.Row="1" 
+                SorterVm="{Binding SorterVm}"        
+                                     
+                                     />
         
     </Grid>
 </Page>

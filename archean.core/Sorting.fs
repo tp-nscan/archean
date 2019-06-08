@@ -359,6 +359,7 @@ module Sorting =
                 }
                 |> Seq.toArray |> ignore
             switchPads |> List.map(fun swp -> swp.switches |> Seq.toArray)
+                       |> List.rev
                        |> List.toArray
                        
 

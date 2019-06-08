@@ -6,8 +6,10 @@ namespace archean.controls.DesignVms.Sorter
     public class SorterVmD : SorterVm
     {
         public SorterVmD() : base(
-            StagedSorterDefD, 
-            StageVmProcs.ScrambledSortableVms(StagedSorterDefD.sorterDef.order, System.DateTime.Now.Millisecond, true))
+            stagedSorterDef: StagedSorterDefD, 
+            sortableItemVms: StageVmProcs.ScrambledSortableVms(StagedSorterDefD.sorterDef.order, System.DateTime.Now.Millisecond, true),
+            animationSpeed: ViewModel.AnimationSpeed.None
+            )
         {
         }
 
@@ -17,7 +19,8 @@ namespace archean.controls.DesignVms.Sorter
         {
             get
             {
-                return _stagedSorterDefD ?? (_stagedSorterDefD = core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
+                return _stagedSorterDefD ?? (
+                    _stagedSorterDefD = core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
                             core.SortersFromData.RefSorter.Order8));
             }
         }

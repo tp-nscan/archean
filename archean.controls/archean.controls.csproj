@@ -76,6 +76,7 @@
     <Compile Include="Utils\GraphicsFuncs.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="Utils\StringFormats.cs" />
+    <Compile Include="ViewModel\Enums.cs" />
     <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableSetVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableItemVm.cs" />
@@ -83,8 +84,12 @@
     <Compile Include="ViewModel\Sorter\StageVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStep.cs" />
+    <Compile Include="ViewModel\Sorter\StageVmStyle.cs" />
     <Compile Include="View\Sorter\SorterControl.xaml.cs">
       <DependentUpon>SorterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter\SorterControlControl.xaml.cs">
+      <DependentUpon>SorterControlControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Sorter\StageControl.xaml.cs">
       <DependentUpon>StageControl.xaml</DependentUpon>
@@ -93,6 +98,10 @@
       <DependentUpon>SortableSetControl.xaml</DependentUpon>
     </Compile>
     <Page Include="View\Sorter\SorterControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Sorter\SorterControlControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
