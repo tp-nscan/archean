@@ -8,6 +8,14 @@
         Fast
     }
 
+    public enum StageLayout
+    {
+        Single,
+        Loose,
+        Tight
+    }
+
+
     public static class EnumExt
     {
         public static double ToUpdateFrequency(this AnimationSpeed animationSpeed)
@@ -17,9 +25,9 @@
                 case AnimationSpeed.None:
                     return -1.0;
                 case AnimationSpeed.Slow:
-                    return 40.0;
+                    return 10.0;
                 case AnimationSpeed.Medium:
-                    return 20.0;
+                    return 10.0;
                 case AnimationSpeed.Fast:
                     return 10.0;
                 default:
@@ -34,9 +42,9 @@
                 case AnimationSpeed.None:
                     return -1.0;
                 case AnimationSpeed.Slow:
-                    return 20.0;
+                    return 125.0;
                 case AnimationSpeed.Medium:
-                    return 10.0;
+                    return 25.0;
                 case AnimationSpeed.Fast:
                     return 5.0;
                 default:

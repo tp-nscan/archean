@@ -142,7 +142,7 @@ module SortersFromData =
     let GetSorterStageCount (randGenerationMode:SorterGenerationMode) =
         match randGenerationMode with
          | Prefixed ( _, 
-                     {order=order; stageCount=totalStageCount; randSwitchFill=_;}) ->
+                      {order=order; stageCount=totalStageCount; randSwitchFill=_;}) ->
                       totalStageCount * order / 2
          | Randy { order=_; stageCount=totalStageCount; randSwitchFill=_ } ->
                       totalStageCount / 2

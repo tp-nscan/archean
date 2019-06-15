@@ -66,7 +66,7 @@ namespace archean.ViewModel.Pages
                 _stopwatch.Stop();
                 Time = _stopwatch.Elapsed.ToString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }

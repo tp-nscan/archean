@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:archean.controls.View.Sorter"
              xmlns:sorter="clr-namespace:archean.controls.DesignVms.Sorter"
              xmlns:Converters="clr-namespace:archean.controls.Utils.Converters" 
-             x:Class="archean.controls.View.Sorter.SorterControl"
+             x:Class="archean.controls.View.Sorter.SorterDisplayControl"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type sorter:SorterVmD}, IsDesignTimeCreatable=True}"
              d:DesignHeight="450" d:DesignWidth="800">

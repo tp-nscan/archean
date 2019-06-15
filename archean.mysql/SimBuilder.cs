@@ -20,7 +20,7 @@ namespace archean.mysql
                 }
                 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

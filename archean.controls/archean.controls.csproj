@@ -80,16 +80,19 @@
     <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableSetVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableItemVm.cs" />
-    <Compile Include="ViewModel\Sorter\SorterVm.cs" />
+    <Compile Include="ViewModel\Sorter\SorterDisplayVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStep.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStyle.cs" />
-    <Compile Include="View\Sorter\SorterControl.xaml.cs">
-      <DependentUpon>SorterControl.xaml</DependentUpon>
+    <Compile Include="View\Sorter\SorterDisplayControl.xaml.cs">
+      <DependentUpon>SorterDisplayControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Sorter\SorterControlControl.xaml.cs">
-      <DependentUpon>SorterControlControl.xaml</DependentUpon>
+    <Compile Include="View\Sorter\SorterGenControl.xaml.cs">
+      <DependentUpon>SorterGenControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter\SorterRunControl.xaml.cs">
+      <DependentUpon>SorterRunControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Sorter\StageControl.xaml.cs">
       <DependentUpon>StageControl.xaml</DependentUpon>
@@ -97,11 +100,15 @@
     <Compile Include="View\Sorter\SortableSetControl.xaml.cs">
       <DependentUpon>SortableSetControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="View\Sorter\SorterControl.xaml">
+    <Page Include="View\Sorter\SorterDisplayControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Sorter\SorterControlControl.xaml">
+    <Page Include="View\Sorter\SorterGenControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Sorter\SorterRunControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

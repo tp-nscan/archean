@@ -5,7 +5,7 @@ open archean.core.Sorting
 open archean.core.SorterA
 
 module GeneratedSortables =
-    true
+    true |> ignore
 //    type ISortable =
 //        abstract member IsSorted :  unit -> bool
        

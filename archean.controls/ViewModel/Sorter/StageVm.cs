@@ -109,7 +109,7 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static StageVm ToNextStep(this StageVm stageVm, SortableItemVm[] sortableVms = null)
+        public static StageVm ToNextStep(this StageVm stageVm, SortableItemVm[] sortableItemVms = null)
         {
             switch (stageVm.StageVmStep)
             {
@@ -176,7 +176,7 @@ namespace archean.controls.ViewModel.Sorter
                             stageVmStyle: stageVm.StageVmStyle,
                             keyCount: stageVm.KeyCount,
                             keyPairVms: stageVm.KeyPairVms,
-                            sortableItemVms: sortableVms
+                            sortableItemVms: sortableItemVms
                          );
                 default:
                     throw new System.Exception($"{stageVm.StageVmStep} not handled");

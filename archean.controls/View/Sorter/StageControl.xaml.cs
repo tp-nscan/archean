@@ -128,14 +128,11 @@ namespace archean.controls.View.Sorter
 
         public static readonly DependencyProperty StageVmProperty =
             DependencyProperty.Register("StageVm", typeof(StageVm), typeof(StageControl),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnStageVmPropertyChanged));
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None, OnStageVmPropertyChanged));
 
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //    (stageControl.StageVmOld != null) &&
-           // (stageControl.StageVmOld.SortableItemVms != null) &&
-
-       var stageControl = (StageControl)d;
+            var stageControl = (StageControl)d;
             stageControl.StageVmOld = (StageVm)e.OldValue;
 
             if ((stageControl.StageVm.SortableItemVms != null ) &&
@@ -143,8 +140,8 @@ namespace archean.controls.View.Sorter
                 (stageControl.StageVmOld.SortableItemVms != null) &&
                 (stageControl.StageVm.StageVmStyle.AnimationSpeed != AnimationSpeed.None))
             {
-                    stageControl.StartTimer(stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateFrequency());
-                    stageControl.TicsPerStep = stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateSteps();
+                stageControl.StartTimer(stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateFrequency());
+                stageControl.TicsPerStep = stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateSteps();
             }
             else
             {

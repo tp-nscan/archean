@@ -7,22 +7,17 @@ using archean.core;
 
 namespace archean.controls.ViewModel.Sorter
 {
-    public enum StageLayout
+    public class SorterDisplayVm : BindableBase
     {
-        Single,
-        Loose,
-        Tight
-    }
-
-    public class SorterVm : BindableBase
-    {
-        public SorterVm(Sorting.StagedSorterDef stagedSorterDef,
+        public SorterDisplayVm(Sorting.StagedSorterDef stagedSorterDef,
                         SortableItemVm[] sortableItemVms,
-                        AnimationSpeed animationSpeed)
+                        AnimationSpeed animationSpeed,
+                        StageLayout stageLayout)
         {
             StagedSorterDef = stagedSorterDef;
             SortableItemVms = sortableItemVms;
             _animationSpeed = animationSpeed;
+            _stageLayout = stageLayout;
             SetupStageVms();
         }
 
@@ -31,7 +26,6 @@ namespace archean.controls.ViewModel.Sorter
             StageVms = new ObservableCollection<StageVm>(
                                 StagedSorterDef.ToStageVms(StageLayout,
                                 SortableItemVms, AnimationSpeed));
-            CurrentStageVm = StageVms[0];
         }
 
         private AnimationSpeed _animationSpeed;
@@ -66,7 +60,11 @@ namespace archean.controls.ViewModel.Sorter
         public ObservableCollection<StageVm> StageVms
         {
             get => _stageVms;
-            set => SetProperty(ref _stageVms, value);
+            set
+            {
+                SetProperty(ref _stageVms, value);
+                CurrentStageVm = value[0];
+            }
         }
 
         StageVm _currentStageVm;
@@ -89,7 +87,6 @@ namespace archean.controls.ViewModel.Sorter
         }
 
         IDisposable subscription;
-
         void AnimationFinished(StageVm stageVm)
         {
             if (KeepGoing)
@@ -113,7 +110,7 @@ namespace archean.controls.ViewModel.Sorter
         {
             if (CurrentStageVm.StageVmStep == StageVmStep.Right)
             {
-                var sortableVms = CurrentStageVm.SortableItemVms;
+                var sortableItemVms = CurrentStageVm.SortableItemVms;
                 if (CurrentStageVm.IndexInSorter + 1 > StageVms.Count - 1) return;
 
                 //since this stage is finished, change it to a sortable free config
@@ -121,7 +118,7 @@ namespace archean.controls.ViewModel.Sorter
 
                 // put the sortables in the  left position on the next stage
                 CurrentStageVm = StageVms[CurrentStageVm.IndexInSorter + 1]
-                                    .ToNextStep(sortableVms.ToLeftStep());
+                                    .ToNextStep(sortableItemVms.ToLeftStep());
                 if (KeepGoing)
                 {
                     MakeStep();

@@ -100,9 +100,5 @@ module StagedSorter =
 
 
     let equalsOn f x (yobj:obj) =
-
         match yobj with
         | T as y -> (f x = f y)
-
-
-        | _ -> false
