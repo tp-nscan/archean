@@ -1,28 +1,75 @@
-﻿using System;
+﻿using archean.controls.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace archean.controls.View.Sorter
 {
-    /// <summary>
-    /// Interaction logic for SorterGenControl.xaml
-    /// </summary>
-    public partial class SorterGenControl : UserControl
+    public partial class SorterGenControl
     {
         public SorterGenControl()
         {
             InitializeComponent();
+
+            var rs = typeof(core.SortersFromData.RefSorter);
+            var ss2 = rs.GetProperties()
+                .Where(p => p.PropertyType == typeof(core.SortersFromData.RefSorter))
+                .Select(p => (core.SortersFromData.RefSorter)p.GetMethod.Invoke(null, null))
+                .ToList();
+
         }
+
+
+
+        #region StageLayout
+
+        List<core.SortersFromData.RefSorter> _refSorters;
+
+        public IEnumerable<core.SortersFromData.RefSorter> RefSorters
+        {
+            get
+            {
+                return _refSorters ?? 
+                    (
+                        _refSorters =
+                            typeof(core.SortersFromData.RefSorter)
+                            .GetProperties()
+                            .Where(p => p.PropertyType == typeof(core.SortersFromData.RefSorter))
+                            .Select(p => (core.SortersFromData.RefSorter)p.GetMethod.Invoke(null, null))
+                            .ToList()
+                    );
+            }
+        }
+
+        public core.SortersFromData.RefSorter RefSorter
+        {
+            get { return (core.SortersFromData.RefSorter)GetValue(RefSorterProperty); }
+            set { SetValue(RefSorterProperty, value); }
+        }
+
+        public static readonly DependencyProperty RefSorterProperty =
+            DependencyProperty.Register("RefSorter", typeof(core.SortersFromData.RefSorter), typeof(SorterGenControl),
+            new FrameworkPropertyMetadata(core.SortersFromData.RefSorter.Order25, 
+                FrameworkPropertyMetadataOptions.None, OnRefSorterPropertyPropertyChanged));
+
+
+        private static void OnRefSorterPropertyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            //var sorterRunControl = (SorterRunControl)d;
+            //var stageLayout = (StageLayout)e.NewValue;
+            //if (sorterRunControl.SorterDisplayVm != null)
+            //{
+            //    sorterRunControl.SorterDisplayVm.StageLayout = stageLayout;
+            //    sorterRunControl.DoReset();
+            //}
+        }
+
+        #endregion
+
+
+
+
     }
 }

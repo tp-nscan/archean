@@ -17,7 +17,7 @@ namespace archean.controls.View.Sorter
             InitializeComponent();
         }
 
-        #region SorterVm
+        #region SorterDisplayVm
 
         //[Category("Custom Properties")]
         public SorterDisplayVm SorterDisplayVm
@@ -200,8 +200,6 @@ namespace archean.controls.View.Sorter
         #endregion
 
 
-
-
         #region StageLayout
 
         public IEnumerable<StageLayout> StageLayouts
@@ -234,7 +232,6 @@ namespace archean.controls.View.Sorter
         }
 
         #endregion
-
 
     }
 }

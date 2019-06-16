@@ -9,8 +9,7 @@ namespace archean.ViewModel.Pages
     {
         public SorterPageVm()
         {
-            StagedSorterDef = SortersFromData.RefSorterModule.CreateRefStagedSorter(
-                                SortersFromData.RefSorter.Order8);
+
         }
 
 
@@ -21,6 +20,16 @@ namespace archean.ViewModel.Pages
             set => SetProperty(ref _sorterVm, value);
         }
 
+        private SortersFromData.RefSorter _refSorter;
+        public SortersFromData.RefSorter RefSorter
+        {
+            get => _refSorter;
+            set
+            {
+                SetProperty(ref _refSorter, value);
+                StagedSorterDef = SortersFromData.RefSorterModule.CreateRefStagedSorter(value);
+            }
+        }
 
         private Sorting.StagedSorterDef _stagedSorterDef;
         public Sorting.StagedSorterDef StagedSorterDef
