@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using archean.controls.ViewModel.Common;
+using System.Windows.Media;
 using System.Globalization;
 using System.Windows;
 using archean.controls.Utils;

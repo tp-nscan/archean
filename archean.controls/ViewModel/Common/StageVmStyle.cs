@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace archean.controls.ViewModel.Sorter
+namespace archean.controls.ViewModel.Common
 {
     public class StageVmStyle
     {

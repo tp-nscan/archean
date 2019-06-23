@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using archean.controls.ViewModel.Common;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System;

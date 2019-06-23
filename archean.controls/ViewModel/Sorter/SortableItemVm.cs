@@ -1,4 +1,5 @@
 ﻿using archean.core;
+using archean.controls.ViewModel.Common;
 using System;
 using System.Linq;
 using System.Windows.Media;

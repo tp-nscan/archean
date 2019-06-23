@@ -1,9 +1,9 @@
-﻿
+﻿using archean.controls.ViewModel.Common;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
-namespace archean.controls.ViewModel.Sorter
+namespace archean.controls.ViewModel.Common
 {
     public enum KeyPairUse
     {

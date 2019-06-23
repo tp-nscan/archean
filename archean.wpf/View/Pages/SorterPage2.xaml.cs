@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace archean.View
+namespace archean.View.Pages
 {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Interaction logic for SorterPage2.xaml
     /// </summary>
-    public partial class UserControl1 : UserControl
+    public partial class SorterPage2 : Page
     {
-        public UserControl1()
+        public SorterPage2()
         {
             InitializeComponent();
         }

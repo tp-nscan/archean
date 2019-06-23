@@ -1,4 +1,5 @@
-﻿using archean.controls.ViewModel.Sorter;
+﻿using archean.controls.ViewModel.Common;
+using archean.controls.ViewModel.Sorter;
 
 namespace archean.controls.DesignVms.Sorter
 {

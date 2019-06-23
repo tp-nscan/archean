@@ -21,6 +21,7 @@
         <Button x:Name="btnBenchmark" Grid.Row="0" Click="BtnBenchmark_Click">Benchmark</Button>
         <Button x:Name="btnStageControl" Grid.Row="1" Click="BtnStageControl_Click">Stage Control</Button>
         <Button x:Name="btnSorterControl" Grid.Row="2" Click="BtnSorterControl_Click">Sorter Control</Button>
+        <Button x:Name="btnSorter2Control" Grid.Row="3" Click="BtnSorter2Control_Click">Sorter2 Control</Button>
         
     </Grid>
 </Page>

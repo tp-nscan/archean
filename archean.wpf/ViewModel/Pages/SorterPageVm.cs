@@ -31,6 +31,8 @@ namespace archean.ViewModel.Pages
             }
         }
 
+
+
         private Sorting.StagedSorterDef _stagedSorterDef;
         public Sorting.StagedSorterDef StagedSorterDef
         {
@@ -63,7 +65,7 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _animationSpeed, value);
-                UpdateSorterDisplayVm();
+                SorterDisplayVm = SorterDisplayVm.ChangeAnimationSpeed(value);
             }
         }
 

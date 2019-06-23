@@ -1,4 +1,5 @@
 ﻿using archean.controls.Utils;
+using archean.controls.ViewModel.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,42 +16,38 @@ namespace archean.controls.ViewModel.Sorter
                         StageLayout stageLayout)
         {
             StagedSorterDef = stagedSorterDef;
+            Order = stagedSorterDef.sorterDef.order;
+            SwitchBlockSets = stagedSorterDef.ToSwitchBlockSets(stageLayout).ToList();
             SortableItemVms = sortableItemVms;
-            _animationSpeed = animationSpeed;
-            _stageLayout = stageLayout;
-            SetupStageVms();
+            SetupStageVms(SwitchBlockSets, sortableItemVms, animationSpeed);
         }
 
-        void SetupStageVms()
+        public SorterDisplayVm(IEnumerable<Sorting.Switch[][]> switchBlockSets,
+                        int order,
+                        SortableItemVm[] sortableItemVms,
+                        IEnumerable<StageVm> stageVms)
         {
+            SwitchBlockSets = switchBlockSets.ToList();
+            Order = order;
+            SortableItemVms = sortableItemVms;
+            StageVms = new ObservableCollection<StageVm>(stageVms);
+        }
+
+
+        void SetupStageVms(
+            IEnumerable<Sorting.Switch[][]> switchBlockSets,
+            SortableItemVm[] sortableItemVms, 
+            AnimationSpeed animationSpeed)
+        {
+
             StageVms = new ObservableCollection<StageVm>(
-                                StagedSorterDef.ToStageVms(StageLayout,
-                                SortableItemVms, AnimationSpeed));
+                        switchBlockSets.ToStageVms(
+                        Order, sortableItemVms, animationSpeed));
         }
 
-        private AnimationSpeed _animationSpeed;
-        public AnimationSpeed AnimationSpeed
-        {
-            get => _animationSpeed;
-            set  {
+        public List<Sorting.Switch[][]> SwitchBlockSets { get; private set;}
 
-                _animationSpeed = value;
-                StageVms = new ObservableCollection<StageVm>(
-                    StageVms.Select(stvm => stvm.SetStageVmStyle(
-                        stvm.StageVmStyle.ChangeAnimationSpeed(value))));
-            }
-        }
-
-        StageLayout _stageLayout;
-        public StageLayout StageLayout
-        {
-            get => _stageLayout;
-            set
-            {
-                _stageLayout = value;
-                SetupStageVms();
-            }
-        }
+        public int Order { get; set; }
 
         public Sorting.StagedSorterDef StagedSorterDef { get; }
 
@@ -131,7 +128,7 @@ namespace archean.controls.ViewModel.Sorter
         }
     }
 
-    public static class SorterVmExt
+    public static class SorterDisplayVmExt
     {
         public static IEnumerable<Func<Sorting.Switch[][], StageVm>> StageVmMaps(
                                             int keyCount, 
@@ -167,12 +164,23 @@ namespace archean.controls.ViewModel.Sorter
         }
 
         public static IEnumerable<StageVm> ToStageVms(
-            this Sorting.StagedSorterDef stagedSorterDef,
-            StageLayout stageLayout,
+            this IEnumerable<Sorting.Switch[][]> switchBlockSets,
+            int keyCount,
             SortableItemVm[] sortableItemVms,
             AnimationSpeed animationSpeed)
         {
-            var keyCount = stagedSorterDef.sorterDef.order;
+            return switchBlockSets.Zip
+                (
+                    StageVmMaps(keyCount, sortableItemVms, animationSpeed),
+                    (s, m) => m(s)
+                );
+        }
+
+
+        public static IEnumerable<Sorting.Switch[][]> ToSwitchBlockSets(
+            this Sorting.StagedSorterDef stagedSorterDef,
+            StageLayout stageLayout)
+        {
             IEnumerable<Sorting.Switch[][]> switchBlockSets = Enumerable.Empty<Sorting.Switch[][]>();
 
             switch (stageLayout)
@@ -187,15 +195,10 @@ namespace archean.controls.ViewModel.Sorter
                     switchBlockSets = Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
                     break;
                 default:
-                    break;
+                    throw new Exception($"{stageLayout} not handled");
             }
 
-            return switchBlockSets.Zip
-                (
-                    StageVmMaps(keyCount, sortableItemVms, animationSpeed), 
-                    (s, m) => m(s)
-                 );
-
+            return switchBlockSets;
         }
 
 
@@ -230,6 +233,14 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-
+        public static SorterDisplayVm ChangeAnimationSpeed(this SorterDisplayVm sorterDisplayVm, AnimationSpeed animationSpeed)
+        {
+            return new SorterDisplayVm(
+                switchBlockSets: sorterDisplayVm.SwitchBlockSets,
+                order: sorterDisplayVm.Order,
+                sortableItemVms: sorterDisplayVm.SortableItemVms,
+                stageVms: sorterDisplayVm.StageVms.Select(
+                    stvm => stvm.SetStageVmStyle(stvm.StageVmStyle.ChangeAnimationSpeed(AnimationSpeed.None))));
+        }
     }
 }
