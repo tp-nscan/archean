@@ -10,42 +10,19 @@ namespace archean.controls.ViewModel.Sorter
 {
     public class SorterDisplayVm : BindableBase
     {
-        public SorterDisplayVm(Sorting.StagedSorterDef stagedSorterDef,
-                        SortableItemVm[] sortableItemVms,
-                        AnimationSpeed animationSpeed,
-                        StageLayout stageLayout)
-        {
-            StagedSorterDef = stagedSorterDef;
-            Order = stagedSorterDef.sorterDef.order;
-            SwitchBlockSets = stagedSorterDef.ToSwitchBlockSets(stageLayout).ToList();
-            SortableItemVms = sortableItemVms;
-            SetupStageVms(SwitchBlockSets, sortableItemVms, animationSpeed);
-        }
-
-        public SorterDisplayVm(IEnumerable<Sorting.Switch[][]> switchBlockSets,
+        public SorterDisplayVm(
                         int order,
                         SortableItemVm[] sortableItemVms,
-                        IEnumerable<StageVm> stageVms)
+                        IEnumerable<StageVm> stageVms,
+                        int currentstageIndex)
         {
-            SwitchBlockSets = switchBlockSets.ToList();
             Order = order;
             SortableItemVms = sortableItemVms;
             StageVms = new ObservableCollection<StageVm>(stageVms);
+            CurrentStageVm = StageVms[currentstageIndex];
         }
 
-
-        void SetupStageVms(
-            IEnumerable<Sorting.Switch[][]> switchBlockSets,
-            SortableItemVm[] sortableItemVms, 
-            AnimationSpeed animationSpeed)
-        {
-
-            StageVms = new ObservableCollection<StageVm>(
-                        switchBlockSets.ToStageVms(
-                        Order, sortableItemVms, animationSpeed));
-        }
-
-        public List<Sorting.Switch[][]> SwitchBlockSets { get; private set;}
+        public List<Sorting.ISwitch[][]> SwitchBlockSets { get; private set;}
 
         public int Order { get; set; }
 
@@ -60,7 +37,6 @@ namespace archean.controls.ViewModel.Sorter
             set
             {
                 SetProperty(ref _stageVms, value);
-                CurrentStageVm = value[0];
             }
         }
 
@@ -79,7 +55,7 @@ namespace archean.controls.ViewModel.Sorter
                     subscription.Dispose();
                 }
                 subscription = _currentStageVm.OnAnimationFinished.Subscribe(AnimationFinished);
-                StageVms[value.IndexInSorter] = value;
+                StageVms[value.StageIndex] = value;
             }
         }
 
@@ -108,13 +84,13 @@ namespace archean.controls.ViewModel.Sorter
             if (CurrentStageVm.StageVmStep == StageVmStep.Right)
             {
                 var sortableItemVms = CurrentStageVm.SortableItemVms;
-                if (CurrentStageVm.IndexInSorter + 1 > StageVms.Count - 1) return;
+                if (CurrentStageVm.StageIndex + 1 > StageVms.Count - 1) return;
 
                 //since this stage is finished, change it to a sortable free config
                 CurrentStageVm = CurrentStageVm.ToNextStep();
 
                 // put the sortables in the  left position on the next stage
-                CurrentStageVm = StageVms[CurrentStageVm.IndexInSorter + 1]
+                CurrentStageVm = StageVms[CurrentStageVm.StageIndex + 1]
                                     .ToNextStep(sortableItemVms.ToLeftStep());
                 if (KeepGoing)
                 {
@@ -130,7 +106,7 @@ namespace archean.controls.ViewModel.Sorter
 
     public static class SorterDisplayVmExt
     {
-        public static IEnumerable<Func<Sorting.Switch[][], StageVm>> StageVmMaps(
+        public static IEnumerable<Func<Sorting.ISwitch[][], StageVm>> StageVmMaps(
                                             int keyCount, 
                                             SortableItemVm[] sortableVms,
                                             AnimationSpeed animationSpeed)
@@ -138,7 +114,7 @@ namespace archean.controls.ViewModel.Sorter
             var indexInSorter = 0;
             yield return
                 switchblocks => switchblocks.SwitchBlocksToStageVm(
-                    indexInSorter: indexInSorter++, 
+                    stageIndex: indexInSorter++, 
                     stageVmStyle: StageVmStyle.Standard(false, animationSpeed),
                     keyCount: keyCount, 
                     sortableVms: sortableVms,
@@ -148,14 +124,14 @@ namespace archean.controls.ViewModel.Sorter
                 {
                     yield return
                         switchblocks => switchblocks.SwitchBlocksToStageVm(
-                            indexInSorter: indexInSorter++,
+                            stageIndex: indexInSorter++,
                             stageVmStyle: StageVmStyle.Standard(true, animationSpeed),
                             keyCount: keyCount,
                             sortableVms: null,
                             stageVmStep: StageVmStep.None);
                     yield return
                         switchblocks => switchblocks.SwitchBlocksToStageVm(
-                            indexInSorter: indexInSorter++,
+                            stageIndex: indexInSorter++,
                             stageVmStyle: StageVmStyle.Standard(false, animationSpeed),
                             keyCount: keyCount,
                             sortableVms: null,
@@ -164,7 +140,7 @@ namespace archean.controls.ViewModel.Sorter
         }
 
         public static IEnumerable<StageVm> ToStageVms(
-            this IEnumerable<Sorting.Switch[][]> switchBlockSets,
+            this IEnumerable<Sorting.ISwitch[][]> switchBlockSets,
             int keyCount,
             SortableItemVm[] sortableItemVms,
             AnimationSpeed animationSpeed)
@@ -177,11 +153,11 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static IEnumerable<Sorting.Switch[][]> ToSwitchBlockSets(
+        public static IEnumerable<Sorting.ISwitch[][]> ToSwitchBlockSets(
             this Sorting.StagedSorterDef stagedSorterDef,
             StageLayout stageLayout)
         {
-            IEnumerable<Sorting.Switch[][]> switchBlockSets = Enumerable.Empty<Sorting.Switch[][]>();
+            IEnumerable<Sorting.ISwitch[][]> switchBlockSets = Enumerable.Empty<Sorting.Switch[][]>();
 
             switch (stageLayout)
             {
@@ -207,26 +183,28 @@ namespace archean.controls.ViewModel.Sorter
         {
             foreach(var stvm in stageVms)
             {
-                if(stvm.IndexInSorter==0)
+                if(stvm.StageIndex==0)
                 {
                     yield return new StageVm(
                         stageVmStep: StageVmStep.Left,
-                        indexInSorter: stvm.IndexInSorter,
+                        stageIndex: stvm.StageIndex,
                         stageVmStyle: stvm.StageVmStyle,
                         keyCount: stvm.KeyCount,
                         keyPairVms: stvm.KeyPairVms,
-                        sortableItemVms: sortableItemVms
+                        sortableItemVms: sortableItemVms,
+                        sortableItemVmsOld: null
                     );
                 }
                 else
                 {
                     yield return new StageVm(
                         stageVmStep: StageVmStep.None,
-                        indexInSorter: stvm.IndexInSorter,
+                        stageIndex: stvm.StageIndex,
                         stageVmStyle: stvm.StageVmStyle,
                         keyCount: stvm.KeyCount,
                         keyPairVms: stvm.KeyPairVms,
-                        sortableItemVms: null
+                        sortableItemVms: null,
+                        sortableItemVmsOld: null
                     );
                 }
             }
@@ -236,11 +214,13 @@ namespace archean.controls.ViewModel.Sorter
         public static SorterDisplayVm ChangeAnimationSpeed(this SorterDisplayVm sorterDisplayVm, AnimationSpeed animationSpeed)
         {
             return new SorterDisplayVm(
-                switchBlockSets: sorterDisplayVm.SwitchBlockSets,
                 order: sorterDisplayVm.Order,
                 sortableItemVms: sorterDisplayVm.SortableItemVms,
                 stageVms: sorterDisplayVm.StageVms.Select(
-                    stvm => stvm.SetStageVmStyle(stvm.StageVmStyle.ChangeAnimationSpeed(AnimationSpeed.None))));
+                    stvm => stvm.SetStageVmStyle(stvm.StageVmStyle.ChangeAnimationSpeed(animationSpeed))),
+                currentstageIndex: sorterDisplayVm.CurrentStageVm.StageIndex
+
+                );
         }
     }
 }

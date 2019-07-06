@@ -15,13 +15,25 @@ module Sorting =
 
     type SwitchCount = {v:int}
 
-    type Switch = {low:int;hi:int}
+    type ISwitch =
+        abstract member low: int
+        abstract member hi: int
+
+    type Switch(low, hi) =
+        interface ISwitch with 
+            member this.low = low
+            member this.hi = hi
+
+        member this.low = low
+        member this.hi = hi
+
+
     module Switch =
         let SwitchSeqFromIntArray (pArray:int[]) =
              seq { for i = 0 to pArray.Length - 1 do
                     let j = pArray.[i]
                     if ((j > i ) && (i = pArray.[j]) ) then
-                        yield { low=i; hi=j; } }
+                        yield new Switch(i,j) :> ISwitch }
 
         let SwitchSeqFromPermutation (p:Permutation) =
             SwitchSeqFromIntArray (Permutation.value p)
@@ -29,20 +41,20 @@ module Sorting =
         let SwitchSeqFromPolyCycle (p:TwoCycleIntArray) =
             SwitchSeqFromIntArray (TwoCycleIntArray.value p)
         
-        let ToString (sw:Switch) =
+        let ToString (sw:ISwitch) =
             sprintf "(%d, %d)" sw.low sw.hi
 
         let RandomSwitchesOfOrder (order:int) (rnd:Random) =
             seq { while true do 
                      let hi = rnd.Next(order)
-                     yield { low=rnd.Next(hi); hi=hi; } }
+                     yield new Switch(rnd.Next(hi), hi) :> ISwitch }
 
 
-    type Stage = {switches:Switch list}
+    type Stage = {switches:ISwitch list}
     module Stage =
-        let MergeSwitchesIntoStages (order:int) (switches:seq<Switch>) =
+        let MergeSwitchesIntoStages (order:int) (switches:seq<ISwitch>) =
             let mutable stageTracker = Array.init order (fun i -> false)
-            let switchesForStage = new ResizeArray<Switch>()
+            let switchesForStage = new ResizeArray<ISwitch>()
             seq { 
                     for sw in switches do
                         if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
@@ -55,7 +67,7 @@ module Sorting =
                     yield { Stage.switches=switchesForStage |> Seq.toList }
                  }
 
-        let GetStageIndexesFromSwitches (order:int) (switches:seq<Switch>) =
+        let GetStageIndexesFromSwitches (order:int) (switches:seq<ISwitch>) =
             let mutable stageTracker = Array.init order (fun i -> false)
             let mutable curDex = 0
             seq { 
@@ -84,7 +96,7 @@ module Sorting =
         let apply f (p:SortableIntArray) = f p.values
         let value p = apply id p
 
-        let SwitchFuncForSwitch (sw:Switch) =
+        let SwitchFuncForSwitch (sw:ISwitch) =
             fun (x:int[]) -> 
                 if (x.[sw.low] > x.[sw.hi]) then
                     let lv = x.[sw.low]
@@ -113,7 +125,7 @@ module Sorting =
     
 
 
-    type SorterDef = {order:int; switches: array<Switch>}
+    type SorterDef = {order:int; switches: array<ISwitch>}
     module SorterDef =
 
         let CreateRandom (order:int) (len:int) (rnd:Random) =
@@ -132,7 +144,7 @@ module Sorting =
                                 |> Seq.toArray
             }
 
-        let AppendSwitches (switches:seq<Switch>) (sorterDef:SorterDef) =
+        let AppendSwitches (switches:seq<ISwitch>) (sorterDef:SorterDef) =
             {
                 SorterDef.order= sorterDef.order;
                 switches = (switches |> Seq.toArray) |> Array.append sorterDef.switches
@@ -167,7 +179,7 @@ module Sorting =
 
 
         // Retains the stage partitions of the prefix
-        let AppendSwitches (switches:seq<Switch>) (stagedSorterDef:StagedSorterDef) =
+        let AppendSwitches (switches:seq<ISwitch>) (stagedSorterDef:StagedSorterDef) =
             let swCapture = switches |> Seq.toArray
             let appendArray = 
                 swCapture 
@@ -213,7 +225,7 @@ module Sorting =
             NestedArrayToString ArrayToString (ToStageArrays switchTracker stagedSorterDef)
 
 
-    type SwitchUsage = {switch:Switch; switchIndex:int; useCount:int}
+    type SwitchUsage = {switch:ISwitch; switchIndex:int; useCount:int}
     module SwitchUsage =
 
         let CollectTheUsedSwitches 
@@ -288,24 +300,24 @@ module Sorting =
 
 
 
-    type SwitchPad = {switches:ResizeArray<Switch>; keyUsage:int[] }
+    type SwitchPad = {switches:ResizeArray<ISwitch>; keyUsage:int[] }
     module StageLayout =
 
         let InitSwitchPad (order:int) =
-            {switches= new ResizeArray<Switch>(); keyUsage = Array.init order (fun i -> 1) }
+            {switches= new ResizeArray<ISwitch>(); keyUsage = Array.init order (fun i -> 1) }
 
 
-        let SwitchFits (switchPad:SwitchPad) (switch:Switch) =
+        let SwitchFits (switchPad:SwitchPad) (switch:ISwitch) =
             seq {switch.low .. switch.hi}
                 |> Seq.forall(fun i -> switchPad.keyUsage.[i] = 1)
 
 
-        let SwitchPrint (switch:Switch) (position:int) (current:int) =
+        let SwitchPrint (switch:ISwitch) (position:int) (current:int) =
             if  ((position >= switch.low) && (position <= switch.hi)) then
                 0 else current
         
 
-        let AddSwitch (switchPad:SwitchPad) (switch:Switch) =
+        let AddSwitch (switchPad:SwitchPad) (switch:ISwitch) =
 
             switchPad.switches.Add switch
             { 
@@ -315,7 +327,7 @@ module Sorting =
             }
 
 
-        let LayoutSwitchesLoose (order:int) (switches:seq<Switch>) = 
+        let LayoutSwitchesLoose (order:int) (switches:seq<ISwitch>) = 
             let mutable switchPad = InitSwitchPad order
             seq {
                     for sw in switches do
@@ -331,7 +343,7 @@ module Sorting =
                 |> Seq.toArray
 
 
-        let AddSwitchTight (order:int) (switchPads: SwitchPad list) (switch:Switch) =
+        let AddSwitchTight (order:int) (switchPads: SwitchPad list) (switch:ISwitch) =
             let revList = switchPads |> List.rev
 
             let rec spM (prefix: SwitchPad list) suffix =
@@ -351,7 +363,7 @@ module Sorting =
             spM [] revList
 
 
-        let LayoutSwitchesTight (order:int) (switches:seq<Switch>) = 
+        let LayoutSwitchesTight (order:int) (switches:seq<ISwitch>) = 
             let mutable switchPads = [InitSwitchPad order]
             seq {
                     for sw in switches do
@@ -368,7 +380,7 @@ module Sorting =
             LayoutSwitchesLoose order switches
 
 
-        let LayoutStagedSorter (ssd:StagedSorterDef) (switchLayout:seq<Switch>->Switch[][]) =
+        let LayoutStagedSorter (ssd:StagedSorterDef) (switchLayout:seq<ISwitch>->ISwitch[][]) =
                 StagedSorterDef.GetStages ssd
                      |> Seq.map(fun sq -> switchLayout sq )
 
@@ -384,6 +396,16 @@ module Sorting =
 
         let LayoutStagedSorterTight (ssd:StagedSorterDef) =
                 LayoutStagedSorter ssd (LayoutSwitchesTight ssd.sorterDef.order)
+        
+
+        let LayoutSwitchSeqsTight (order:int) (ssqs:seq<seq<ISwitch>>) =
+                ssqs
+                  |> Seq.map(fun sq -> (LayoutSwitchesTight order) sq )  
+
+
+        let LayoutSwitchSeqsLoose (order:int) (ssqs:seq<seq<ISwitch>>) =
+                ssqs
+                  |> Seq.map(fun sq -> (LayoutSwitchesLoose order) sq )  
 
 
 

@@ -96,9 +96,6 @@
     <Compile Include="View\Pages\SorterPage.xaml.cs">
       <DependentUpon>SorterPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Pages\SorterPage2.xaml.cs">
-      <DependentUpon>SorterPage2.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Pages\StagePage.xaml.cs">
       <DependentUpon>StagePage.xaml</DependentUpon>
     </Compile>
@@ -128,10 +125,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Pages\SorterPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Pages\SorterPage2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

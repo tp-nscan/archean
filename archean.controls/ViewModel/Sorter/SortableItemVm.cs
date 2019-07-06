@@ -3,6 +3,8 @@ using archean.controls.ViewModel.Common;
 using System;
 using System.Linq;
 using System.Windows.Media;
+using archean.controls.Utils;
+using System.Collections.Generic;
 
 namespace archean.controls.ViewModel.Sorter
 {
@@ -42,7 +44,7 @@ namespace archean.controls.ViewModel.Sorter
         public int Label { get; }
         public int StageSection { get; }
         public StagePos StagePos { get; }
-        public int KeyLinePos { get; set; }
+        public int KeyLinePos { get; }
         public int SortableValue { get; }
         public static Typeface Typeface = new Typeface("Segoe UI");
     }
@@ -101,7 +103,7 @@ namespace archean.controls.ViewModel.Sorter
 
 
         public static Tuple<StagePos, int> ToStageSection(
-            this SortableItemVm sortableVm, KeyPairVm[] keyPairVms)
+            this SortableItemVm sortableVm, IEnumerable<KeyPairVm> keyPairVms)
         {
             var swH = keyPairVms.FirstOrDefault(
                 kpv => (kpv.HiKey == sortableVm.KeyLinePos)
@@ -115,7 +117,7 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableItemVm ToPresortSortableVm(this SortableItemVm sortableVm, KeyPairVm[] keyPairVms)
+        public static SortableItemVm ToPresortSortableVm(this SortableItemVm sortableVm, IEnumerable<KeyPairVm> keyPairVms)
         {
             var tup = sortableVm.ToStageSection(keyPairVms);
             return new SortableItemVm(
@@ -131,7 +133,7 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableItemVm ToPostSortSortableVm(this SortableItemVm sortableVm, KeyPairVm[] keyPairVms)
+        public static SortableItemVm ToPostSortSortableVm(this SortableItemVm sortableVm, IEnumerable<KeyPairVm> keyPairVms)
         {
             var tup = sortableVm.ToStageSection(keyPairVms);
             return new SortableItemVm(
@@ -175,61 +177,115 @@ namespace archean.controls.ViewModel.Sorter
         }
 
 
-        public static SortableItemVm[] ToLeftStep(this SortableItemVm[] sortableItemVms)
+        public static SortableItemVm[] ToLeftStep(this IEnumerable<SortableItemVm> sortableItemVms)
         {
             return sortableItemVms.Select(svm => svm.ToLeftSortableVm())
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToPreSortStep(this SortableItemVm[] sortableItemVms, KeyPairVm[] keyPairVms)
+        public static SortableItemVm[] ToPreSortStep(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
         {
-            return sortableItemVms.Select(svm => svm.ToPresortSortableVm(keyPairVms))
+            return sortableItemVms.NullToEnumerable().Select(svm => svm.ToPresortSortableVm(keyPairVms))
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToPostSortStep(this SortableItemVm[] sortableItemVms, KeyPairVm[] keyPairVms)
+        public static SortableItemVm[] ToPostSortStep(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
         {
             return sortableItemVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms))
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToRightStep(this SortableItemVm[] sortableItemVms)
+        public static SortableItemVm[] ToRightStep(this IEnumerable<SortableItemVm> sortableItemVms)
         {
             return sortableItemVms.Select(svm => svm.ToRightSortableVm())
                               .ToArray();
         }
 
-        public static SortableItemVm[] ToMissingStep(this SortableItemVm[] sortableItemVms)
+        public static SortableItemVm[] ToMissingStep(this IEnumerable<SortableItemVm> sortableItemVms)
         {
             return sortableItemVms.Select(svm => svm.ToMissingSortableVm())
                               .ToArray();
         }
 
-        public static void SortWithAKeyPairVm(this SortableItemVm[] sortableItemVms, KeyPairVm keyPairVm)
+        public static IEnumerable<SortableItemVm> UpdateSortableVms(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
         {
-            var swL = sortableItemVms.FirstOrDefault(
-                                    swm => (swm.KeyLinePos == keyPairVm.LowKey));
-
-            var swH = sortableItemVms.FirstOrDefault(
-                                    swm => (swm.KeyLinePos == keyPairVm.HiKey));
-
-            if ((swL == null) || (swH == null)) return;
-
-                if (swL.SortableValue > swH.SortableValue)
+            foreach (var sivm in sortableItemVms)
             {
-                var lv = swL.KeyLinePos;
-                swL.KeyLinePos = swH.KeyLinePos;
-                swH.KeyLinePos = lv;
-                keyPairVm.KeyPairUse = KeyPairUse.InUse;
+                var kpvmLow = keyPairVms.FirstOrDefault(k => k.LowKey == sivm.KeyLinePos);
+                if(kpvmLow != null)
+                {
+                    var sHi = sortableItemVms.First(s => (s.KeyLinePos == kpvmLow.HiKey));
+                    if (sivm.SortableValue > sHi.SortableValue)
+                    {
+                        yield return new SortableItemVm(
+                            backgroundBrush: sivm.BackgroundBrush,
+                            foregroundBrush: sivm.ForegroundBrush,
+                            stageSection: sivm.StageSection,
+                            stagePos: sivm.StagePos,
+                            keyLinePos: sHi.KeyLinePos,
+                            showLabel: sivm.ShowLabel,
+                            label: sivm.Label,
+                            sortableValue: sivm.SortableValue);
+                    }
+                    else yield return sivm;
+                }
+                else
+                {
+                    var kpvmHi = keyPairVms.FirstOrDefault(k => k.HiKey == sivm.KeyLinePos);
+                    if (kpvmHi == null) yield return sivm;
+
+                    else
+                    {
+                        var sLow = sortableItemVms.First(s => (s.KeyLinePos == kpvmHi.LowKey));
+                        if (sivm.SortableValue < sLow.SortableValue)
+                        {
+                            yield return new SortableItemVm(
+                                backgroundBrush: sivm.BackgroundBrush,
+                                foregroundBrush: sivm.ForegroundBrush,
+                                stageSection: sivm.StageSection,
+                                stagePos: sivm.StagePos,
+                                keyLinePos: sLow.KeyLinePos,
+                                showLabel: sivm.ShowLabel,
+                                label: sivm.Label,
+                                sortableValue: sivm.SortableValue);
+                        }
+                        else yield return sivm;
+                    }
+                }
             }
         }
 
-        public static void SortTheSortableVms(this SortableItemVm[] sortableItemVms, KeyPairVm[] keyPairVms)
+
+        public static IEnumerable<KeyPairVm> UpdateKeyPairVms(this IEnumerable<KeyPairVm> keyPairVms, IEnumerable<SortableItemVm> sortableItemVms)
         {
-            foreach(var kpvm in keyPairVms)
+            foreach (var kpvm in keyPairVms)
             {
-                SortWithAKeyPairVm(sortableItemVms, kpvm);
+                var sortableItemsLow = sortableItemVms.FirstOrDefault(
+                        swm => (swm.KeyLinePos == kpvm.LowKey));
+                var sortableItemHi = sortableItemVms.FirstOrDefault(
+                                        swm => (swm.KeyLinePos == kpvm.HiKey));
+
+                if (sortableItemsLow.SortableValue > sortableItemHi.SortableValue)
+                {
+                    var kpv = new KeyPairVm(
+                            notUsedBrush: kpvm.NotUsedBrush,
+                            inUseBrush: kpvm.InUseBrush,
+                            wasUsedBrush: kpvm.WasUsedBrush,
+                            keyPairUse: KeyPairUse.InUse,
+                            stageSection: kpvm.StageSection,
+                            stageIndex: kpvm.StageIndex,
+                            hiKey: kpvm.HiKey,
+                            lowKey: kpvm.LowKey,
+                            useCount: kpvm.UseCount + 1
+                        );
+                    yield return kpv;
+                }
+                else
+                {
+                    yield return kpvm;
+                }
             }
         }
+
     }
 }

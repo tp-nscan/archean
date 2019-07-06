@@ -8,11 +8,12 @@ namespace archean.controls.DesignVms.Sorter
         public StageVmD() :
             base(
                     stageVmStep: StageVmStep.Left,
-                    indexInSorter:0,
+                    stageIndex:0,
                     stageVmStyle: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None),
                     keyCount: _KeyCount,
-                    keyPairVms: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None).ToRandomKeyPairVms(_KeyCount),
-                    sortableItemVms: StageVmProcs.ScrambledSortableVms(_KeyCount, System.DateTime.Now.Millisecond, true)
+                    keyPairVms: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None).ToRandomKeyPairVms(0, _KeyCount),
+                    sortableItemVms: StageVmProcs.ScrambledSortableVms(_KeyCount, System.DateTime.Now.Millisecond, true),
+                    sortableItemVmsOld: null
                 )
         {
         }

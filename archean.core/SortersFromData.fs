@@ -49,12 +49,12 @@ module SortersFromData =
                 let pcs = s.Split([|',';|])
                             |> Seq.map(fun i -> i |> int)
                             |> Seq.toArray
-                { Switch.low = pcs.[0]; Switch.hi = pcs.[1]}
+                new Switch(pcs.[0], pcs.[1])   // { Switch.low = pcs.[0]; Switch.hi = pcs.[1]}
 
             stagesStr.Split([|'[';  ']'; '\n'; '\r'; ' ';|], StringSplitOptions.RemoveEmptyEntries)
                 |> Seq.map(fun l -> l.Split([|'(';  ')';|], StringSplitOptions.RemoveEmptyEntries)
                                     |> Seq.filter(fun pc -> pc <> ",")
-                                    |> Seq.map(fun pcs -> MakeSwitch pcs)
+                                    |> Seq.map(fun pcs -> (MakeSwitch pcs):> ISwitch)
                                     |> Seq.toList
                             )
                 |> Seq.map(fun sws -> {Stage.switches = sws} )

@@ -7,7 +7,7 @@ module SorterA =
     type Sorter<'T> = { sorterDef:SorterDef; switches: array<'T->'T*bool> }
     module Sorter =
 
-        let MakeSorter<'T> (switchmap:Switch->('T->'T*bool)) (sorterDef:SorterDef) =
+        let MakeSorter<'T> (switchmap:ISwitch->('T->'T*bool)) (sorterDef:SorterDef) =
             { sorterDef=sorterDef; switches=sorterDef.switches |> Array.map(fun i-> (switchmap i)) }
         
         let Sort<'T> (sorter:Sorter<'T>) (sortable: 'T) =

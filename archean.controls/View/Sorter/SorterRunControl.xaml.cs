@@ -59,7 +59,7 @@ namespace archean.controls.View.Sorter
             SorterDisplayVm.MakeStep();
             if (SorterDisplayVm.CurrentStageVm.StageVmStep == StageVmStep.Right)
             {
-                SorterDisplayVm.MakeStep();
+               SorterDisplayVm.MakeStep();
             }
         }
 
@@ -71,7 +71,7 @@ namespace archean.controls.View.Sorter
                    (
                     (SorterDisplayVm.CurrentStageVm.StageVmStep != StageVmStep.Right) 
                     ||
-                    (SorterDisplayVm.CurrentStageVm.IndexInSorter < SorterDisplayVm.StageVms.Count - 1)
+                    (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count - 1)
                    );
         }
 
@@ -101,7 +101,7 @@ namespace archean.controls.View.Sorter
                    (
                     (SorterDisplayVm.CurrentStageVm.StageVmStep != StageVmStep.Right)
                     ||
-                    (SorterDisplayVm.CurrentStageVm.IndexInSorter < SorterDisplayVm.StageVms.Count - 1)
+                    (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count - 1)
                    );
         }
 
@@ -119,7 +119,7 @@ namespace archean.controls.View.Sorter
 
         private void DoClear()
         {
-            var currentIndex = SorterDisplayVm.CurrentStageVm.IndexInSorter;
+            var currentIndex = SorterDisplayVm.CurrentStageVm.StageIndex;
             SorterDisplayVm.StageVms = new ObservableCollection<StageVm>(
                     SorterDisplayVm.StageVms.Select(stvm => stvm.ClearSwitchUses())
                     );
@@ -131,7 +131,7 @@ namespace archean.controls.View.Sorter
             if (SorterDisplayVm == null) return false;
 
             return (SorterDisplayVm.CurrentStageVm != null) &&
-                   (SorterDisplayVm.CurrentStageVm.IndexInSorter < SorterDisplayVm.StageVms.Count);
+                   (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count);
         }
 
         #endregion // ClearCommand
@@ -149,7 +149,7 @@ namespace archean.controls.View.Sorter
         private void DoReset()
         {
             SorterDisplayVm.SortableItemVms = StageVmProcs.ScrambledSortableVms(
-                SorterDisplayVm.StagedSorterDef.sorterDef.order, DateTime.Now.Millisecond, true);
+                SorterDisplayVm.Order, DateTime.Now.Millisecond, true);
             SorterDisplayVm.StageVms = new ObservableCollection<StageVm>(
                      SorterDisplayVm.StageVms.ResetSortables(SorterDisplayVm.SortableItemVms));
             SorterDisplayVm.CurrentStageVm = SorterDisplayVm.StageVms[0];
@@ -160,7 +160,7 @@ namespace archean.controls.View.Sorter
             if (SorterDisplayVm == null) return false;
 
             return (SorterDisplayVm.CurrentStageVm != null) &&
-                   (SorterDisplayVm.CurrentStageVm.IndexInSorter < SorterDisplayVm.StageVms.Count);
+                   (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count);
         }
 
         #endregion // ResetCommand

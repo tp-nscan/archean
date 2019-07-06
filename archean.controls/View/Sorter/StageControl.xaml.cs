@@ -86,7 +86,6 @@ namespace archean.controls.View.Sorter
         }
 
 
-
         protected override void OnRender(DrawingContext dc)
         {
             if (StageVm == null)

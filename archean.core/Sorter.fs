@@ -5,7 +5,7 @@ open Sorting
 module Sorter =
 
     let RunSwitchOnSortable 
-                  (switch:Switch) 
+                  (switch:ISwitch) 
                   (switchTracker:SwitchTracker)
                   (switchDex:int) 
                   (sortable:int[]) =

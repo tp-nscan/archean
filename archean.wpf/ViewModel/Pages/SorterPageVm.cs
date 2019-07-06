@@ -2,6 +2,7 @@
 using archean.controls.Utils;
 using archean.controls.ViewModel;
 using archean.controls.ViewModel.Sorter;
+using System.Linq;
 
 namespace archean.ViewModel.Pages
 {
@@ -13,11 +14,11 @@ namespace archean.ViewModel.Pages
         }
 
 
-        SorterDisplayVm _sorterVm;
+        SorterDisplayVm _sorterDisplayVm;
         public SorterDisplayVm SorterDisplayVm
         {
-            get => _sorterVm;
-            set => SetProperty(ref _sorterVm, value);
+            get => _sorterDisplayVm;
+            set => SetProperty(ref _sorterDisplayVm, value);
         }
 
         private SortersFromData.RefSorter _refSorter;
@@ -32,7 +33,6 @@ namespace archean.ViewModel.Pages
         }
 
 
-
         private Sorting.StagedSorterDef _stagedSorterDef;
         public Sorting.StagedSorterDef StagedSorterDef
         {
@@ -40,21 +40,26 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _stagedSorterDef, value);
-                UpdateSorterDisplayVm();
+                ResetSorterDisplayVm();
             }
         }
 
 
-        void UpdateSorterDisplayVm()
+        void ResetSorterDisplayVm()
         {
+            var switchBlockSets = _stagedSorterDef.ToSwitchBlockSets(StageLayout).ToList();
+            var sortableItemVms = StageVmProcs.ScrambledSortableVms(
+                                        _stagedSorterDef.sorterDef.order,
+                                        System.DateTime.Now.Millisecond, true);
+            var stageVms = switchBlockSets.ToStageVms(
+                _stagedSorterDef.sorterDef.order, sortableItemVms, AnimationSpeed);
+
             SorterDisplayVm = new SorterDisplayVm(
-                stagedSorterDef: _stagedSorterDef,
-                sortableItemVms: StageVmProcs.ScrambledSortableVms(
-                                    _stagedSorterDef.sorterDef.order, 
-                                    System.DateTime.Now.Millisecond, true),
-                animationSpeed: AnimationSpeed,
-                stageLayout: StageLayout
-            );
+                    order: _stagedSorterDef.sorterDef.order,
+                    sortableItemVms: sortableItemVms,
+                    stageVms: stageVms,
+                    currentstageIndex: 0
+                );
         }
 
 
@@ -70,14 +75,14 @@ namespace archean.ViewModel.Pages
         }
 
 
-        StageLayout _stageLayout = StageLayout.Single;
+        StageLayout _stageLayout = StageLayout.Loose;
         public StageLayout StageLayout
         {
             get => _stageLayout;
             set
             {
                 SetProperty(ref _stageLayout, value);
-                UpdateSorterDisplayVm();
+                ResetSorterDisplayVm();
             }
         }
 

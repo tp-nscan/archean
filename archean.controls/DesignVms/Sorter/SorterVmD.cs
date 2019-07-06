@@ -1,18 +1,20 @@
-﻿using archean.controls.ViewModel.Sorter;
-
+﻿using archean.controls.ViewModel;
+using archean.controls.ViewModel.Sorter;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace archean.controls.DesignVms.Sorter
 {
     public class SorterVmD : SorterDisplayVm
     {
         public SorterVmD() : base(
-            stagedSorterDef: StagedSorterDefD, 
+            order: StagedSorterDefD.sorterDef.order,
             sortableItemVms: StageVmProcs.ScrambledSortableVms(StagedSorterDefD.sorterDef.order, System.DateTime.Now.Millisecond, true),
-            animationSpeed: ViewModel.AnimationSpeed.None,
-            stageLayout: ViewModel.StageLayout.Single
+            stageVms: StageVmsD,
+            currentstageIndex: 0
             )
-        {
-        }
+            {
+            }
 
         static core.Sorting.StagedSorterDef _stagedSorterDefD;
         public static core.Sorting.StagedSorterDef StagedSorterDefD
@@ -22,6 +24,18 @@ namespace archean.controls.DesignVms.Sorter
                 return _stagedSorterDefD ?? (
                     _stagedSorterDefD = core.SortersFromData.RefSorterModule.CreateRefStagedSorter(
                             core.SortersFromData.RefSorter.Order8));
+            }
+        }
+
+        public static IEnumerable<StageVm> StageVmsD
+        {
+            get
+            {
+                var order = StagedSorterDefD.sorterDef.order;
+                var switchBlockSets = StagedSorterDefD.ToSwitchBlockSets(StageLayout.Loose).ToList();
+                var sortableItemVms = StageVmProcs.ScrambledSortableVms(order,
+                                            System.DateTime.Now.Millisecond, true);
+                return switchBlockSets.ToStageVms(order, sortableItemVms, AnimationSpeed.None);
             }
         }
     }
