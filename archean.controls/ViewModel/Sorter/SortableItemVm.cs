@@ -268,7 +268,7 @@ namespace archean.controls.ViewModel.Sorter
                 if (sortableItemsLow.SortableValue > sortableItemHi.SortableValue)
                 {
                     var kpv = new KeyPairVm(
-                            notUsedBrush: kpvm.NotUsedBrush,
+                            disabledBrush: kpvm.DisabledBrush,
                             inUseBrush: kpvm.InUseBrush,
                             wasUsedBrush: kpvm.WasUsedBrush,
                             keyPairUse: KeyPairUse.InUse,

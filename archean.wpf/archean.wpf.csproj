@@ -81,7 +81,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModel\Pages\BenchmarkPageVm.cs" />
-    <Compile Include="ViewModel\Pages\SorterPage2Vm.cs" />
     <Compile Include="ViewModel\Pages\SorterPageVm.cs" />
     <Compile Include="ViewModel\Pages\StagePageVm.cs" />
     <Compile Include="View\NavWindow.xaml.cs">

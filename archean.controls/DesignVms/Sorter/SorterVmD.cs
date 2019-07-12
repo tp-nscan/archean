@@ -1,4 +1,5 @@
 ﻿using archean.controls.ViewModel;
+using archean.controls.ViewModel.Common;
 using archean.controls.ViewModel.Sorter;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,13 @@ namespace archean.controls.DesignVms.Sorter
                 var switchBlockSets = StagedSorterDefD.ToSwitchBlockSets(StageLayout.Loose).ToList();
                 var sortableItemVms = StageVmProcs.ScrambledSortableVms(order,
                                             System.DateTime.Now.Millisecond, true);
-                return switchBlockSets.ToStageVms(order, sortableItemVms, AnimationSpeed.None);
+
+                SwitchUseWrap max = new SwitchUseWrap();
+
+                return switchBlockSets.ToStageVms(
+                    stageVmStyle: StageVmStyle.Standard(false, AnimationSpeed.None, max),
+                    order: order,
+                    sortableItemVms: sortableItemVms);
             }
         }
     }

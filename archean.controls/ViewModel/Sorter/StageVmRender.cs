@@ -21,14 +21,14 @@ namespace archean.controls.ViewModel.Sorter
         public static double KeyRenderYc(this StageVm vm, int keyDex, double stageRenderHeight)
         {
             var vmHeight = vm.StageVmStyle.VPadding + 
-                          (vm.KeyCount - keyDex) * vm.StageVmStyle.KeyLineHeight;
+                          (vm.Order - keyDex) * vm.StageVmStyle.KeyLineHeight;
             return vm.RenderHeight(vmHeight, stageRenderHeight);
         }
 
         public static double KeyRenderYh(this StageVm vm, int keyDex, double stageRenderHeight)
         {
             var vmHeight = vm.StageVmStyle.VPadding + 
-                          (vm.KeyCount - keyDex) * vm.StageVmStyle.KeyLineHeight - 
+                          (vm.Order - keyDex) * vm.StageVmStyle.KeyLineHeight - 
                           vm.StageVmStyle.KeyLineThickness / 2;
             return vm.RenderHeight(vmHeight, stageRenderHeight);
         }
@@ -36,7 +36,7 @@ namespace archean.controls.ViewModel.Sorter
         public static double KeyRenderYl(this StageVm vm, int keyDex, double stageRenderHeight)
         {
             var vmHeight = vm.StageVmStyle.VPadding + 
-                          (vm.KeyCount - keyDex) * vm.StageVmStyle.KeyLineHeight + 
+                          (vm.Order - keyDex) * vm.StageVmStyle.KeyLineHeight + 
                            vm.StageVmStyle.KeyLineThickness / 2;
             return vm.RenderHeight(vmHeight, stageRenderHeight);
         }
@@ -84,7 +84,7 @@ namespace archean.controls.ViewModel.Sorter
         public static void DrawKeyLines(this DrawingContext dc, StageVm stageVm, 
                                         double stageRenderWidth, double stageRenderHeight)
         {
-            for(var keyDex=0; keyDex < stageVm.KeyCount; keyDex++)
+            for(var keyDex=0; keyDex < stageVm.Order; keyDex++)
             {
                 dc.DrawKeyLine(stageVm, keyDex, stageRenderWidth, stageRenderHeight);
             }

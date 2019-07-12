@@ -3,14 +3,18 @@ using archean.controls.Utils;
 using archean.controls.ViewModel;
 using archean.controls.ViewModel.Sorter;
 using System.Linq;
+using archean.controls.ViewModel.Common;
+using System;
 
 namespace archean.ViewModel.Pages
 {
     public class SorterPageVm : BindableBase
     {
+        SwitchUseWrap SwitchUseWrap;
+
         public SorterPageVm()
         {
-
+            SwitchUseWrap = new SwitchUseWrap();
         }
 
 
@@ -28,6 +32,7 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _refSorter, value);
+                TotalUses = 0;
                 StagedSorterDef = SortersFromData.RefSorterModule.CreateRefStagedSorter(value);
             }
         }
@@ -44,15 +49,18 @@ namespace archean.ViewModel.Pages
             }
         }
 
-
         void ResetSorterDisplayVm()
         {
             var switchBlockSets = _stagedSorterDef.ToSwitchBlockSets(StageLayout).ToList();
             var sortableItemVms = StageVmProcs.ScrambledSortableVms(
                                         _stagedSorterDef.sorterDef.order,
-                                        System.DateTime.Now.Millisecond, true);
+                                        DateTime.Now.Millisecond, true);
+            SwitchUseWrap.Value = 1;
+
             var stageVms = switchBlockSets.ToStageVms(
-                _stagedSorterDef.sorterDef.order, sortableItemVms, AnimationSpeed);
+                stageVmStyle: StageVmStyle.Standard(false, AnimationSpeed, SwitchUseWrap),
+                order: _stagedSorterDef.sorterDef.order, 
+                sortableItemVms: sortableItemVms);
 
             SorterDisplayVm = new SorterDisplayVm(
                     order: _stagedSorterDef.sorterDef.order,
@@ -61,7 +69,6 @@ namespace archean.ViewModel.Pages
                     currentstageIndex: 0
                 );
         }
-
 
         AnimationSpeed _animationSpeed = AnimationSpeed.None;
         public AnimationSpeed AnimationSpeed
@@ -74,7 +81,6 @@ namespace archean.ViewModel.Pages
             }
         }
 
-
         StageLayout _stageLayout = StageLayout.Loose;
         public StageLayout StageLayout
         {
@@ -83,6 +89,16 @@ namespace archean.ViewModel.Pages
             {
                 SetProperty(ref _stageLayout, value);
                 ResetSorterDisplayVm();
+            }
+        }
+
+        object _totalUses = 0;
+        public int TotalUses
+        {
+            set
+            {
+                SetProperty(ref _totalUses, value);
+                SwitchUseWrap.Value = value + 1;
             }
         }
 

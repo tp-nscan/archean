@@ -34,19 +34,21 @@ module ColorSets =
         let incy = (step *  (iR - iL)) / stepMax
         (byte (iL + incy))
 
-
+    //returns {colStart .. colEnd} with length stepCount
     let ColorSpan (stepCount:int) (colStart:Color) (colEnd:Color) =
-        {1 .. stepCount } |> Seq.map(fun step -> 
+        {0 .. stepCount-1 } |> Seq.map(fun step -> 
             Color.FromArgb(
-                ByteInterp colStart.A colEnd.A (stepCount + 1) step,
-                ByteInterp colStart.R colEnd.R (stepCount + 1) step,
-                ByteInterp colStart.G colEnd.G (stepCount + 1) step,
-                ByteInterp colStart.B colEnd.B (stepCount + 1) step))
+                ByteInterp colStart.A colEnd.A (stepCount - 1) step,
+                ByteInterp colStart.R colEnd.R (stepCount - 1) step,
+                ByteInterp colStart.G colEnd.G (stepCount - 1) step,
+                ByteInterp colStart.B colEnd.B (stepCount - 1) step))
 
 
-    let RedBlueSpan =
-        ColorSpan 256 Colors.Red Colors.Blue |> Seq.toArray
+    let RedBlueSpan (stepCount:int) =
+        ColorSpan stepCount Colors.Red Colors.Blue |> Seq.toArray
 
+    let TwoColorSpan (first:Color) (last:Color) (stepCount:int) =
+        ColorSpan stepCount first last |> Seq.toArray
 
     let TriColorStrip (interStep:int) (colorA:Color) (colorB:Color) (colorC:Color) =
         let btwStp = ColorSpan interStep
@@ -86,8 +88,10 @@ module ColorSets =
 
     let RedBlueSFLeg =
         { minC=Colors.Black; maxC=Colors.Green; 
-            spanC=RedBlueSpan; mapper=Partition.SF32to256; 
-            minV= -1.0f; maxV=0.999f; tics=Partition.SF32Tics256 }
+            spanC = TwoColorSpan Colors.Red Colors.Blue 256; 
+            mapper = Partition.SF32to256; 
+            minV = -1.0f; maxV=0.999f; 
+            tics = Partition.SF32Tics256 }
 
 
     // 0.25 < beta < 0.75

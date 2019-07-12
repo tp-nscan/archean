@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archean.controls", "archean
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "archean.controls.test", "archean.controls.test\archean.controls.test.csproj", "{838D26C0-FFEC-48EE-AB6C-2CA441A78E6E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{8B530CBB-7882-428E-9CA7-374C83446240}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{838D26C0-FFEC-48EE-AB6C-2CA441A78E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{838D26C0-FFEC-48EE-AB6C-2CA441A78E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{838D26C0-FFEC-48EE-AB6C-2CA441A78E6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B530CBB-7882-428E-9CA7-374C83446240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B530CBB-7882-428E-9CA7-374C83446240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B530CBB-7882-428E-9CA7-374C83446240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B530CBB-7882-428E-9CA7-374C83446240}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

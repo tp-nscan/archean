@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
@@ -6,16 +7,16 @@ namespace archean.controls.ViewModel.Common
 {
     public enum KeyPairUse
     {
-        NotUsed,
+        Disabled,
         InUse,
-        WasUsed
+        Enabled
     }
 
     public class KeyPairVm : core.Sorting.ISwitch
     {
-        public KeyPairVm(Brush notUsedBrush, 
-                         Brush inUseBrush, 
-                         Brush wasUsedBrush, 
+        public KeyPairVm(Brush disabledBrush,
+                         Brush inUseBrush,
+                         Func<int, Brush> wasUsedBrush, 
                          KeyPairUse keyPairUse,
                          int stageSection,
                          int stageIndex,
@@ -24,7 +25,7 @@ namespace archean.controls.ViewModel.Common
                          int useCount)
                         
         {
-            NotUsedBrush = notUsedBrush;
+            DisabledBrush = disabledBrush;
             InUseBrush = inUseBrush;
             WasUsedBrush = wasUsedBrush;
             StageSection = stageSection;
@@ -41,21 +42,21 @@ namespace archean.controls.ViewModel.Common
             {
                 switch (KeyPairUse)
                 {
-                    case KeyPairUse.NotUsed:
-                        return NotUsedBrush;
+                    case KeyPairUse.Disabled:
+                        return DisabledBrush;
                     case KeyPairUse.InUse:
                         return InUseBrush;
-                    case KeyPairUse.WasUsed:
-                        return WasUsedBrush;
+                    case KeyPairUse.Enabled:
+                        return WasUsedBrush(UseCount);
                     default:
                         throw new System.Exception($"{KeyPairUse} not handled");
                 }
             }
         }
 
-        public Brush NotUsedBrush { get; }
+        public Brush DisabledBrush { get; }
         public Brush InUseBrush { get; }
-        public Brush WasUsedBrush { get; }
+        public Func<int, Brush> WasUsedBrush { get; }
         public KeyPairUse KeyPairUse { get; }
         public int UseCount { get; }
         public int StageSection { get; }
@@ -63,8 +64,8 @@ namespace archean.controls.ViewModel.Common
         public int LowKey { get; }
         public int StageIndex { get; }
 
+        // ISwitch impl
         public int low => LowKey;
-
         public int hi => HiKey;
     }
 
@@ -82,11 +83,11 @@ namespace archean.controls.ViewModel.Common
                 for (var i = 0; i < swb.Length; i++)
                 {
                     yield return new KeyPairVm(
-                        notUsedBrush: stageVmStyle.SwitchBrushNotUsed,
+                        disabledBrush: stageVmStyle.SwitchBrushNotUsed,
                         inUseBrush: stageVmStyle.SwitchBrushInUse,
                         wasUsedBrush: stageVmStyle.SwitchBrushWasUsed,
                         stageSection: stageSection,
-                        keyPairUse: KeyPairUse.NotUsed,
+                        keyPairUse: KeyPairUse.Enabled,
                         stageIndex: stageIndex,
                         hiKey: swb[i].hi,
                         lowKey: swb[i].low,
@@ -101,28 +102,28 @@ namespace archean.controls.ViewModel.Common
             return switchblocks.ToKeyPairVms(stageIndex, stageVmStyle);
         }
 
-        public static KeyPairVm ToWasUsed(this KeyPairVm keyPairVm)
+        public static KeyPairVm ToInactive(this KeyPairVm keyPairVm)
         {
                 return new KeyPairVm(
-                        notUsedBrush: keyPairVm.NotUsedBrush,
+                        disabledBrush: keyPairVm.DisabledBrush,
                         inUseBrush: keyPairVm.InUseBrush,
                         wasUsedBrush: keyPairVm.WasUsedBrush,
                         stageSection: keyPairVm.StageSection,
-                        keyPairUse: (keyPairVm.KeyPairUse == KeyPairUse.InUse) ? KeyPairUse.WasUsed : keyPairVm.KeyPairUse,
+                        keyPairUse: (keyPairVm.KeyPairUse == KeyPairUse.InUse) ? KeyPairUse.Enabled : keyPairVm.KeyPairUse,
                         stageIndex: keyPairVm.StageIndex,
                         hiKey: keyPairVm.HiKey,
                         lowKey: keyPairVm.LowKey,
                         useCount: keyPairVm.UseCount);
         }
 
-        public static KeyPairVm ToNotUsed(this KeyPairVm keyPairVm)
+        public static KeyPairVm ResetUseHistory(this KeyPairVm keyPairVm)
         {
             return new KeyPairVm(
-                    notUsedBrush: keyPairVm.NotUsedBrush,
+                    disabledBrush: keyPairVm.DisabledBrush,
                     inUseBrush: keyPairVm.InUseBrush,
                     wasUsedBrush: keyPairVm.WasUsedBrush,
                     stageSection: keyPairVm.StageSection,
-                    keyPairUse: KeyPairUse.NotUsed,
+                    keyPairUse: (keyPairVm.KeyPairUse == KeyPairUse.InUse) ? KeyPairUse.Enabled : keyPairVm.KeyPairUse,
                     stageIndex: keyPairVm.StageIndex,
                     hiKey: keyPairVm.HiKey,
                     lowKey: keyPairVm.LowKey,

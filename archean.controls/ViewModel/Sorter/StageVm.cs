@@ -15,7 +15,7 @@ namespace archean.controls.ViewModel.Sorter
             int stageIndex,
             StageVmStep stageVmStep,
             StageVmStyle stageVmStyle,
-            int keyCount,
+            int order,
             IEnumerable<KeyPairVm> keyPairVms,
             SortableItemVm[] sortableItemVms,
             SortableItemVm[] sortableItemVmsOld
@@ -24,7 +24,7 @@ namespace archean.controls.ViewModel.Sorter
             StageIndex = stageIndex;
             StageVmStep = stageVmStep;
             StageVmStyle = stageVmStyle;
-            KeyCount = keyCount;
+            Order = order;
             _keyPairVms = keyPairVms.ToList();
             SortableItemVms = sortableItemVms;
             SortableItemVmsOld = sortableItemVmsOld;
@@ -32,7 +32,7 @@ namespace archean.controls.ViewModel.Sorter
             VmWidth = StageVmStyle.StageRightMargin + 
                       StageVmStyle.SwitchHSpacing * SectionCount;
             VmHeight = 2 * StageVmStyle.VPadding + 
-                      StageVmStyle.KeyLineHeight * KeyCount + 
+                      StageVmStyle.KeyLineHeight * Order + 
                       StageVmStyle.KeyLineHeight;
         }
 
@@ -43,7 +43,7 @@ namespace archean.controls.ViewModel.Sorter
 
         public int StageIndex { get; }
         public StageVmStep StageVmStep { get; }
-        public int KeyCount { get; }
+        public int Order { get; }
         public SortableItemVm[] SortableItemVms { get; }
         public SortableItemVm[] SortableItemVmsOld { get; }
         public StageVmStyle StageVmStyle { get; }
@@ -70,7 +70,7 @@ namespace archean.controls.ViewModel.Sorter
                     stageVmStep: StageVmStep.None,
                     stageIndex: stageIndex,
                     stageVmStyle: stageVmStyle,
-                    keyCount: keyCount,
+                    order: keyCount,
                     keyPairVms: kpVms,
                     sortableItemVms: null,
                     sortableItemVmsOld: null
@@ -82,7 +82,7 @@ namespace archean.controls.ViewModel.Sorter
                             this core.Sorting.ISwitch[][] switchBlocks,
                             int stageIndex,
                             StageVmStyle stageVmStyle, 
-                            int keyCount,
+                            int order,
                             SortableItemVm[] sortableVms,
                             StageVmStep stageVmStep)
         {
@@ -91,7 +91,7 @@ namespace archean.controls.ViewModel.Sorter
                     stageVmStep: stageVmStep,
                     stageIndex: stageIndex,
                     stageVmStyle: stageVmStyle,
-                    keyCount: keyCount,
+                    order: order,
                     keyPairVms: kpVms,
                     sortableItemVms: sortableVms,
                     sortableItemVmsOld: null
@@ -125,31 +125,11 @@ namespace archean.controls.ViewModel.Sorter
                             stageVmStep: StageVmStep.Presort,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
-                            keyCount: stageVm.KeyCount,
+                            order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms,
                             sortableItemVms: stageVm.SortableItemVms.ToPreSortStep(stageVm.KeyPairVms.ToArray()),
                             sortableItemVmsOld: stageVm.SortableItemVms
                          );
-
-                //case StageVmStep.Presort:
-
-                //    var newSortableItemVms = stageVm.SortableItemVms.Select(
-                //        vm => vm.Copy()).ToArray();
-
-                //    SortableItemVmExt.SortTheSortableVms(
-                //        newSortableItemVms, 
-                //        stageVm.KeyPairVms.ToArray());
-
-                //    return new StageVm(
-                //            stageVmStep: StageVmStep.PostSort,
-                //            stageIndex: stageVm.StageIndex,
-                //            stageVmStyle: stageVm.StageVmStyle,
-                //            keyCount: stageVm.KeyCount,
-                //            keyPairVms: stageVm.KeyPairVms,
-                //            sortableItemVms: newSortableItemVms.ToPostSortStep(stageVm.KeyPairVms.ToArray()),
-                //            sortableItemVmsOld: stageVm.SortableItemVms
-                //         );
-
 
                 case StageVmStep.Presort:
 
@@ -160,7 +140,7 @@ namespace archean.controls.ViewModel.Sorter
                             stageVmStep: StageVmStep.PostSort,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
-                            keyCount: stageVm.KeyCount,
+                            order: stageVm.Order,
                             keyPairVms: newKeypairVms,
                             sortableItemVms: newSortableItemVms.ToPostSortStep(stageVm.KeyPairVms.ToArray()),
                             sortableItemVmsOld: stageVm.SortableItemVms
@@ -173,8 +153,8 @@ namespace archean.controls.ViewModel.Sorter
                             stageVmStep: StageVmStep.Right,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
-                            keyCount: stageVm.KeyCount,
-                            keyPairVms: stageVm.KeyPairVms.Select(kvm=>kvm.ToWasUsed()),
+                            order: stageVm.Order,
+                            keyPairVms: stageVm.KeyPairVms.Select(kvm=>kvm.ToInactive()),
                             sortableItemVms: stageVm.SortableItemVms.ToRightStep(),
                             sortableItemVmsOld: stageVm.SortableItemVms
                          );
@@ -184,7 +164,7 @@ namespace archean.controls.ViewModel.Sorter
                             stageVmStep: StageVmStep.None,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
-                            keyCount: stageVm.KeyCount,
+                            order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms,
                             sortableItemVms: null,
                             sortableItemVmsOld: null
@@ -195,7 +175,7 @@ namespace archean.controls.ViewModel.Sorter
                             stageVmStep: StageVmStep.Left,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
-                            keyCount: stageVm.KeyCount,
+                            order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms,
                             sortableItemVms: sortableItemVms,
                             sortableItemVmsOld: null
@@ -213,9 +193,8 @@ namespace archean.controls.ViewModel.Sorter
                     stageVmStep: stageVm.StageVmStep,
                     stageIndex: stageVm.StageIndex,
                     stageVmStyle: stageVm.StageVmStyle,
-                    keyCount: stageVm.KeyCount,
-                    keyPairVms: stageVm.KeyPairVms.Select(
-                        kpvm => kpvm.ToNotUsed()),
+                    order: stageVm.Order,
+                    keyPairVms: stageVm.KeyPairVms.Select(kpvm => kpvm.ResetUseHistory()),
                     sortableItemVms: stageVm.SortableItemVms,
                     sortableItemVmsOld: stageVm.SortableItemVmsOld
                  );
@@ -227,7 +206,7 @@ namespace archean.controls.ViewModel.Sorter
                     stageVmStep: stageVm.StageVmStep,
                     stageIndex: stageVm.StageIndex,
                     stageVmStyle: stageVmStyle,
-                    keyCount: stageVm.KeyCount,
+                    order: stageVm.Order,
                     keyPairVms: stageVm.KeyPairVms,
                     sortableItemVms: stageVm.SortableItemVms,
                     sortableItemVmsOld: stageVm.SortableItemVmsOld

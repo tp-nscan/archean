@@ -43,9 +43,10 @@
         <StackPanel Margin="10" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
 
             <sorter:SorterGenControl Margin="10,0" RefSorter="{Binding RefSorter, Mode=OneWayToSource}" />
-            <sorter:SorterRunControl Margin="10,0"  
+            <sorter:SorterRunControl Margin="10,0"
                                      SorterDisplayVm="{Binding SorterDisplayVm, Mode=TwoWay}" 
                                      StageLayout="{Binding StageLayout, Mode=OneWayToSource}" 
+                                     TotalUses="{Binding TotalUses, Mode=TwoWay}"
                                      AnimationSpeed="{Binding AnimationSpeed, Mode=OneWayToSource}" />
 
         </StackPanel>

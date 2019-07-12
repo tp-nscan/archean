@@ -9,9 +9,9 @@ namespace archean.controls.DesignVms.Sorter
             base(
                     stageVmStep: StageVmStep.Left,
                     stageIndex:0,
-                    stageVmStyle: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None),
-                    keyCount: _KeyCount,
-                    keyPairVms: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None).ToRandomKeyPairVms(0, _KeyCount),
+                    stageVmStyle: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None, max),
+                    order: _KeyCount,
+                    keyPairVms: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None, max).ToRandomKeyPairVms(0, _KeyCount),
                     sortableItemVms: StageVmProcs.ScrambledSortableVms(_KeyCount, System.DateTime.Now.Millisecond, true),
                     sortableItemVmsOld: null
                 )
@@ -19,7 +19,8 @@ namespace archean.controls.DesignVms.Sorter
         }
 
         public static int _KeyCount = 32;
-
+        public static object maxUses = 0;
+        public static SwitchUseWrap max = new SwitchUseWrap();
     }
 
 }
