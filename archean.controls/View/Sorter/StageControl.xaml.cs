@@ -12,7 +12,6 @@ namespace archean.controls.View.Sorter
 {
     public partial class StageControl : UserControl
     {
-        private const double DEFAULT_INTERVAL = 10;
         private const double DEFAULT_TICS_PER_STEP = 5;
 
         public StageControl()
@@ -103,7 +102,7 @@ namespace archean.controls.View.Sorter
 
             if((RenderTimer != null) && (RenderTimer.Enabled))
             {
-                StageVm.DrawSortableValuesAnimate(StageVmOld, (ticks / TicsPerStep), dc, ActualWidth, ActualHeight);
+                StageVm.DrawSortableValuesAnimate(ticks / TicsPerStep, dc, ActualWidth, ActualHeight);
             }
             else
             {
@@ -111,7 +110,6 @@ namespace archean.controls.View.Sorter
             }
         }
 
-        public StageVm StageVmOld;
         public double TicsPerStep = DEFAULT_TICS_PER_STEP;
         public double RenderInterval = DEFAULT_TICS_PER_STEP;
 
@@ -132,12 +130,10 @@ namespace archean.controls.View.Sorter
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var stageControl = (StageControl)d;
-            stageControl.StageVmOld = (StageVm)e.OldValue;
 
             if ((stageControl.StageVm.SortableItemVms != null ) &&
-                (stageControl.StageVmOld != null) &&
-                (stageControl.StageVmOld.SortableItemVms != null) &&
-                (stageControl.StageVm.StageVmStyle.AnimationSpeed != AnimationSpeed.None))
+                (stageControl.StageVm.SortableItemVmsOld != null) &&
+                (stageControl.StageVm.StageVmStyle.AnimationSpeed != AnimationSpeed.Stopped))
             {
                 stageControl.StartTimer(stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateFrequency());
                 stageControl.TicsPerStep = stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateSteps();

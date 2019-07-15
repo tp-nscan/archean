@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
-namespace archean.controls.ViewModel.Common
+namespace archean.controls.ViewModel.Sorter
 {
     public enum KeyPairUse
     {

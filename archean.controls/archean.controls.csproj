@@ -78,14 +78,37 @@
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="Utils\StringFormats.cs" />
     <Compile Include="ViewModel\Enums.cs" />
-    <Compile Include="ViewModel\Common\KeyPairVm.cs" />
+    <Compile Include="ViewModel\Sorter2\KeyPairVm.cs" />
+    <Compile Include="ViewModel\Sorter2\SortableItemVm.cs" />
+    <Compile Include="ViewModel\Sorter2\SortableSetVm.cs" />
+    <Compile Include="ViewModel\Sorter2\SorterDisplayVm.cs" />
+    <Compile Include="ViewModel\Sorter2\StageVm.cs" />
+    <Compile Include="ViewModel\Sorter2\StageVmRender.cs" />
+    <Compile Include="ViewModel\Sorter2\StageVmStep.cs" />
+    <Compile Include="ViewModel\Sorter2\StageVmStyle.cs" />
+    <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableSetVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableItemVm.cs" />
     <Compile Include="ViewModel\Sorter\SorterDisplayVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStep.cs" />
-    <Compile Include="ViewModel\Common\StageVmStyle.cs" />
+    <Compile Include="ViewModel\Sorter\StageVmStyle.cs" />
+    <Compile Include="View\Sorter2\SortableSetControl.xaml.cs">
+      <DependentUpon>SortableSetControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter2\SorterDisplayControl.xaml.cs">
+      <DependentUpon>SorterDisplayControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter2\SorterGenControl.xaml.cs">
+      <DependentUpon>SorterGenControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter2\SorterRunControl.xaml.cs">
+      <DependentUpon>SorterRunControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter2\StageControl.xaml.cs">
+      <DependentUpon>StageControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Sorter\SorterDisplayControl.xaml.cs">
       <DependentUpon>SorterDisplayControl.xaml</DependentUpon>
     </Compile>
@@ -101,6 +124,26 @@
     <Compile Include="View\Sorter\SortableSetControl.xaml.cs">
       <DependentUpon>SortableSetControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\Sorter2\SortableSetControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Sorter2\SorterDisplayControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Sorter2\SorterGenControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Sorter2\SorterRunControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Sorter2\StageControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\Sorter\SorterDisplayControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

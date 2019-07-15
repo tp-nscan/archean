@@ -5,7 +5,7 @@ using System.Windows.Media;
 using archean.controls.Utils;
 using System.Collections.Generic;
 
-namespace archean.controls.ViewModel.Sorter
+namespace archean.controls.ViewModel.Sorter2
 {
     public enum StagePos
     {

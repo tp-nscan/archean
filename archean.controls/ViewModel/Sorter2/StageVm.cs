@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System;
 
-namespace archean.controls.ViewModel.Sorter
+namespace archean.controls.ViewModel.Sorter2
 {
     public class StageVm
     {

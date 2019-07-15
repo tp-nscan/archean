@@ -81,6 +81,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModel\Pages\BenchmarkPageVm.cs" />
+    <Compile Include="ViewModel\Pages\SorterPageVm2.cs" />
     <Compile Include="ViewModel\Pages\SorterPageVm.cs" />
     <Compile Include="ViewModel\Pages\StagePageVm.cs" />
     <Compile Include="View\NavWindow.xaml.cs">
@@ -91,6 +92,9 @@
     </Compile>
     <Compile Include="View\Pages\MenuPage.xaml.cs">
       <DependentUpon>MenuPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\SorterPage2.xaml.cs">
+      <DependentUpon>SorterPage2.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Pages\SorterPage.xaml.cs">
       <DependentUpon>SorterPage.xaml</DependentUpon>
@@ -122,6 +126,10 @@
     <Page Include="View\Pages\MenuPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\SorterPage2.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Pages\SorterPage.xaml">
       <SubType>Designer</SubType>

@@ -2,7 +2,7 @@
 {
     public enum AnimationSpeed
     {
-        None,
+        Stopped,
         Slow,
         Medium,
         Fast
@@ -22,7 +22,7 @@
         {
             switch (animationSpeed)
             {
-                case AnimationSpeed.None:
+                case AnimationSpeed.Stopped:
                     return -1.0;
                 case AnimationSpeed.Slow:
                     return 10.0;
@@ -39,7 +39,7 @@
         {
             switch (animationSpeed)
             {
-                case AnimationSpeed.None:
+                case AnimationSpeed.Stopped:
                     return -1.0;
                 case AnimationSpeed.Slow:
                     return 125.0;

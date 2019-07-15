@@ -10,11 +10,17 @@
 
     <Grid Background="LightGreen">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Border Margin="20" BorderBrush="Black" BorderThickness="1">
+        <Border Margin="10" Grid.Row="0" BorderBrush="Black" BorderThickness="1" 
+                Background="#4FFF">
+            <TextBlock Margin="20,0,0,0" Text="Stage" FontSize="20" />
+        </Border>
+
+        <Border Margin="20" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
             <sorter:StageControl Margin="5" StageVm="{Binding StageVm}" />
         </Border>
 
@@ -23,6 +29,6 @@
             Margin="10" 
             Height="30" 
             Width="70" 
-            Grid.Row="1">Step</Button>
+            Grid.Row="2">Step</Button>
     </Grid>
 </Page>

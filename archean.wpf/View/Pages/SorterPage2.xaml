@@ -3,10 +3,10 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:sorter="clr-namespace:archean.controls.View.Sorter;assembly=archean.controls"
+      xmlns:sorter="clr-namespace:archean.controls.View.Sorter2;assembly=archean.controls"
       xmlns:local="clr-namespace:archean.ViewModel.Pages"
       xmlns:Converters="clr-namespace:archean.controls.Utils.Converters;assembly=archean.controls" 
-      x:Class="archean.View.Pages.SorterPage"
+      x:Class="archean.View.Pages.SorterPage2"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance {x:Type local:SorterPageVm}, IsDesignTimeCreatable=True}"
       d:DesignHeight="650" d:DesignWidth="1200"
@@ -39,7 +39,7 @@
 
         <Border Margin="10" Grid.Row="0" BorderBrush="Black" BorderThickness="1" 
                 Background="#4FFF">
-            <TextBlock Margin="20,0,0,0" Text="Sorter" FontSize="20" />
+            <TextBlock Margin="20,0,0,0"  Text="Sorter2" FontSize="20" />
         </Border>
 
         <Border Margin="10" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
@@ -52,8 +52,7 @@
             <sorter:SorterRunControl Margin="10,0"
                                      SorterDisplayVm="{Binding SorterDisplayVm, Mode=TwoWay}" 
                                      StageLayout="{Binding StageLayout, Mode=OneWayToSource}" 
-                                     TotalUses="{Binding TotalUses, Mode=TwoWay}"
-                                     AnimationSpeed="{Binding AnimationSpeed, Mode=OneWayToSource}" />
+                                     TotalUses="{Binding TotalUses, Mode=TwoWay}"/>
 
         </StackPanel>
 

@@ -1,0 +1,80 @@
+﻿<UserControl x:Name="userControl" x:Class="archean.controls.View.Sorter2.SorterRunControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Converters="clr-namespace:archean.controls.Utils.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="90" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <Converters:PassThruConverter x:Key="PassThruConverter"/>
+
+        <Style x:Key="btnStyleBigPanel" TargetType="Button">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+
+        <Style x:Key="btnStyleMedPanel" TargetType="Button">
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <Style x:Key="cboStyle" TargetType="ComboBox">
+            <Setter Property="Width" Value="125"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="5,10,5,5"/>
+        </Style>
+
+        <Style x:Key="groupBoxStyle" TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+    </UserControl.Resources>
+
+    <Grid >
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+            <TextBlock Width="50" Height="50" FontSize="20"  Text="{Binding TotalUses}" 
+                       Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+
+            <Button x:Name="btnStep"
+                Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding StepCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Step"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding ClearCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Clear"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding ResetCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Reset"/>
+
+            <GroupBox Style="{DynamicResource groupBoxStyle}" Header="Layout" >
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox ItemsSource="{Binding StageLayouts, ElementName=userControl}" 
+                              SelectedItem="{Binding StageLayout, ElementName=userControl}" 
+                              Style="{DynamicResource cboStyle}"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Style="{DynamicResource groupBoxStyle}" Header="Animation" >
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox ItemsSource="{Binding AnimationSpeeds, ElementName=userControl}" 
+                              SelectedItem="{Binding AnimationSpeed, ElementName=userControl}" 
+                              Style="{DynamicResource cboStyle}"/>
+                </StackPanel>
+            </GroupBox>
+
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>

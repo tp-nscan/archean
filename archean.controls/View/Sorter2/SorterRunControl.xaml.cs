@@ -1,20 +1,33 @@
 ﻿using archean.controls.Utils;
 using archean.controls.ViewModel;
-using archean.controls.ViewModel.Sorter;
+using archean.controls.ViewModel.Sorter2;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 
-namespace archean.controls.View.Sorter
+namespace archean.controls.View.Sorter2
 {
     public partial class SorterRunControl
     {
         public SorterRunControl()
         {
             InitializeComponent();
+        }
+
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+                return;
+            if (RenderTimer != null)
+            {
+                _renderTimer.Elapsed -= OnRenderTimerElapsed;
+                _renderTimer.Dispose();
+            }
         }
 
 
@@ -54,57 +67,75 @@ namespace archean.controls.View.Sorter
 
         private void DoStep()
         {
-            SorterDisplayVm.KeepGoing = false;
-            SorterDisplayVm.MakeStep();
-            if (SorterDisplayVm.CurrentStageVm.StageVmStep == StageVmStep.Right)
-            {
-               SorterDisplayVm.MakeStep();
-            }
+            TotalUses++;
+            //SorterDisplayVm.KeepGoing = false;
+            //SorterDisplayVm.MakeStep();
+            //if (SorterDisplayVm.CurrentStageVm.StageVmStep == StageVmStep.Right)
+            //{
+            //   SorterDisplayVm.MakeStep();
+            //}
         }
 
         bool CanStep()
         {
-            if (SorterDisplayVm == null) return false;
+            //if (SorterDisplayVm == null) return false;
 
-            return (SorterDisplayVm.CurrentStageVm != null) &&
-                   (
-                    (SorterDisplayVm.CurrentStageVm.StageVmStep != StageVmStep.Right) 
-                    ||
-                    (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count - 1)
-                   );
+            //return (SorterDisplayVm.CurrentStageVm != null) &&
+            //       (
+            //        (SorterDisplayVm.CurrentStageVm.StageVmStep != StageVmStep.Right) 
+            //        ||
+            //        (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count - 1)
+            //       );
+            return true;
         }
 
         #endregion // StepCommand
 
 
-        #region RunCommand
+        #region RenderTimer
 
-        RelayCommand _runCommand;
-
-        public ICommand RunCommand => _runCommand ?? (_runCommand = new RelayCommand(
-                DoRun,
-                CanRun
-            ));
-
-        private void DoRun()
+        Timer _renderTimer;
+        public Timer RenderTimer
         {
-            SorterDisplayVm.KeepGoing = true;
-            SorterDisplayVm.MakeStep();
+            get { return _renderTimer; }
+            set
+            {
+                if (_renderTimer != null)
+                {
+                    _renderTimer.Elapsed -= OnRenderTimerElapsed;
+                }
+                _renderTimer = value;
+                _renderTimer.Elapsed += OnRenderTimerElapsed;
+            }
         }
 
-        bool CanRun()
+        private void StartTimer(double renderInterval)
         {
-            if (SorterDisplayVm == null) return false;
-
-            return (SorterDisplayVm.CurrentStageVm != null) &&
-                   (
-                    (SorterDisplayVm.CurrentStageVm.StageVmStep != StageVmStep.Right)
-                    ||
-                    (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count - 1)
-                   );
+            if ((RenderTimer != null) && (RenderTimer.Enabled))
+                return;
+            RenderTimer = new Timer(renderInterval);
+            RenderTimer.Enabled = true;
         }
 
-        #endregion // RunCommand
+        private void StopTimer()
+        {
+            if (RenderTimer != null)
+            {
+                RenderTimer.Enabled = false;
+            }
+        }
+
+        private double ticks = 0;
+        async void OnRenderTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                TotalUses++;
+            });
+        }
+
+
+        #endregion
 
 
         #region ClearCommand
@@ -173,23 +204,26 @@ namespace archean.controls.View.Sorter
 
         private void DoReset()
         {
-            TotalUses++;
+            AnimationSpeed = AnimationSpeed.Stopped;
+            TotalUses = 0;
 
-            SorterDisplayVm = new SorterDisplayVm(
-                order: SorterDisplayVm.Order, 
-                sortableItemVms: StageVmProcs.ScrambledSortableVms(SorterDisplayVm.Order, DateTime.Now.Millisecond, true), 
-                stageVms: new ObservableCollection<StageVm>(
-                                SorterDisplayVm.StageVms.ResetSortables(SorterDisplayVm.SortableItemVms)), 
-                currentstageIndex: 0);
+            //SorterDisplayVm = new SorterDisplayVm(
+            //    order: SorterDisplayVm.Order, 
+            //    sortableItemVms: StageVmProcs.ScrambledSortableVms(SorterDisplayVm.Order, DateTime.Now.Millisecond, true), 
+            //    stageVms: new ObservableCollection<StageVm>(
+            //                    SorterDisplayVm.StageVms.ResetSortables(SorterDisplayVm.SortableItemVms)), 
+            //    currentstageIndex: 0);
 
         }
 
         bool CanReset()
         {
-            if (SorterDisplayVm == null) return false;
+            //if (SorterDisplayVm == null) return false;
 
-            return (SorterDisplayVm.CurrentStageVm != null) &&
-                   (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count);
+            //return (SorterDisplayVm.CurrentStageVm != null) &&
+            //       (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count);
+
+            return true;
         }
 
         #endregion // ResetCommand
@@ -219,8 +253,13 @@ namespace archean.controls.View.Sorter
         {
             var sorterRunControl = (SorterRunControl)d;
             var animationSpeed = (AnimationSpeed)e.NewValue;
-            if (sorterRunControl.SorterDisplayVm != null)
+            if ((sorterRunControl.RenderTimer != null) && (sorterRunControl.RenderTimer.Enabled))
             {
+                sorterRunControl.StopTimer();
+            }
+            if(animationSpeed != AnimationSpeed.Stopped)
+            {
+                sorterRunControl.StartTimer(sorterRunControl.AnimationSpeed.ToUpdateFrequency());
             }
         }
 

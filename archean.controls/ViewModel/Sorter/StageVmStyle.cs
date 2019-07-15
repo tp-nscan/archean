@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 
-namespace archean.controls.ViewModel.Common
+namespace archean.controls.ViewModel.Sorter
 {
     public class StageVmStyle
     {
@@ -22,7 +21,7 @@ namespace archean.controls.ViewModel.Common
         public Brush BackgroundBrush { get; set; }
 
         public static StageVmStyle Standard(
-                            bool oddStep, 
+                            Brush backgroundBrush, 
                             AnimationSpeed animationSpeed,
                             SwitchUseWrap maxSwitchUse)
         {
@@ -39,7 +38,7 @@ namespace archean.controls.ViewModel.Common
                 KeyLineThickness = 1.0,
                 KeyLineHeight = 4.0,
                 VPadding = 1.0,
-                BackgroundBrush = oddStep ? Brushes.Lavender : Brushes.White
+                BackgroundBrush = backgroundBrush
             };
         }
 
@@ -75,13 +74,6 @@ namespace archean.controls.ViewModel.Common
 
         public static Func<int, Brush> ToSwitchBrushFunc(this SwitchUseWrap maxUseCount)
         {
-
-            //return useCount =>
-            //{
-            //    var step = (colorSteps * useCount) / (float)maxUseCount.Value;
-            //    return (useCount < maxUseCount.Value) ? SwitchBrushes[colorSteps - (int)step - 1] : Brushes.GreenYellow;
-            //};
-
             return useCount =>
             {
                 if (useCount == 0) return Brushes.Black;
@@ -93,10 +85,31 @@ namespace archean.controls.ViewModel.Common
             };
         }
 
+        public static Brush AlternatingBrush => new SolidColorBrush(Color.FromScRgb(0.3f, 0, 1.0f, 0));
+
         public static Func<int, Brush> ToSwitchBrushFunc0(this SwitchUseWrap maxUseCount)
         {
             return useCount =>
                         (useCount < maxUseCount.Value) ? Brushes.Blue : Brushes.GreenYellow;
+        }
+
+        public static StageVmStyle ChangeBackground(this StageVmStyle stageVmStyle, Brush newBrush)
+        {
+            return new StageVmStyle
+            {
+                AnimationSpeed = stageVmStyle.AnimationSpeed,
+                KeyLineBrush = stageVmStyle.KeyLineBrush,
+                SwitchBrushNotUsed = stageVmStyle.SwitchBrushNotUsed,
+                SwitchBrushInUse = stageVmStyle.SwitchBrushInUse,
+                SwitchBrushWasUsed = stageVmStyle.SwitchBrushWasUsed,
+                SwitchLineWidth = stageVmStyle.SwitchLineWidth,
+                SwitchHSpacing = stageVmStyle.SwitchHSpacing,
+                StageRightMargin = stageVmStyle.StageRightMargin,
+                KeyLineThickness = stageVmStyle.KeyLineThickness,
+                KeyLineHeight = stageVmStyle.KeyLineHeight,
+                VPadding = stageVmStyle.VPadding,
+                BackgroundBrush = newBrush
+            };
         }
     }
 

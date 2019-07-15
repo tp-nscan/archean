@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using archean.controls.Utils;
 
-namespace archean.controls.ViewModel.Sorter
+namespace archean.controls.ViewModel.Sorter2
 {
     public static class StageVmRender
     {
@@ -211,19 +211,19 @@ namespace archean.controls.ViewModel.Sorter
             this StageVm stageVm,
             double pctAlong,
             DrawingContext dc,
-            double stageRenderWidth, 
+            double stageRenderWidth,
             double stageRenderHeight)
         {
             if (stageVm.SortableItemVms == null) return;
 
-            for(var i=0; i< stageVm.SortableItemVms.Length; i++)
+            for (var i = 0; i < stageVm.SortableItemVms.Length; i++)
             {
                 stageVm.DrawSortableValueAnimate(
-                    stageVm.SortableItemVmsOld[i], 
-                    pctAlong, 
-                    dc, 
-                    stageVm.SortableItemVms[i], 
-                    stageRenderWidth, 
+                    stageVm.SortableItemVmsOld[i],
+                    pctAlong,
+                    dc,
+                    stageVm.SortableItemVms[i],
+                    stageRenderWidth,
                     stageRenderHeight);
             }
         }

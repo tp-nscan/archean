@@ -1,5 +1,4 @@
 ﻿using archean.ViewModel.Pages;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,26 +15,28 @@ namespace archean.View.Pages
         {
             var nextPage = new BenchmarkPage();
             nextPage.DataContext = new BenchmarkPageVm();
-            this.NavigationService.Navigate(nextPage);
+            NavigationService.Navigate(nextPage);
         }
 
         private void BtnSorterControl_Click(object sender, RoutedEventArgs e)
         {
             var nextPage = new SorterPage();
             nextPage.DataContext = new SorterPageVm();
-            this.NavigationService.Navigate(nextPage);
+            NavigationService.Navigate(nextPage);
         }
 
         private void BtnStageControl_Click(object sender, RoutedEventArgs e)
         {
             var nextPage = new StagePage();
             nextPage.DataContext = new StagePageVm();
-            this.NavigationService.Navigate(nextPage);
+            NavigationService.Navigate(nextPage);
         }
 
         private void BtnSorter2Control_Click(object sender, RoutedEventArgs e)
         {
-
+            var nextPage = new SorterPage2();
+            nextPage.DataContext = new SorterPageVm2();
+            NavigationService.Navigate(nextPage);
         }
     }
 }

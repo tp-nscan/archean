@@ -1,8 +1,8 @@
 ﻿using archean.controls.ViewModel;
-using archean.controls.ViewModel.Common;
 using archean.controls.ViewModel.Sorter;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 
 namespace archean.controls.DesignVms.Sorter
 {
@@ -40,7 +40,8 @@ namespace archean.controls.DesignVms.Sorter
                 SwitchUseWrap max = new SwitchUseWrap();
 
                 return switchBlockSets.ToStageVms(
-                    stageVmStyle: StageVmStyle.Standard(false, AnimationSpeed.None, max),
+                    stageVmStyle: StageVmStyle.Standard(Brushes.AliceBlue, AnimationSpeed.Stopped, max),
+                    alternatingBrush: new SolidColorBrush(Color.FromScRgb(0.3f, 0, 0, 0)),
                     order: order,
                     sortableItemVms: sortableItemVms);
             }

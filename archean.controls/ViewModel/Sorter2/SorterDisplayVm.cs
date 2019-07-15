@@ -6,7 +6,7 @@ using System.Linq;
 using archean.core;
 using System.Windows.Media;
 
-namespace archean.controls.ViewModel.Sorter
+namespace archean.controls.ViewModel.Sorter2
 {
     public class SorterDisplayVm : BindableBase
     {
@@ -134,7 +134,7 @@ namespace archean.controls.ViewModel.Sorter
                     stageVmStep: StageVmStep.Left);
 
             while (true)
-                {
+            {
                     yield return
                         switchblocks => switchblocks.SwitchBlocksToStageVm(
                             stageIndex: indexInSorter++,
@@ -226,16 +226,13 @@ namespace archean.controls.ViewModel.Sorter
             }
         }
 
-
-        public static SorterDisplayVm ChangeAnimationSpeed(
-                    this SorterDisplayVm sorterDisplayVm, 
-                    AnimationSpeed animationSpeed)
+        public static SorterDisplayVm Step(
+            this SorterDisplayVm sorterDisplayVm)
         {
             return new SorterDisplayVm(
                 order: sorterDisplayVm.Order,
                 sortableItemVms: sorterDisplayVm.SortableItemVms,
-                stageVms: sorterDisplayVm.StageVms.Select(
-                    stvm => stvm.SetStageVmStyle(stvm.StageVmStyle.ChangeAnimationSpeed(animationSpeed))),
+                stageVms: sorterDisplayVm.StageVms,
                 currentstageIndex: sorterDisplayVm.CurrentStageVm.StageIndex
                 );
         }

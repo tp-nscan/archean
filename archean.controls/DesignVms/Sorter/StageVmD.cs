@@ -1,5 +1,5 @@
-﻿using archean.controls.ViewModel.Common;
-using archean.controls.ViewModel.Sorter;
+﻿using archean.controls.ViewModel.Sorter;
+using System.Windows.Media;
 
 namespace archean.controls.DesignVms.Sorter
 {
@@ -9,9 +9,9 @@ namespace archean.controls.DesignVms.Sorter
             base(
                     stageVmStep: StageVmStep.Left,
                     stageIndex:0,
-                    stageVmStyle: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None, max),
+                    stageVmStyle: StageVmStyle.Standard(Brushes.AliceBlue, ViewModel.AnimationSpeed.Stopped, max),
                     order: _KeyCount,
-                    keyPairVms: StageVmStyle.Standard(false, ViewModel.AnimationSpeed.None, max).ToRandomKeyPairVms(0, _KeyCount),
+                    keyPairVms: StageVmStyle.Standard(Brushes.AliceBlue, ViewModel.AnimationSpeed.Stopped, max).ToRandomKeyPairVms(0, _KeyCount),
                     sortableItemVms: StageVmProcs.ScrambledSortableVms(_KeyCount, System.DateTime.Now.Millisecond, true),
                     sortableItemVmsOld: null
                 )
