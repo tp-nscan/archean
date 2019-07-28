@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="DesignVms\Sorter\SorterVmD.cs" />
     <Compile Include="DesignVms\Sorter\StageVmD.cs" />
+    <Compile Include="Utils\AnimationState.cs" />
     <Compile Include="Utils\BindableBase.cs" />
     <Compile Include="Utils\Converters\CoreLibConverters.cs" />
     <Compile Include="Utils\Converters\FEconverters.cs" />
@@ -80,23 +81,18 @@
     <Compile Include="ViewModel\Enums.cs" />
     <Compile Include="ViewModel\Sorter2\KeyPairVm.cs" />
     <Compile Include="ViewModel\Sorter2\SortableItemVm.cs" />
-    <Compile Include="ViewModel\Sorter2\SortableSetVm.cs" />
     <Compile Include="ViewModel\Sorter2\SorterDisplayVm.cs" />
     <Compile Include="ViewModel\Sorter2\StageVm.cs" />
     <Compile Include="ViewModel\Sorter2\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter2\StageVmStep.cs" />
     <Compile Include="ViewModel\Sorter2\StageVmStyle.cs" />
     <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
-    <Compile Include="ViewModel\Sorter\SortableSetVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableItemVm.cs" />
     <Compile Include="ViewModel\Sorter\SorterDisplayVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVm.cs" />
     <Compile Include="ViewModel\Sorter\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStep.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStyle.cs" />
-    <Compile Include="View\Sorter2\SortableSetControl.xaml.cs">
-      <DependentUpon>SortableSetControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Sorter2\SorterDisplayControl.xaml.cs">
       <DependentUpon>SorterDisplayControl.xaml</DependentUpon>
     </Compile>
@@ -121,13 +117,12 @@
     <Compile Include="View\Sorter\StageControl.xaml.cs">
       <DependentUpon>StageControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Sorter\SortableSetControl.xaml.cs">
-      <DependentUpon>SortableSetControl.xaml</DependentUpon>
+    <Compile Include="View\Sorter2\SortableGenControl.xaml.cs">
+      <DependentUpon>SortableGenControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="View\Sorter2\SortableSetControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <Compile Include="View\Utils\AnimationControl.xaml.cs">
+      <DependentUpon>AnimationControl.xaml</DependentUpon>
+    </Compile>
     <Page Include="View\Sorter2\SorterDisplayControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -160,9 +155,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Sorter\SortableSetControl.xaml">
+    <Page Include="View\Sorter2\SortableGenControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Utils\AnimationControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

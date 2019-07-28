@@ -11,13 +11,13 @@ namespace archean.controls.ViewModel.Sorter
         public IObservable<StageVm> OnAnimationFinished => _animationFinished;
 
         public StageVm(
-            int stageIndex,
-            StageVmStep stageVmStep,
-            StageVmStyle stageVmStyle,
-            int order,
-            IEnumerable<KeyPairVm> keyPairVms,
-            SortableItemVm[] sortableItemVms,
-            SortableItemVm[] sortableItemVmsOld
+                int stageIndex,
+                StageVmStep stageVmStep,
+                StageVmStyle stageVmStyle,
+                int order,
+                IEnumerable<KeyPairVm> keyPairVms,
+                SortableItemVm[] sortableItemVms,
+                SortableItemVm[] sortableItemVmsOld
             )
         {
             StageIndex = stageIndex;

@@ -7,7 +7,76 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MenuPage">
+    <Page.Resources>
+        <SolidColorBrush x:Key="StandardButtonBackground" Color="#1C536F" />
+        <SolidColorBrush x:Key="StandardButtonForeground" Color="#FEFEFE" />
 
+        <!-- Standard Button Template-->
+        <Style x:Key="StandardButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource StandardButtonBackground}" />
+            <Setter Property="Foreground" Value="{StaticResource StandardButtonForeground}" />
+            <Setter Property="FontSize" Value="20"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="55" Background="{StaticResource StandardButtonBackground}">
+                            <ContentPresenter Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <!-- the background for the button -->
+                            <Rectangle RadiusX="20" RadiusY="30" Grid.RowSpan="2">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Color="#872234" Offset="0"/>
+                                            <GradientStop Color="#872234" Offset="0.9"/>
+                                        </LinearGradientBrush.GradientStops>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <!-- the "gel" hilight at the top of the button -->
+                            <Rectangle RadiusX="20" RadiusY="30" Margin="5">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Color="#C53550" Offset="0.1"/>
+                                            <GradientStop Color="#C43551" Offset="0.5"/>
+                                            <GradientStop Color="#C43551" Offset="0.9"/>
+                                        </LinearGradientBrush.GradientStops>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <!-- place for the content inside the button to be displayed -->
+                            <ContentPresenter Grid.RowSpan="2"   
+                                  x:Name="PrimaryContent"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Margin="{TemplateBinding Padding}" 
+                                  Content="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" 
+                                  />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="gold" />
+        </Style>
+    </Page.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -18,7 +87,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="btnBenchmark" Grid.Row="0" Click="BtnBenchmark_Click">Benchmark</Button>
+        <Button x:Name="btnBenchmark" Grid.Row="0" Click="BtnBenchmark_Click" Style="{DynamicResource StandardButton}">Benchmark</Button>
         <Button x:Name="btnStageControl" Grid.Row="1" Click="BtnStageControl_Click">Stage Control</Button>
         <Button x:Name="btnSorterControl" Grid.Row="2" Click="BtnSorterControl_Click">Sorter Control</Button>
         <Button x:Name="btnSorter2Control" Grid.Row="3" Click="BtnSorter2Control_Click">Sorter2 Control</Button>

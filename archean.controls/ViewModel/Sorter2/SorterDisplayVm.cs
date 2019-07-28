@@ -12,24 +12,16 @@ namespace archean.controls.ViewModel.Sorter2
     {
         public SorterDisplayVm(
                         int order,
-                        SortableItemVm[] sortableItemVms,
-                        IEnumerable<StageVm> stageVms,
-                        int currentstageIndex)
+                        IEnumerable<StageVm> stageVms)
         {
             Order = order;
-            SortableItemVms = sortableItemVms;
            // StageVms = stageVms.ToList();
             StageVms = new ObservableCollection<StageVm>(stageVms);
-            CurrentStageVm = StageVms[currentstageIndex];
         }
-
-        public List<Sorting.ISwitch[][]> SwitchBlockSets { get; private set;}
 
         public int Order { get; set; }
 
         public Sorting.StagedSorterDef StagedSorterDef { get; }
-
-        public SortableItemVm[] SortableItemVms { get; set; }
 
         ObservableCollection<StageVm> _stageVms;
         public ObservableCollection<StageVm> StageVms
@@ -40,89 +32,15 @@ namespace archean.controls.ViewModel.Sorter2
                 SetProperty(ref _stageVms, value);
             }
         }
-
-        //List<StageVm> _stageVms;
-        //public List<StageVm> StageVms
-        //{
-        //    get => _stageVms;
-        //    private set
-        //    {
-        //        SetProperty(ref _stageVms, value);
-        //    }
-        //}
-
-        StageVm _currentStageVm;
-        public StageVm CurrentStageVm
-        {
-            get
-            {
-                return _currentStageVm;
-            }
-            private set
-            {
-                _currentStageVm = value;
-                if (subscription != null)
-                {
-                    subscription.Dispose();
-                }
-                subscription = _currentStageVm.OnAnimationFinished.Subscribe(AnimationFinished);
-                StageVms[value.StageIndex] = value;
-            }
-        }
-
-        IDisposable subscription;
-        void AnimationFinished(StageVm stageVm)
-        {
-            if (KeepGoing)
-            {
-                MakeStep();
-            }
-        }
-
-        private bool keepGoing;
-        public bool KeepGoing
-        {
-            get => keepGoing;
-            set
-            {
-                keepGoing = value;
-            }
-        }
-
-
-        public void MakeStep()
-        {
-            if (CurrentStageVm.StageVmStep == StageVmStep.Right)
-            {
-                var sortableItemVms = CurrentStageVm.SortableItemVms;
-                if (CurrentStageVm.StageIndex + 1 > StageVms.Count - 1) return;
-
-                //since this stage is finished, change it to a sortable free config
-                CurrentStageVm = CurrentStageVm.ToNextStep();
-
-                // put the sortables in the  left position on the next stage
-                CurrentStageVm = StageVms[CurrentStageVm.StageIndex + 1]
-                                    .ToNextStep(sortableItemVms.ToLeftStep());
-                if (KeepGoing)
-                {
-                    MakeStep();
-                }
-            }
-            else
-            {
-                CurrentStageVm = CurrentStageVm.ToNextStep();
-            }
-        }
     }
 
-    //StageVmStyle.Standard(false, animationSpeed, maxSwitchUse),
     public static class SorterDisplayVmExt
     {
         public static IEnumerable<Func<Sorting.ISwitch[][], StageVm>> StageVmMaps(
                                             StageVmStyle stageVmStyle,
                                             Brush alternating,
                                             int order, 
-                                            SortableItemVm[] sortableVms)
+                                            SortableItemVm[] sortableItemVms)
         {
             var indexInSorter = 0;
             yield return
@@ -130,7 +48,7 @@ namespace archean.controls.ViewModel.Sorter2
                     stageIndex: indexInSorter++, 
                     stageVmStyle: stageVmStyle,
                     order: order, 
-                    sortableVms: sortableVms,
+                    sortableVms: sortableItemVms,
                     stageVmStep: StageVmStep.Left);
 
             while (true)
@@ -227,13 +145,12 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
         public static SorterDisplayVm Step(
-            this SorterDisplayVm sorterDisplayVm)
+                    this SorterDisplayVm sorterDisplayVm,
+                    SortableItemVm[] sortableItemVms)
         {
             return new SorterDisplayVm(
-                order: sorterDisplayVm.Order,
-                sortableItemVms: sorterDisplayVm.SortableItemVms,
-                stageVms: sorterDisplayVm.StageVms,
-                currentstageIndex: sorterDisplayVm.CurrentStageVm.StageIndex
+                    order: sorterDisplayVm.Order,
+                    stageVms: sorterDisplayVm.StageVms
                 );
         }
 

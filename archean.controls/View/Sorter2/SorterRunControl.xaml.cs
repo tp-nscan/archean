@@ -97,7 +97,11 @@ namespace archean.controls.View.Sorter2
         Timer _renderTimer;
         public Timer RenderTimer
         {
-            get { return _renderTimer; }
+            get
+            {
+
+                return _renderTimer;
+            }
             set
             {
                 if (_renderTimer != null)
@@ -138,35 +142,55 @@ namespace archean.controls.View.Sorter2
         #endregion
 
 
-        #region ClearCommand
+        #region StartCommand
 
-        RelayCommand _clearCommand;
+        RelayCommand _startCommand;
 
-        public ICommand ClearCommand => _clearCommand ?? (_clearCommand = new RelayCommand(
-                DoClear,
-                CanClear
+        public ICommand StartCommand => _startCommand ?? (_startCommand = new RelayCommand(
+                DoStart,
+                CanStart
             ));
 
-        private void DoClear()
+        private void DoStart()
         {
-            TotalUses = 0;
-            SorterDisplayVm = new SorterDisplayVm(
-                    order: SorterDisplayVm.Order,
-                    sortableItemVms: SorterDisplayVm.SortableItemVms,
-                    stageVms: new ObservableCollection<StageVm>(
-                                SorterDisplayVm.StageVms.Select(stvm => stvm.ClearSwitchUses())),
-                    currentstageIndex: SorterDisplayVm.CurrentStageVm.StageIndex);
+            if ((RenderTimer != null) && (RenderTimer.Enabled))
+            {
+                RenderTimer.Start();
+            }
         }
 
-        bool CanClear()
+        bool CanStart()
         {
             if (SorterDisplayVm == null) return false;
 
-            return (SorterDisplayVm.CurrentStageVm != null) &&
-                   (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count);
+            return true;
         }
 
-        #endregion // ClearCommand
+        #endregion // StartCommand
+
+
+        #region StopCommand
+
+        RelayCommand _stopCommand;
+
+        public ICommand StopCommand => _stopCommand ?? (_stopCommand = new RelayCommand(
+                DoStop,
+                CanStop
+            ));
+
+        private void DoStop()
+        {
+            TotalUses = 0;
+        }
+
+        bool CanStop()
+        {
+            if (SorterDisplayVm == null) return false;
+
+            return true;
+        }
+
+        #endregion // StopCommand
 
 
         #region TotalUses
@@ -206,24 +230,16 @@ namespace archean.controls.View.Sorter2
         {
             AnimationSpeed = AnimationSpeed.Stopped;
             TotalUses = 0;
-
-            //SorterDisplayVm = new SorterDisplayVm(
-            //    order: SorterDisplayVm.Order, 
-            //    sortableItemVms: StageVmProcs.ScrambledSortableVms(SorterDisplayVm.Order, DateTime.Now.Millisecond, true), 
-            //    stageVms: new ObservableCollection<StageVm>(
-            //                    SorterDisplayVm.StageVms.ResetSortables(SorterDisplayVm.SortableItemVms)), 
-            //    currentstageIndex: 0);
+            SorterDisplayVm = new SorterDisplayVm(
+                    order: SorterDisplayVm.Order,
+                    stageVms: new ObservableCollection<StageVm>(
+                                SorterDisplayVm.StageVms.Select(stvm => stvm.ClearAll())));
 
         }
 
         bool CanReset()
         {
-            //if (SorterDisplayVm == null) return false;
-
-            //return (SorterDisplayVm.CurrentStageVm != null) &&
-            //       (SorterDisplayVm.CurrentStageVm.StageIndex < SorterDisplayVm.StageVms.Count);
-
-            return true;
+            return (SorterDisplayVm != null);
         }
 
         #endregion // ResetCommand
@@ -247,7 +263,7 @@ namespace archean.controls.View.Sorter2
 
         public static readonly DependencyProperty AnimationSpeedProperty =
             DependencyProperty.Register("AnimationSpeed", typeof(AnimationSpeed), typeof(SorterRunControl),
-            new FrameworkPropertyMetadata(AnimationSpeed.Stopped, FrameworkPropertyMetadataOptions.None, OnAnimationSpeedPropertyChanged));
+            new FrameworkPropertyMetadata(OnAnimationSpeedPropertyChanged));
 
         private static void OnAnimationSpeedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -257,7 +273,11 @@ namespace archean.controls.View.Sorter2
             {
                 sorterRunControl.StopTimer();
             }
-            if(animationSpeed != AnimationSpeed.Stopped)
+
+            sorterRunControl.StartTimer(0.0);
+
+
+            if (animationSpeed != AnimationSpeed.Stopped)
             {
                 sorterRunControl.StartTimer(sorterRunControl.AnimationSpeed.ToUpdateFrequency());
             }
@@ -272,7 +292,9 @@ namespace archean.controls.View.Sorter2
         {
             get
             {
-                return Enum.GetValues(typeof(StageLayout)).Cast<StageLayout>();
+                yield return StageLayout.Single;
+                yield return StageLayout.Loose;
+                yield return StageLayout.Tight;
             }
         }
 
@@ -284,16 +306,7 @@ namespace archean.controls.View.Sorter2
 
         public static readonly DependencyProperty StageLayoutProperty =
             DependencyProperty.Register("StageLayout", typeof(StageLayout), typeof(SorterRunControl),
-            new FrameworkPropertyMetadata(StageLayout.Single, FrameworkPropertyMetadataOptions.None, OnStageLayoutPropertyChanged));
-
-        private static void OnStageLayoutPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var sorterRunControl = (SorterRunControl)d;
-            var stageLayout = (StageLayout)e.NewValue;
-            if (sorterRunControl.SorterDisplayVm != null)
-            {
-            }
-        }
+            new FrameworkPropertyMetadata(StageLayout.Single));
 
         #endregion
 

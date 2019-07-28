@@ -5,9 +5,22 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+      Background="Pink"
       Title="BenchmarkPage">
+    <Page.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontFamily" Value="Blackadder ITC"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontFamily" Value="Blackadder ITC"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Page.Resources>
 
-    <Grid Background="Peru">
+    <Grid Background="Peru" Margin="30, 10, 15, 50">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
@@ -16,9 +29,17 @@
 
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Margin="20,10" FontSize="14" Text="{Binding Result}" Width="100" Height="20"/>
-            <TextBlock Margin="20,10" FontSize="14" Text="{Binding Message}" Width="100" Height="20"/>
-            <CheckBox Margin="20,10"  FontSize="14" IsChecked="{Binding Parallel}">Parallel</CheckBox>
+            <Border BorderBrush="Bisque" BorderThickness="4" CornerRadius="10">
+            <StackPanel>
+                <TextBlock Text="Result"></TextBlock>
+                <TextBlock Margin="20,10" FontSize="14" Text="{Binding Result}" Width="100" Height="20"/>
+            </StackPanel>
+            </Border>
+            <StackPanel>
+                <TextBlock Text="Message" FontFamily="Snap ITC"></TextBlock>
+                <TextBlock Margin="20,10" FontSize="14" Text="{Binding Message}" Width="100" Height="20"/>
+            </StackPanel>
+        <CheckBox Margin="20,10" IsChecked="{Binding Parallel}">Parallel</CheckBox>
         </StackPanel>
 
         <Button
@@ -29,10 +50,14 @@
             Width="70"
             Grid.Row="1">Step</Button>
 
-        <TextBlock FontSize="14"
-                   Grid.Row="2" 
+
+
+        <StackPanel Grid.Row="2" Margin="50,50,0,0" >
+            <TextBlock Text="Time"></TextBlock>
+            <TextBlock FontSize="14"
                    Text="{Binding Time}" 
                    Width="200" Height="100"/>
+        </StackPanel>
         
     </Grid>
 

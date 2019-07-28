@@ -8,11 +8,27 @@
         Fast
     }
 
+    public enum AnimationMode
+    {
+        Stop,
+        Run,
+        Step,
+        Reset
+    }
+
     public enum StageLayout
     {
         Single,
         Loose,
-        Tight
+        Tight,
+        Undefined
+    }
+
+    public enum SortableType
+    {
+        Integer,
+        Bool,
+        Undefined
     }
 
 

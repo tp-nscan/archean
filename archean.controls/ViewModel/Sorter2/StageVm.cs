@@ -98,14 +98,19 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
 
-        public static SortableItemVm[] ScrambledSortableVms(int keyCount, int seed, bool showLabels)
+        public static SortableItemVm[] RandomPermutationSortableItemVms(int keyCount, int seed, bool showLabels)
         {
             return
-                ScramblePos(keyCount, seed).ToRedBlueSortableVms(keyCount, showLabels);
+                RandomPermutation(keyCount, seed).ToRedBlueSortableVms(keyCount, showLabels);
         }
 
+        public static SortableItemVm[] Random_0_1_SortableItemVms(int keyCount, int seed, bool showLabels)
+        {
+            return
+                Random_0_1_Array(keyCount, seed).ToBlackOrWhiteSortableVms(keyCount, showLabels);
+        }
 
-        public static int[] ScramblePos(int order, int seed)
+        public static int[] RandomPermutation(int order, int seed)
         {
             return
                     core.Combinatorics.FisherYatesShuffle(
@@ -114,6 +119,15 @@ namespace archean.controls.ViewModel.Sorter2
                 ).ToArray();
         }
 
+        public static int[] Random_0_1_Array(int order, int seed)
+        {
+            return
+                    core.Combinatorics.Random_0_1(
+                    rnd:new Random(seed),
+                    len:order, 
+                    pctOnes: 0.5
+                ).ToArray();
+        }
 
         public static StageVm ToNextStep(this StageVm stageVm, SortableItemVm[] sortableItemVms = null)
         {
@@ -196,6 +210,19 @@ namespace archean.controls.ViewModel.Sorter2
                     keyPairVms: stageVm.KeyPairVms.Select(kpvm => kpvm.ResetUseHistory()),
                     sortableItemVms: stageVm.SortableItemVms,
                     sortableItemVmsOld: stageVm.SortableItemVmsOld
+                 );
+        }
+
+        public static StageVm ClearAll(this StageVm stageVm)
+        {
+            return new StageVm(
+                    stageVmStep: stageVm.StageVmStep,
+                    stageIndex: stageVm.StageIndex,
+                    stageVmStyle: stageVm.StageVmStyle,
+                    order: stageVm.Order,
+                    keyPairVms: stageVm.KeyPairVms.Select(kpvm => kpvm.ResetUseHistory()),
+                    sortableItemVms: null,
+                    sortableItemVmsOld: null
                  );
         }
 

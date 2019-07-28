@@ -55,11 +55,11 @@ namespace archean.ViewModel.Pages
                 int successCount = 0;
                 if(Parallel)
                 {
-                    successCount = core.Benchmarks.SorterBenchB(123, 16, 80, 300);
+                    successCount = core.Benchmarks.SorterBenchB(123, 12, 60, 100);
                 }
                 else
                 {
-                    successCount = core.Benchmarks.SorterBenchA(123, 16, 80, 300);
+                    successCount = core.Benchmarks.SorterBenchA(123, 12, 60, 100);
                 }
 
                 Result = successCount.ToString();

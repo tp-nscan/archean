@@ -56,7 +56,7 @@ namespace archean.controls.View.Sorter2
             //}
             //else
             //{
-            //    StageVm.DrawSortableValues(dc, ActualWidth, ActualHeight);
+                StageVm.DrawSortableValues(dc, ActualWidth, ActualHeight);
             //}
         }
 

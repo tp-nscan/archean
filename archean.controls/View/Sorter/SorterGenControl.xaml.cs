@@ -1,8 +1,5 @@
-﻿using archean.controls.ViewModel;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 
 namespace archean.controls.View.Sorter
@@ -23,7 +20,7 @@ namespace archean.controls.View.Sorter
 
 
 
-        #region StageLayout
+        #region RefSorters
 
         List<core.SortersFromData.RefSorter> _refSorters;
 

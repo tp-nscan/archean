@@ -84,7 +84,6 @@ namespace archean.controls.View.Sorter
             });
         }
 
-
         protected override void OnRender(DrawingContext dc)
         {
             if (StageVm == null)
@@ -109,6 +108,7 @@ namespace archean.controls.View.Sorter
                 StageVm.DrawSortableValues(dc, ActualWidth, ActualHeight);
             }
         }
+
 
         public double TicsPerStep = DEFAULT_TICS_PER_STEP;
         public double RenderInterval = DEFAULT_TICS_PER_STEP;

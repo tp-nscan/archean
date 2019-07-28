@@ -74,17 +74,36 @@ namespace archean.controls.ViewModel.Sorter2
                 Enumerable.Range(0, order).Select
                 (i =>
                    new SortableItemVm(
-                        backgroundBrush: csB[i],
+                        backgroundBrush: csB[positions[i]],
                         foregroundBrush: Brushes.White,
                         showLabel: showLabel,
                         stageSection: -1,
                         stagePos: StagePos.Left,
-                        keyLinePos: positions[i],
-                        label: i,
-                        sortableValue: i)
+                        keyLinePos: i,
+                        label: positions[i],
+                        sortableValue: positions[i])
                 ).ToArray();
         }
 
+        public static SortableItemVm[] ToBlackOrWhiteSortableVms(this int[] positions, int order, bool showLabel)
+        {
+            Func<int, SolidColorBrush> bkB = i => (i == 0) ? Brushes.White : Brushes.Black;
+            Func<int, SolidColorBrush> fgB = i => (i == 0) ? Brushes.Black : Brushes.White;
+
+            return
+                Enumerable.Range(0, order).Select
+                (i =>
+                   new SortableItemVm(
+                        backgroundBrush: bkB(positions[i]),
+                        foregroundBrush: fgB(positions[i]),
+                        showLabel: showLabel,
+                        stageSection: -1,
+                        stagePos: StagePos.Left,
+                        keyLinePos: i,
+                        label: positions[i],
+                        sortableValue: positions[i])
+                ).ToArray();
+        }
 
         public static SortableItemVm ToLeftSortableVm(this SortableItemVm sortableVm)
         {

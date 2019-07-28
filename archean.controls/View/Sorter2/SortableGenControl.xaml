@@ -1,12 +1,11 @@
-﻿<UserControl x:Name="userControl" x:Class="archean.controls.View.Sorter2.SorterRunControl"
+﻿<UserControl x:Class="archean.controls.View.Sorter2.SortableGenControl"
+             x:Name="userControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Converters="clr-namespace:archean.controls.Utils.Converters"
-             xmlns:utils="clr-namespace:archean.controls.View.Utils"
-             mc:Ignorable="d" 
-             d:DesignHeight="90" d:DesignWidth="900">
+             mc:Ignorable="d" >
 
     <UserControl.Resources>
         <Converters:PassThruConverter x:Key="PassThruConverter"/>
@@ -36,23 +35,15 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
-        
+
     </UserControl.Resources>
-
-    <Grid >
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-
-            <utils:AnimationControl/>
-
-            <GroupBox Style="{DynamicResource groupBoxStyle}" Header="Layout" >
-                <StackPanel Orientation="Horizontal">
-                    <ComboBox ItemsSource="{Binding StageLayouts, ElementName=userControl}" 
-                              SelectedItem="{Binding StageLayout, ElementName=userControl}" 
+    <Grid>
+        <GroupBox Style="{DynamicResource groupBoxStyle}" Header="Sortables" >
+            <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding SortableTypes, ElementName=userControl}" 
+                              SelectedItem="{Binding SortableType, ElementName=userControl}" 
                               Style="{DynamicResource cboStyle}"/>
-                </StackPanel>
-            </GroupBox>
-
-        </StackPanel>
-
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </UserControl>

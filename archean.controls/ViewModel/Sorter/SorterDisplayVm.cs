@@ -23,8 +23,6 @@ namespace archean.controls.ViewModel.Sorter
             CurrentStageVm = StageVms[currentstageIndex];
         }
 
-        public List<Sorting.ISwitch[][]> SwitchBlockSets { get; private set;}
-
         public int Order { get; set; }
 
         public Sorting.StagedSorterDef StagedSorterDef { get; }

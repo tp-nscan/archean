@@ -5,6 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Source="Pages/MenuPage.xaml"
-        Title="NavWindow" Height="450" Width="800">
+        Title="NavWindow" Height="800" Width="1200">
 
 </NavigationWindow>

@@ -1,10 +1,10 @@
-﻿<UserControl x:Name="userControl" x:Class="archean.controls.View.Sorter2.SorterRunControl"
+﻿<UserControl x:Name="userControl" 
+             x:Class="archean.controls.View.Utils.AnimationControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Converters="clr-namespace:archean.controls.Utils.Converters"
-             xmlns:utils="clr-namespace:archean.controls.View.Utils"
              mc:Ignorable="d" 
              d:DesignHeight="90" d:DesignWidth="900">
 
@@ -42,15 +42,35 @@
     <Grid >
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-            <utils:AnimationControl/>
+            <TextBlock Width="50" Height="50" FontSize="20"  
+                       Text="{Binding AnimationState.TotalSteps, ElementName=userControl, Mode=OneWay}" 
+                       Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
 
-            <GroupBox Style="{DynamicResource groupBoxStyle}" Header="Layout" >
+            <Button x:Name="btnStep"
+                Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding StepCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Step"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding StartCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Start"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding StopCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Stop"/>
+
+            <Button Style="{StaticResource btnStyleBigPanel}"
+                Command="{Binding ResetCommand, ElementName=userControl, Mode=OneWay}"
+                Content="Reset"/>
+
+            <GroupBox Style="{DynamicResource groupBoxStyle}" Header="Animation" >
                 <StackPanel Orientation="Horizontal">
-                    <ComboBox ItemsSource="{Binding StageLayouts, ElementName=userControl}" 
-                              SelectedItem="{Binding StageLayout, ElementName=userControl}" 
+                    <ComboBox ItemsSource="{Binding AnimationSpeeds, ElementName=userControl}" 
+                              SelectedItem="{Binding AnimationSpeed, ElementName=userControl}" 
                               Style="{DynamicResource cboStyle}"/>
                 </StackPanel>
             </GroupBox>
+
 
         </StackPanel>
 

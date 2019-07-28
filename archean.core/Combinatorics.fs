@@ -4,6 +4,9 @@ open System
 
 module Combinatorics =
 
+    let Random_0_1 (rnd : Random) (len: int) (pctOnes:float) =
+        Seq.init len (fun n -> if (rnd.NextDouble() > pctOnes) then 0 else 1)
+
     // Splits the sourceArray into segments using segBounds
     let BreakIntoSegments (sourceArray : array<'a>) 
                           (segBounds : array<int>) =
