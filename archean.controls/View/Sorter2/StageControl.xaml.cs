@@ -1,8 +1,6 @@
-﻿using archean.controls.ViewModel;
-using archean.controls.ViewModel.Sorter2;
+﻿using archean.controls.ViewModel.Sorter2;
 using System;
 using System.ComponentModel;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -23,7 +21,7 @@ namespace archean.controls.View.Sorter2
 
         void StageControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-
+            if (StageVm == null) return;
             Dispatcher.BeginInvoke(
                 DispatcherPriority.Normal,
                 new Action(() =>
@@ -75,7 +73,7 @@ namespace archean.controls.View.Sorter2
 
         public static readonly DependencyProperty StageVmProperty =
             DependencyProperty.Register("StageVm", typeof(StageVm), typeof(StageControl),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None, OnStageVmPropertyChanged));
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsArrange, OnStageVmPropertyChanged));
 
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

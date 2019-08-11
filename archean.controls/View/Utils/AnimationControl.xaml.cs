@@ -11,10 +11,11 @@ namespace archean.controls.View.Utils
 {
     public partial class AnimationControl
     {
+        const int TICSPERSTEP = 10;
+
         public AnimationControl()
         {
             InitializeComponent();
-
         }
 
         protected void Dispose(bool disposing)
@@ -38,15 +39,24 @@ namespace archean.controls.View.Utils
                 CanStep
             ));
 
+        bool IsStepping { get; set; }
         private void DoStep()
         {
-            if (AnimationState == null)
+            if(AnimationSpeed != AnimationSpeed.Stopped)
             {
-                var s = "S";
+                IsStepping = true;
+                StartTimer();
             }
-            else
+            AnimationState = AnimationState.Step();
+        }
+
+        private void DoRun()
+        {
+            AnimationState = AnimationState.Run();
+            if(IsStepping && AnimationState.AnimationMode == AnimationMode.Step)
             {
-                AnimationState = AnimationState.Step();
+                IsStepping = false;
+                DoStop();
             }
         }
 
@@ -110,12 +120,11 @@ namespace archean.controls.View.Utils
             }
         }
 
-        private double ticks = 0;
         async void OnRenderTimerElapsed(object sender, ElapsedEventArgs e)
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                DoStep();
+                DoRun();
             });
         }
 
@@ -134,7 +143,13 @@ namespace archean.controls.View.Utils
 
         private void DoStart()
         {
-            if ((RenderTimer != null) && (! RenderTimer.Enabled))
+            IsStepping = false;
+            StartTimer();
+        }
+
+        void StartTimer()
+        {
+            if ((RenderTimer != null) && (!RenderTimer.Enabled))
             {
                 RenderTimer.Start();
             }
@@ -156,7 +171,8 @@ namespace archean.controls.View.Utils
 
         RelayCommand _stopCommand;
 
-        public ICommand StopCommand => _stopCommand ?? (_stopCommand = new RelayCommand(
+        public ICommand StopCommand => _stopCommand ?? (
+            _stopCommand = new RelayCommand(
                 DoStop,
                 CanStop
             ));
@@ -164,6 +180,7 @@ namespace archean.controls.View.Utils
         private void DoStop()
         {
             StopTimer();
+            AnimationState = AnimationState.Stop();
         }
 
         bool CanStop()
@@ -189,14 +206,7 @@ namespace archean.controls.View.Utils
 
         private void DoReset()
         {
-            if (AnimationState == null)
-            {
-                var s = "S";
-            }
-            else
-            {
-                AnimationState = AnimationState.Reset();
-            }
+            AnimationState = AnimationState.Reset();
         }
 
         bool CanReset()
@@ -219,12 +229,14 @@ namespace archean.controls.View.Utils
         public AnimationState AnimationState
         {
             get { return (AnimationState)GetValue(AnimationStateProperty); }
-            set { SetValue(AnimationStateProperty, value); }
+            set {
+                SetValue(AnimationStateProperty, value);
+            }
         }
 
         public static readonly DependencyProperty AnimationStateProperty =
             DependencyProperty.Register("AnimationState", typeof(AnimationState), typeof(AnimationControl),
-            new FrameworkPropertyMetadata(OnAnimationStatePropertyChanged));
+            new FrameworkPropertyMetadata(AnimationState.Initial(TICSPERSTEP), OnAnimationStatePropertyChanged));
 
         private static void OnAnimationStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -267,16 +279,26 @@ namespace archean.controls.View.Utils
 
         public static readonly DependencyProperty AnimationSpeedProperty =
             DependencyProperty.Register("AnimationSpeed", typeof(AnimationSpeed), typeof(AnimationControl),
-            new FrameworkPropertyMetadata(OnAnimationSpeedPropertyChanged));
+            new FrameworkPropertyMetadata(AnimationSpeed.Stopped, OnAnimationSpeedPropertyChanged));
 
         private static void OnAnimationSpeedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var animationControl = (AnimationControl)d;
             var newAnimationSpeed = (AnimationSpeed)e.NewValue;
-            animationControl.ResetTimer(newAnimationSpeed.ToUpdateFrequency(), true);
 
-            //animationControl.AnimationState =
-            //      animationControl.AnimationState.ChangeAnimationSpeed(newAnimationSpeed);
+            switch (newAnimationSpeed)
+            {
+                case AnimationSpeed.Stopped:
+                    animationControl.DoStop();
+                    break;
+                case AnimationSpeed.Slow:
+                case AnimationSpeed.Medium:
+                case AnimationSpeed.Fast:
+                    animationControl.ResetTimer(newAnimationSpeed.ToUpdateFrequency(), true);
+                    break;
+                default:
+                    throw new Exception($"{newAnimationSpeed.ToString()} not handled");
+            }
         }
 
         #endregion

@@ -24,8 +24,20 @@ namespace archean.ViewModel.Pages
             get => _sorterDisplayVm;
             set
             {
-                SetProperty(ref _sorterDisplayVm, value);
-                Order = SorterDisplayVm.Order;
+                if(_sorterDisplayVm == null)
+                {
+                    SetProperty(ref _sorterDisplayVm, value);
+                    return;
+                }
+                if(_sorterDisplayVm.StageVms.Count != value.StageVms.Count)
+                {
+                    SetProperty(ref _sorterDisplayVm, value);
+                    return;
+                }
+                for(var stageDex = 0; stageDex < value.StageVms.Count; stageDex++)
+                {
+                    _sorterDisplayVm.StageVms[stageDex] = value.StageVms[stageDex];
+                }
             }
         }
 
@@ -71,6 +83,7 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _stagedSorterDef, value);
+                Order = value.sorterDef.order;
                 ResetSorterDisplayVm();
             }
         }
@@ -127,6 +140,7 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _stageLayout, value);
+                _sorterDisplayVm = null;
                 ResetSorterDisplayVm();
             }
         }
@@ -137,6 +151,26 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _animationState, value);
+
+                switch (value.AnimationMode)
+                {
+                    case AnimationMode.Stop:
+                        Console.WriteLine(value.AnimationMode.ToString());
+                        break;
+                    case AnimationMode.Run:
+                        Console.WriteLine(value.AnimationMode.ToString());
+                        break;
+                    case AnimationMode.Step:
+                        Console.WriteLine(value.AnimationMode.ToString());
+                        ResetSorterDisplayVm();
+                        break;
+                    case AnimationMode.Reset:
+                        Console.WriteLine(value.AnimationMode.ToString());
+                        break;
+                    default:
+                        throw new Exception($"{value.AnimationMode.ToString()} unknown");
+                }
+
             }
             get => (AnimationState)_animationState;
         }

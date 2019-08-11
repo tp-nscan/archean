@@ -75,7 +75,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <utils:AnimationControl AnimationState="{Binding AnimationState}"/>
+            <utils:AnimationControl AnimationState="{Binding AnimationState, Mode=OneWayToSource}"/>
 
         </StackPanel>
 

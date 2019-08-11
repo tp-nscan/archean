@@ -6,19 +6,28 @@ namespace archean.controls.Utils
     {
         public AnimationState(
             AnimationMode animationMode,
-            AnimationSpeed animationSpeed,
-            int totalSteps)
+            int currentStep,
+            int currentTic,
+            int ticsPerStep)
         {
             AnimationMode = animationMode;
-            AnimationSpeed = animationSpeed;
-            TotalSteps = totalSteps;
+            CurrentStep = currentStep;
+            CurrentTic = currentTic;
+            TicsPerStep = ticsPerStep;
         }
-
-        public AnimationSpeed AnimationSpeed { get; }
-        public int TotalSteps { get; }
+        public int CurrentTic { get; }
+        public int CurrentStep { get; }
+        public int TicsPerStep { get; }
         public AnimationMode AnimationMode { get; }
+        public static AnimationState Initial(int ticsPerStep)
+        {
+            return new AnimationState(
+              animationMode: AnimationMode.Stop,
+              currentStep: 0,
+              currentTic: 0,
+              ticsPerStep: ticsPerStep);
+        }
     }
-
 
     public static class AnimationStateExt
     {
@@ -35,32 +44,46 @@ namespace archean.controls.Utils
         {
             return new AnimationState(
                 animationMode: AnimationMode.Stop,
-                animationSpeed: animationState.AnimationSpeed,
-                totalSteps: animationState.TotalSteps);
-        }
-
-        public static AnimationState ChangeAnimationSpeed(this AnimationState animationState, AnimationSpeed animationSpeed)
-        {
-            return new AnimationState(
-                animationMode: animationState.AnimationMode,
-                animationSpeed: animationSpeed,
-                totalSteps: animationState.TotalSteps);
+                currentStep: animationState.CurrentStep,
+                currentTic: animationState.CurrentTic,
+                ticsPerStep: animationState.TicsPerStep);
         }
 
         public static AnimationState Step(this AnimationState animationState)
         {
             return new AnimationState(
-                animationMode: animationState.AnimationMode,
-                animationSpeed: AnimationSpeed.Stopped,
-                totalSteps: animationState.TotalSteps + 1);
+                animationMode: AnimationMode.Step,
+                currentStep: animationState.CurrentStep + 1,
+                currentTic: animationState.CurrentTic,
+                ticsPerStep: animationState.TicsPerStep);
+        }
+
+        public static AnimationState Run(this AnimationState animationState)
+        {
+            if(animationState.CurrentTic == animationState.TicsPerStep)
+            {
+                return new AnimationState(
+                    animationMode: AnimationMode.Step,
+                    currentStep: animationState.CurrentStep,
+                    currentTic: 0,
+                    ticsPerStep: animationState.TicsPerStep);
+            }
+
+            return new AnimationState(
+                    animationMode: AnimationMode.Run,
+                    currentStep: animationState.CurrentStep,
+                    currentTic: animationState.CurrentTic + 1,
+                    ticsPerStep: animationState.TicsPerStep);
         }
 
         public static AnimationState Reset(this AnimationState animationState)
         {
             return new AnimationState(
                 animationMode: AnimationMode.Reset,
-                animationSpeed: animationState.AnimationSpeed,
-                totalSteps: 0);
+                currentStep: 0,
+                currentTic: 0,
+                ticsPerStep: animationState.TicsPerStep);
         }
+
     }
 }

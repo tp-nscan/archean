@@ -124,6 +124,15 @@ namespace archean.controls.ViewModel.Sorter2
 
         }
 
+        static Pen _sortableBorderPen;
+        static Pen SortableBorderPen
+        {
+            get
+            {
+                return _sortableBorderPen ?? (_sortableBorderPen = new Pen(Brushes.Black, 1.0));
+            }
+        }
+
 
         public static void DrawSortableValue(this StageVm stageVm, DrawingContext dc,
                                                   SortableItemVm sortableVm,
@@ -141,7 +150,7 @@ namespace archean.controls.ViewModel.Sorter2
             var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
 
             var center = stageVm.GetSortableItemPosition(sortableVm, stageRenderWidth, stageRenderHeight);
-            dc.DrawEllipse(sortableVm.BackgroundBrush, null, center, radius, radius);
+            dc.DrawEllipse(sortableVm.BackgroundBrush, SortableBorderPen, center, radius, radius);
 
             if(sortableVm.ShowLabel)
             {

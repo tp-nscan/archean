@@ -43,7 +43,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
             <TextBlock Width="50" Height="50" FontSize="20"  
-                       Text="{Binding AnimationState.TotalSteps, ElementName=userControl, Mode=OneWay}" 
+                       Text="{Binding AnimationState.CurrentStep, ElementName=userControl, Mode=OneWay}" 
                        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
 
             <Button x:Name="btnStep"
