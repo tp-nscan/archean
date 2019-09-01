@@ -10,11 +10,11 @@ namespace archean.ViewModel.Pages
 {
     public class SorterPageVm2 : BindableBase
     {
-        SwitchUseWrap SwitchUseWrap;
+        SwitchUseWrap MaxSwitchUseInSorter;
 
         public SorterPageVm2()
         {
-            SwitchUseWrap = new SwitchUseWrap();
+            MaxSwitchUseInSorter = new SwitchUseWrap();
         }
 
 
@@ -100,21 +100,25 @@ namespace archean.ViewModel.Pages
                 return;
             }
 
-            SortableItemVm[] sortableItemVms = null;
+            SortableVm sortableVm = null;
             if (SortableItemVmsGen != null)
             {
-                sortableItemVms = SortableItemVmsGen.Invoke();
+                sortableVm = new SortableVm(
+                    currentSortableItemVms: SortableItemVmsGen.Invoke(),
+                    nextSortableItemVms:null,
+                    stageVmStep:StageVmStep.Left,
+                    animationPct: 0);
             }
 
             var switchBlockSets = _stagedSorterDef.ToSwitchBlockSets(StageLayout).ToList();
 
-            SwitchUseWrap.Value = 1;
+            MaxSwitchUseInSorter.Value = 1;
 
             var stageVms = switchBlockSets.ToStageVms(
-                stageVmStyle: StageVmStyle.Standard(false, SwitchUseWrap),
+                stageVmStyle: StageVmStyle.Standard(false, MaxSwitchUseInSorter),
                 alternatingBrush: StageVmStyleExt.AlternatingBrush,
                 order: _stagedSorterDef.sorterDef.order,
-                sortableItemVms: sortableItemVms);
+                sortableVm: sortableVm);
 
             SorterDisplayVm = new SorterDisplayVm(
                     order: _stagedSorterDef.sorterDef.order,
@@ -152,23 +156,35 @@ namespace archean.ViewModel.Pages
             {
                 SetProperty(ref _animationState, value);
 
-                switch (value.AnimationMode)
+                Console.WriteLine(value.UpdateMode.ToString());
+
+                if (SorterDisplayVm == null) return;
+                switch (value.UpdateMode)
                 {
-                    case AnimationMode.Stop:
-                        Console.WriteLine(value.AnimationMode.ToString());
+                    case UpdateMode.Stop:
                         break;
-                    case AnimationMode.Run:
-                        Console.WriteLine(value.AnimationMode.ToString());
+                    case UpdateMode.Tic:
+                        SorterDisplayVm = SorterDisplayVm.Tic();
+
                         break;
-                    case AnimationMode.Step:
-                        Console.WriteLine(value.AnimationMode.ToString());
-                        ResetSorterDisplayVm();
+                    case UpdateMode.Step:
+                        SortableItemVm[] sortableItemVms = null;
+                        if (SortableItemVmsGen != null)
+                        {
+                            sortableItemVms = SortableItemVmsGen.Invoke();
+                        }
+                        SorterDisplayVm = SorterDisplayVm.Step(sortableItemVms);
                         break;
-                    case AnimationMode.Reset:
-                        Console.WriteLine(value.AnimationMode.ToString());
+                    case UpdateMode.Reset:
+                        SorterDisplayVm = SorterDisplayVm.ResetSorterDisplayVm(
+                                stagedSorterDef: StagedSorterDef,
+                                stageLayout: StageLayout,
+                                sortableItemVmsGen: SortableItemVmsGen,
+                                maxSwitchUseInSorter: MaxSwitchUseInSorter
+                            );
                         break;
                     default:
-                        throw new Exception($"{value.AnimationMode.ToString()} unknown");
+                        throw new Exception($"{value.UpdateMode.ToString()} unknown");
                 }
 
             }

@@ -31,8 +31,6 @@ namespace archean.controls.View.Sorter2
                 }));
         }
 
-
-
         protected override void OnRender(DrawingContext dc)
         {
             if (StageVm == null)
@@ -58,10 +56,6 @@ namespace archean.controls.View.Sorter2
             //}
         }
 
-        public double TicsPerStep = DEFAULT_TICS_PER_STEP;
-        public double RenderInterval = DEFAULT_TICS_PER_STEP;
-
-
         #region StageVm
 
         [Category("Custom Properties")]
@@ -78,17 +72,7 @@ namespace archean.controls.View.Sorter2
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var stageControl = (StageControl)d;
-
-            if ((stageControl.StageVm.SortableItemVms != null) &&
-                (stageControl.StageVm.SortableItemVmsOld != null))
-            {
-                //stageControl.StartTimer(stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateFrequency());
-                //stageControl.TicsPerStep = stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateSteps();
-            }
-            else
-            {
-                stageControl.InvalidateVisual();
-            }
+            stageControl.InvalidateVisual();
         }
 
         #endregion

@@ -5,12 +5,12 @@ namespace archean.controls.Utils
     public class AnimationState
     {
         public AnimationState(
-            AnimationMode animationMode,
+            UpdateMode updateMode,
             int currentStep,
             int currentTic,
             int ticsPerStep)
         {
-            AnimationMode = animationMode;
+            UpdateMode = updateMode;
             CurrentStep = currentStep;
             CurrentTic = currentTic;
             TicsPerStep = ticsPerStep;
@@ -18,11 +18,11 @@ namespace archean.controls.Utils
         public int CurrentTic { get; }
         public int CurrentStep { get; }
         public int TicsPerStep { get; }
-        public AnimationMode AnimationMode { get; }
+        public UpdateMode UpdateMode { get; }
         public static AnimationState Initial(int ticsPerStep)
         {
             return new AnimationState(
-              animationMode: AnimationMode.Stop,
+              updateMode: UpdateMode.Stop,
               currentStep: 0,
               currentTic: 0,
               ticsPerStep: ticsPerStep);
@@ -37,13 +37,13 @@ namespace archean.controls.Utils
             {
                 return false;
             }
-            return animationState.AnimationMode == AnimationMode.Run;
+            return animationState.UpdateMode == UpdateMode.Tic;
         }
 
         public static AnimationState Stop(this AnimationState animationState)
         {
             return new AnimationState(
-                animationMode: AnimationMode.Stop,
+                updateMode: UpdateMode.Stop,
                 currentStep: animationState.CurrentStep,
                 currentTic: animationState.CurrentTic,
                 ticsPerStep: animationState.TicsPerStep);
@@ -52,7 +52,7 @@ namespace archean.controls.Utils
         public static AnimationState Step(this AnimationState animationState)
         {
             return new AnimationState(
-                animationMode: AnimationMode.Step,
+                updateMode: UpdateMode.Step,
                 currentStep: animationState.CurrentStep + 1,
                 currentTic: animationState.CurrentTic,
                 ticsPerStep: animationState.TicsPerStep);
@@ -63,14 +63,14 @@ namespace archean.controls.Utils
             if(animationState.CurrentTic == animationState.TicsPerStep)
             {
                 return new AnimationState(
-                    animationMode: AnimationMode.Step,
+                    updateMode: UpdateMode.Step,
                     currentStep: animationState.CurrentStep,
                     currentTic: 0,
                     ticsPerStep: animationState.TicsPerStep);
             }
 
             return new AnimationState(
-                    animationMode: AnimationMode.Run,
+                    updateMode: UpdateMode.Tic,
                     currentStep: animationState.CurrentStep,
                     currentTic: animationState.CurrentTic + 1,
                     ticsPerStep: animationState.TicsPerStep);
@@ -79,7 +79,7 @@ namespace archean.controls.Utils
         public static AnimationState Reset(this AnimationState animationState)
         {
             return new AnimationState(
-                animationMode: AnimationMode.Reset,
+                updateMode: UpdateMode.Reset,
                 currentStep: 0,
                 currentTic: 0,
                 ticsPerStep: animationState.TicsPerStep);

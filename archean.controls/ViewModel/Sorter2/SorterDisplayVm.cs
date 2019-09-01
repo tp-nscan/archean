@@ -40,7 +40,7 @@ namespace archean.controls.ViewModel.Sorter2
                                             StageVmStyle stageVmStyle,
                                             Brush alternating,
                                             int order, 
-                                            SortableItemVm[] sortableItemVms)
+                                            SortableVm sortableVm)
         {
             var indexInSorter = 0;
             yield return
@@ -48,8 +48,7 @@ namespace archean.controls.ViewModel.Sorter2
                     stageIndex: indexInSorter++, 
                     stageVmStyle: stageVmStyle,
                     order: order, 
-                    sortableVms: sortableItemVms,
-                    stageVmStep: StageVmStep.Left);
+                    sortableVms: sortableVm);
 
             while (true)
             {
@@ -58,15 +57,13 @@ namespace archean.controls.ViewModel.Sorter2
                             stageIndex: indexInSorter++,
                             stageVmStyle: stageVmStyle.ChangeBackground(alternating),
                             order: order,
-                            sortableVms: null,
-                            stageVmStep: StageVmStep.None);
+                            sortableVms: null);
                     yield return
                         switchblocks => switchblocks.SwitchBlocksToStageVm(
                             stageIndex: indexInSorter++,
                             stageVmStyle: stageVmStyle,
                             order: order,
-                            sortableVms: null,
-                            stageVmStep: StageVmStep.None);
+                            sortableVms: null);
             };
         }
 
@@ -75,16 +72,14 @@ namespace archean.controls.ViewModel.Sorter2
                             StageVmStyle stageVmStyle,
                             Brush alternatingBrush,
                             int order,
-                            SortableItemVm[] sortableItemVms)
+                            SortableVm sortableVm)
         {
             return switchBlockSets.Zip
                 (
-                    StageVmMaps(stageVmStyle, alternatingBrush, order, sortableItemVms),
+                    StageVmMaps(stageVmStyle, alternatingBrush, order, sortableVm),
                     (s, m) => m(s)
                 );
         }
-
-        public static Brush AlternatingBrush => new SolidColorBrush(Color.FromScRgb(0.3f, 0, 0, 0));
 
         public static IEnumerable<Sorting.ISwitch[][]> ToSwitchBlockSets(
             this Sorting.StagedSorterDef stagedSorterDef,
@@ -113,32 +108,28 @@ namespace archean.controls.ViewModel.Sorter2
 
         public static IEnumerable<StageVm> ResetSortables(
                                 this IEnumerable<StageVm> stageVms, 
-                                SortableItemVm[] sortableItemVms)
+                                SortableVm sortableVm)
         {
             foreach(var stvm in stageVms)
             {
                 if(stvm.StageIndex==0)
                 {
                     yield return new StageVm(
-                        stageVmStep: StageVmStep.Left,
                         stageIndex: stvm.StageIndex,
                         stageVmStyle: stvm.StageVmStyle,
                         order: stvm.Order,
                         keyPairVms: stvm.KeyPairVms,
-                        sortableItemVms: sortableItemVms,
-                        sortableItemVmsOld: null
+                        sortableVms: sortableVm
                     );
                 }
                 else
                 {
                     yield return new StageVm(
-                        stageVmStep: StageVmStep.None,
                         stageIndex: stvm.StageIndex,
                         stageVmStyle: stvm.StageVmStyle,
                         order: stvm.Order,
                         keyPairVms: stvm.KeyPairVms,
-                        sortableItemVms: null,
-                        sortableItemVmsOld: null
+                        sortableVms: null
                     );
                 }
             }
@@ -148,11 +139,68 @@ namespace archean.controls.ViewModel.Sorter2
                     this SorterDisplayVm sorterDisplayVm,
                     SortableItemVm[] sortableItemVms)
         {
+
+
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
                     stageVms: sorterDisplayVm.StageVms
                 );
         }
+
+        public static SorterDisplayVm Tic(
+            this SorterDisplayVm sorterDisplayVm,
+            SortableItemVm[] sortableItemVms = null)
+        {
+            return new SorterDisplayVm(
+                    order: sorterDisplayVm.Order,
+                    stageVms: sorterDisplayVm.StageVms
+                );
+        }
+
+        public static SorterDisplayVm ResetSorterDisplayVm(
+                this SorterDisplayVm sorterDisplayVm,
+                Sorting.StagedSorterDef stagedSorterDef,
+                StageLayout stageLayout,
+                Func<SortableItemVm[]> sortableItemVmsGen,
+                SwitchUseWrap maxSwitchUseInSorter
+            )
+        {
+            if (stagedSorterDef == null)
+            {
+                return null;
+            }
+            if (stageLayout == StageLayout.Undefined)
+            {
+                return null;
+            }
+
+            SortableVm sortableVm = null;
+            if (sortableItemVmsGen != null)
+            {
+                sortableVm = new SortableVm(
+                    currentSortableItemVms: sortableItemVmsGen.Invoke(),
+                    nextSortableItemVms: null,
+                    stageVmStep: StageVmStep.Left,
+                    animationPct: 0);
+            }
+
+            var switchBlockSets = stagedSorterDef.ToSwitchBlockSets(stageLayout).ToList();
+
+            maxSwitchUseInSorter.Value = 1;
+
+            var stageVms = switchBlockSets.ToStageVms(
+                stageVmStyle: StageVmStyle.Standard(false, maxSwitchUseInSorter),
+                alternatingBrush: StageVmStyleExt.AlternatingBrush,
+                order: stagedSorterDef.sorterDef.order,
+                sortableVm: sortableVm);
+
+            return new SorterDisplayVm(
+                    order: stagedSorterDef.sorterDef.order,
+                    stageVms: stageVms
+                );
+        }
+
+
 
     }
 }

@@ -53,7 +53,7 @@ namespace archean.controls.View.Utils
         private void DoRun()
         {
             AnimationState = AnimationState.Run();
-            if(IsStepping && AnimationState.AnimationMode == AnimationMode.Step)
+            if(IsStepping && AnimationState.UpdateMode == UpdateMode.Step)
             {
                 IsStepping = false;
                 DoStop();
@@ -117,6 +117,7 @@ namespace archean.controls.View.Utils
             if (RenderTimer != null)
             {
                 RenderTimer.Enabled = false;
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -127,7 +128,6 @@ namespace archean.controls.View.Utils
                 DoRun();
             });
         }
-
 
         #endregion
 

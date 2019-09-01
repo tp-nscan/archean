@@ -165,13 +165,12 @@ namespace archean.controls.ViewModel.Sorter2
             }
         }
 
-
         public static void DrawSortableValues(this StageVm stageVm, DrawingContext dc, 
                                                    double stageRenderWidth, double stageRenderHeight)
         {
-            if (stageVm.SortableItemVms == null) return;
+            if (stageVm.SortableVms?.CurrentSortableItemVms == null) return;
 
-            foreach (var sortableVm in stageVm.SortableItemVms)
+            foreach (var sortableVm in stageVm.SortableVms.CurrentSortableItemVms)
             {
                 stageVm.DrawSortableValue(dc, sortableVm, stageRenderWidth, stageRenderHeight);
             }
@@ -179,10 +178,9 @@ namespace archean.controls.ViewModel.Sorter2
 
         public static void DrawSortableValueAnimate(this StageVm stageVm,
                 SortableItemVm sortableItemVmOld,
-                double pctAlong,
                 DrawingContext dc,
                 SortableItemVm sortableItemVm,
-                double stageRenderWidth, 
+                double stageRenderWidth,
                 double stageRenderHeight)
         {
             if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
@@ -199,7 +197,7 @@ namespace archean.controls.ViewModel.Sorter2
             var centerO = stageVm.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
             var centerN = stageVm.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
 
-            var center = centerO.Interpolate(centerN, pctAlong);
+            var center = centerO.Interpolate(centerN, stageVm.SortableVms.AnimationPct);
 
             dc.DrawEllipse(sortableItemVm.BackgroundBrush, null, center, radius, radius);
 
@@ -216,22 +214,21 @@ namespace archean.controls.ViewModel.Sorter2
             }
         }
 
+
         public static void DrawSortableValuesAnimate(
             this StageVm stageVm,
-            double pctAlong,
             DrawingContext dc,
             double stageRenderWidth,
             double stageRenderHeight)
         {
-            if (stageVm.SortableItemVms == null) return;
+            if (stageVm.SortableVms?.CurrentSortableItemVms == null) return;
 
-            for (var i = 0; i < stageVm.SortableItemVms.Length; i++)
+            for (var i = 0; i < stageVm.SortableVms.CurrentSortableItemVms.Length; i++)
             {
                 stageVm.DrawSortableValueAnimate(
-                    stageVm.SortableItemVmsOld[i],
-                    pctAlong,
-                    dc,
-                    stageVm.SortableItemVms[i],
+                    sortableItemVmOld: stageVm.SortableVms.CurrentSortableItemVms[i],
+                    dc: dc,
+                    sortableItemVm: stageVm.SortableVms.CurrentSortableItemVms[i],
                     stageRenderWidth,
                     stageRenderHeight);
             }

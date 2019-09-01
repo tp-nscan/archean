@@ -8,10 +8,10 @@
         Fast
     }
 
-    public enum AnimationMode
+    public enum UpdateMode
     {
         Stop,
-        Run,
+        Tic,
         Step,
         Reset
     }

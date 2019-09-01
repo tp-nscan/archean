@@ -12,21 +12,17 @@ namespace archean.controls.ViewModel.Sorter2
 
         public StageVm(
             int stageIndex,
-            StageVmStep stageVmStep,
             StageVmStyle stageVmStyle,
             int order,
             IEnumerable<KeyPairVm> keyPairVms,
-            SortableItemVm[] sortableItemVms,
-            SortableItemVm[] sortableItemVmsOld
-            )
+            SortableVm sortableVms
+        )
         {
             StageIndex = stageIndex;
-            StageVmStep = stageVmStep;
             StageVmStyle = stageVmStyle;
             Order = order;
             _keyPairVms = keyPairVms.ToList();
-            SortableItemVms = sortableItemVms;
-            SortableItemVmsOld = sortableItemVmsOld;
+            SortableVms = sortableVms;
             SectionCount = _keyPairVms.Max(vm => vm.StageSection) + 1;
             VmWidth = StageVmStyle.StageRightMargin + 
                       StageVmStyle.SwitchHSpacing * SectionCount;
@@ -35,30 +31,22 @@ namespace archean.controls.ViewModel.Sorter2
                       StageVmStyle.KeyLineHeight;
         }
 
-        public void RaiseAnimationFinished()
-        {
-            _animationFinished.OnNext(this);
-        }
-
-        public int StageIndex { get; }
-        public StageVmStep StageVmStep { get; }
+        public IEnumerable<KeyPairVm> KeyPairVms { get { return _keyPairVms; } }
         public int Order { get; }
-        public SortableItemVm[] SortableItemVms { get; }
-        public SortableItemVm[] SortableItemVmsOld { get; }
+        public int SectionCount { get; }
+        public int StageIndex { get; }
+        public SortableVm SortableVms { get; }
         public StageVmStyle StageVmStyle { get; }
         readonly List<KeyPairVm> _keyPairVms;
-        public IEnumerable<KeyPairVm> KeyPairVms { get { return _keyPairVms; } }
-
-        public int SectionCount { get; }
+        public double WidthToHeight { get { return (VmHeight > 0) ? VmWidth / VmHeight : 0.0;  } }
         public double VmHeight { get; }
         public double VmWidth { get; }
-        public double WidthToHeight { get { return (VmHeight > 0) ? VmWidth / VmHeight : 0.0;  } }
     }
 
 
     public static class StageVmProcs
     {
-        public static StageVm StageToStageVm(this core.Sorting.Stage stage,
+        public static StageVm ToStageVmNoSortables(this core.Sorting.Stage stage,
                                                   int stageIndex,
                                                   StageVmStyle stageVmStyle, 
                                                   int keyCount)
@@ -66,13 +54,11 @@ namespace archean.controls.ViewModel.Sorter2
             var swLayout = core.Sorting.StageLayout.LayoutSwitchesLoose(keyCount, stage.switches);
             var kpVms = swLayout.ToKeyPairVms(stageIndex, stageVmStyle);
             return new StageVm(
-                    stageVmStep: StageVmStep.None,
                     stageIndex: stageIndex,
                     stageVmStyle: stageVmStyle,
                     order: keyCount,
                     keyPairVms: kpVms,
-                    sortableItemVms: null,
-                    sortableItemVmsOld: null
+                    sortableVms: null
                  );
         }
 
@@ -82,18 +68,15 @@ namespace archean.controls.ViewModel.Sorter2
                             int stageIndex,
                             StageVmStyle stageVmStyle, 
                             int order,
-                            SortableItemVm[] sortableVms,
-                            StageVmStep stageVmStep)
+                            SortableVm sortableVms)
         {
             var kpVms = switchBlocks.ToKeyPairVms(stageIndex, stageVmStyle);
             return new StageVm(
-                    stageVmStep: stageVmStep,
                     stageIndex: stageIndex,
                     stageVmStyle: stageVmStyle,
                     order: order,
                     keyPairVms: kpVms,
-                    sortableItemVms: sortableVms,
-                    sortableItemVmsOld: null
+                    sortableVms: sortableVms
                  );
         }
 
@@ -129,72 +112,67 @@ namespace archean.controls.ViewModel.Sorter2
                 ).ToArray();
         }
 
-        public static StageVm ToNextStep(this StageVm stageVm, SortableItemVm[] sortableItemVms = null)
+        public static StageVm ToNextStep(this StageVm stageVm, SortableVm sortableVms = null)
         {
-            switch (stageVm.StageVmStep)
+            switch (stageVm.SortableVms.StageVmStep)
             {
                 case StageVmStep.Left:
                     return new StageVm(
-                            stageVmStep: StageVmStep.Presort,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
                             order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms,
-                            sortableItemVms: stageVm.SortableItemVms.ToPreSortStep(stageVm.KeyPairVms.ToArray()),
-                            sortableItemVmsOld: stageVm.SortableItemVms
+                            sortableVms: stageVm.SortableVms.ToPreSortStep(
+                                stageVm.KeyPairVms.ToArray())
                          );
 
                 case StageVmStep.Presort:
 
-                    var newKeypairVms = stageVm.KeyPairVms.UpdateKeyPairVms(stageVm.SortableItemVms);
-                    var newSortableItemVms = stageVm.SortableItemVms.UpdateSortableVms(stageVm.KeyPairVms);
+                    var newKeypairVms = stageVm.KeyPairVms.UpdateKeyPairVms(stageVm.SortableVms.CurrentSortableItemVms);
+                    var newSortableVms = new SortableVm(
+                        currentSortableItemVms: stageVm.SortableVms.CurrentSortableItemVms.UpdateSortableVms(stageVm.KeyPairVms).ToArray(),
+                        nextSortableItemVms: null,
+                        stageVmStep: stageVm.SortableVms.StageVmStep,
+                        animationPct: 0);
 
                     return new StageVm(
-                            stageVmStep: StageVmStep.PostSort,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
                             order: stageVm.Order,
                             keyPairVms: newKeypairVms,
-                            sortableItemVms: newSortableItemVms.ToPostSortStep(stageVm.KeyPairVms.ToArray()),
-                            sortableItemVmsOld: stageVm.SortableItemVms
+                            sortableVms: newSortableVms.ToPostSortStep(stageVm.KeyPairVms.ToArray())
                          );
 
 
                 case StageVmStep.PostSort:
 
                     return new StageVm(
-                            stageVmStep: StageVmStep.Right,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
                             order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms.Select(kvm=>kvm.ToInactive()),
-                            sortableItemVms: stageVm.SortableItemVms.ToRightStep(),
-                            sortableItemVmsOld: stageVm.SortableItemVms
+                            sortableVms: stageVm.SortableVms.ToRightStep()
                          );
 
                 case StageVmStep.Right:
                     return new StageVm(
-                            stageVmStep: StageVmStep.None,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
                             order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms,
-                            sortableItemVms: null,
-                            sortableItemVmsOld: null
+                            sortableVms: null
                          );
 
                 case StageVmStep.None:
                     return new StageVm(
-                            stageVmStep: StageVmStep.Left,
                             stageIndex: stageVm.StageIndex,
                             stageVmStyle: stageVm.StageVmStyle,
                             order: stageVm.Order,
                             keyPairVms: stageVm.KeyPairVms,
-                            sortableItemVms: sortableItemVms,
-                            sortableItemVmsOld: null
+                            sortableVms: sortableVms
                          );
                 default:
-                    throw new Exception($"{stageVm.StageVmStep} not handled");
+                    throw new Exception($"{stageVm.SortableVms.StageVmStep} not handled");
             }
 
         }
@@ -203,39 +181,33 @@ namespace archean.controls.ViewModel.Sorter2
         public static StageVm ClearSwitchUses(this StageVm stageVm)
         {
             return new StageVm(
-                    stageVmStep: stageVm.StageVmStep,
                     stageIndex: stageVm.StageIndex,
                     stageVmStyle: stageVm.StageVmStyle,
                     order: stageVm.Order,
                     keyPairVms: stageVm.KeyPairVms.Select(kpvm => kpvm.ResetUseHistory()),
-                    sortableItemVms: stageVm.SortableItemVms,
-                    sortableItemVmsOld: stageVm.SortableItemVmsOld
+                    sortableVms: stageVm.SortableVms
                  );
         }
 
         public static StageVm ClearAll(this StageVm stageVm)
         {
             return new StageVm(
-                    stageVmStep: stageVm.StageVmStep,
                     stageIndex: stageVm.StageIndex,
                     stageVmStyle: stageVm.StageVmStyle,
                     order: stageVm.Order,
                     keyPairVms: stageVm.KeyPairVms.Select(kpvm => kpvm.ResetUseHistory()),
-                    sortableItemVms: null,
-                    sortableItemVmsOld: null
+                    sortableVms: null
                  );
         }
 
         public static StageVm SetStageVmStyle(this StageVm stageVm, StageVmStyle stageVmStyle)
         {
             return new StageVm(
-                    stageVmStep: stageVm.StageVmStep,
                     stageIndex: stageVm.StageIndex,
                     stageVmStyle: stageVmStyle,
                     order: stageVm.Order,
                     keyPairVms: stageVm.KeyPairVms,
-                    sortableItemVms: stageVm.SortableItemVms,
-                    sortableItemVmsOld: stageVm.SortableItemVmsOld
+                    sortableVms: stageVm.SortableVms
                  );
         }
 

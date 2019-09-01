@@ -21,14 +21,14 @@ namespace archean.controls.ViewModel.Sorter2
 
         public static StageVmStyle Standard(
                             bool oddStep,
-                            SwitchUseWrap maxSwitchUse)
+                            SwitchUseWrap maxSwitchUseInSorter)
         {
             return new StageVmStyle
             {
                 KeyLineBrush = Brushes.Blue,
                 SwitchBrushNotUsed = Brushes.Black,
                 SwitchBrushInUse = Brushes.Pink,
-                SwitchBrushWasUsed = maxSwitchUse.ToSwitchBrushFunc(),
+                SwitchBrushWasUsed = maxSwitchUseInSorter.ToSwitchBrushFunc(),
                 SwitchLineWidth = 1.0,
                 SwitchHSpacing = 3.25,
                 StageRightMargin = 3.25,

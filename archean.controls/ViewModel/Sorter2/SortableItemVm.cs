@@ -195,34 +195,50 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
 
-        public static SortableItemVm[] ToLeftStep(this IEnumerable<SortableItemVm> sortableItemVms)
+        public static SortableVm ToLeftStep(this SortableVm sortableVms)
         {
-            return sortableItemVms.Select(svm => svm.ToLeftSortableVm())
-                              .ToArray();
+            return new SortableVm(
+                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToLeftSortableVm()).ToArray(),
+                nextSortableItemVms: null,
+                stageVmStep: StageVmStep.Left,
+                animationPct:0);
         }
 
-        public static SortableItemVm[] ToPreSortStep(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
+        public static SortableVm ToPreSortStep(this SortableVm sortableVms, IEnumerable<KeyPairVm> keyPairVms)
         {
-            return sortableItemVms.NullToEnumerable().Select(svm => svm.ToPresortSortableVm(keyPairVms))
-                              .ToArray();
+            return new SortableVm(
+                currentSortableItemVms: sortableVms.CurrentSortableItemVms.NullToEnumerable().Select(svm => svm.ToPresortSortableVm(keyPairVms)).ToArray(),
+                nextSortableItemVms: null,
+                stageVmStep: StageVmStep.Presort,
+                animationPct: 0);
         }
 
-        public static SortableItemVm[] ToPostSortStep(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
+        public static SortableVm ToPostSortStep(this SortableVm sortableVms, IEnumerable<KeyPairVm> keyPairVms)
         {
-            return sortableItemVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms))
-                              .ToArray();
+            return new SortableVm(
+                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms)).ToArray(),
+                nextSortableItemVms: null,
+                stageVmStep: StageVmStep.PostSort,
+                animationPct: 0);
+
         }
 
-        public static SortableItemVm[] ToRightStep(this IEnumerable<SortableItemVm> sortableItemVms)
+        public static SortableVm ToRightStep(this SortableVm sortableVms)
         {
-            return sortableItemVms.Select(svm => svm.ToRightSortableVm())
-                              .ToArray();
+            return new SortableVm(
+                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToRightSortableVm()).ToArray(),
+                nextSortableItemVms: null,
+                stageVmStep: StageVmStep.Right,
+                animationPct: 0);
         }
 
-        public static SortableItemVm[] ToMissingStep(this IEnumerable<SortableItemVm> sortableItemVms)
+        public static SortableVm ToMissingStep(this SortableVm sortableVms)
         {
-            return sortableItemVms.Select(svm => svm.ToMissingSortableVm())
-                              .ToArray();
+            return new SortableVm(
+                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToMissingSortableVm()).ToArray(),
+                nextSortableItemVms: null,
+                stageVmStep: StageVmStep.None,
+                animationPct: 0);
         }
 
         public static IEnumerable<SortableItemVm> UpdateSortableVms(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
