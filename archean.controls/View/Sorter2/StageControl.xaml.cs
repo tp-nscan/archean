@@ -26,35 +26,29 @@ namespace archean.controls.View.Sorter2
                 DispatcherPriority.Normal,
                 new Action(() =>
                 {
-                    Width = ActualHeight * StageVm.WidthToHeight;
+                    Width = ActualHeight * StageVm.WidthToHeight();
                     InvalidateVisual();
                 }));
         }
 
         protected override void OnRender(DrawingContext dc)
         {
-            if (StageVm == null)
-            {
-                return;
-            }
+            if (StageVm == null) { return; }
+
+            Width = ActualHeight * StageVm.WidthToHeight();
+
             dc.DrawRectangle(StageVm.StageVmStyle.BackgroundBrush, null, new Rect(0.0, 0.0, ActualWidth, ActualHeight));
 
-            dc.DrawKeyLines(StageVm, ActualWidth, ActualHeight);
+            dc.DrawKeyLines(StageVm.StageVmStyle, ActualWidth, ActualHeight);
 
             foreach(var kvm in StageVm.KeyPairVms)
             {
-                dc.DrawSwitch(StageVm, kvm, ActualWidth, ActualHeight);
+                dc.DrawSwitch(StageVm.StageVmStyle, StageVm.Order, kvm, ActualWidth, ActualHeight);
             }
 
-            //if((RenderTimer != null) && (RenderTimer.Enabled))
-            //{
-            //    StageVm.DrawSortableValuesAnimate(StageVmOld, (ticks / TicsPerStep), dc, ActualWidth, ActualHeight);
-            //}
-            //else
-            //{
-                StageVm.DrawSortableValues(dc, ActualWidth, ActualHeight);
-            //}
+            dc.DrawSortableValues(StageVm.SortableVm, ActualWidth, ActualHeight);
         }
+
 
         #region StageVm
 
@@ -67,7 +61,7 @@ namespace archean.controls.View.Sorter2
 
         public static readonly DependencyProperty StageVmProperty =
             DependencyProperty.Register("StageVm", typeof(StageVm), typeof(StageControl),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsArrange, OnStageVmPropertyChanged));
+            new FrameworkPropertyMetadata(OnStageVmPropertyChanged));
 
         private static void OnStageVmPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

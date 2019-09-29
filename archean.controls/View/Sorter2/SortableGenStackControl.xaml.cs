@@ -8,9 +8,9 @@ using System.Windows;
 
 namespace archean.controls.View.Sorter2
 {
-    public partial class SortableGenControl
+    public partial class SortableGenStackControl
     {
-        public SortableGenControl()
+        public SortableGenStackControl()
         {
             InitializeComponent();
         }
@@ -33,12 +33,12 @@ namespace archean.controls.View.Sorter2
         }
 
         public static readonly DependencyProperty SortableTypeProperty =
-            DependencyProperty.Register("SortableType", typeof(SortableType), typeof(SortableGenControl),
-            new FrameworkPropertyMetadata(propertyChangedCallback: OnSortableTypePropertyChanged));
+            DependencyProperty.Register("SortableType", typeof(SortableType), typeof(SortableGenStackControl),
+            new FrameworkPropertyMetadata(defaultValue: SortableType.Undefined, propertyChangedCallback: OnSortableTypePropertyChanged));
 
         private static void OnSortableTypePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var sorterGenControl = (SortableGenControl)d;
+            var sorterGenControl = (SortableGenStackControl)d;
             var newType = (SortableType)e.NewValue;
             sorterGenControl.SortableItemVmsGen = MakeFunc(newType, sorterGenControl.Order);
         }
@@ -55,13 +55,13 @@ namespace archean.controls.View.Sorter2
         }
 
         public static readonly DependencyProperty OrderProperty =
-            DependencyProperty.Register("Order", typeof(int), typeof(SortableGenControl),
+            DependencyProperty.Register("Order", typeof(int), typeof(SortableGenStackControl),
             new FrameworkPropertyMetadata(propertyChangedCallback: OnOrderPropertyChanged));
 
 
         private static void OnOrderPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var sorterGenControl = (SortableGenControl)d;
+            var sorterGenControl = (SortableGenStackControl)d;
             var newOrder = (int)e.NewValue;
             sorterGenControl.SortableItemVmsGen = MakeFunc(sorterGenControl.SortableType, newOrder);
         }
@@ -97,7 +97,29 @@ namespace archean.controls.View.Sorter2
         }
 
         public static readonly DependencyProperty SortableItemVmsGenProperty =
-            DependencyProperty.Register("SortableItemVmsGen", typeof(Func<SortableItemVm[]>), typeof(SortableGenControl));
+            DependencyProperty.Register("SortableItemVmsGen", typeof(Func<SortableItemVm[]>), typeof(SortableGenStackControl));
+
+        #endregion
+
+
+        #region StackSize
+
+        public int StackSize
+        {
+            get { return (int)GetValue(StackSizeProperty); }
+            set { SetValue(StackSizeProperty, value); }
+        }
+
+        public static readonly DependencyProperty StackSizeProperty =
+            DependencyProperty.Register("StackSize", typeof(int), typeof(SortableGenStackControl), 
+                new FrameworkPropertyMetadata(propertyChangedCallback: OnStackSizePropertyChanged));
+
+        private static void OnStackSizePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var sorterGenControl = (SortableGenStackControl)d;
+            var newStackSize = (int)e.NewValue;
+            sorterGenControl.SortableItemVmsGen = MakeFunc(sorterGenControl.SortableType, newStackSize);
+        }
 
         #endregion
 

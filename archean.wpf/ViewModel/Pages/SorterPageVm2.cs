@@ -29,7 +29,7 @@ namespace archean.ViewModel.Pages
                     SetProperty(ref _sorterDisplayVm, value);
                     return;
                 }
-                if(_sorterDisplayVm.StageVms.Count != value.StageVms.Count)
+                if((value == null) || (_sorterDisplayVm.StageVms.Count != value.StageVms.Count))
                 {
                     SetProperty(ref _sorterDisplayVm, value);
                     return;
@@ -71,7 +71,11 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _sortableItemVmsGen, value);
-                ResetSorterDisplayVm();
+                SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(
+                    stageLayout: StageLayout,
+                    sortableItemVmsGen: SortableItemVmsGen,
+                    maxSwitchUseInSorter: MaxSwitchUseInSorter
+                );
             }
         }
 
@@ -84,46 +88,12 @@ namespace archean.ViewModel.Pages
             {
                 SetProperty(ref _stagedSorterDef, value);
                 Order = value.sorterDef.order;
-                ResetSorterDisplayVm();
-            }
-        }
-
-
-        void ResetSorterDisplayVm()
-        {
-            if (_stagedSorterDef == null)
-            {
-                return;
-            }
-            if (StageLayout == StageLayout.Undefined)
-            {
-                return;
-            }
-
-            SortableVm sortableVm = null;
-            if (SortableItemVmsGen != null)
-            {
-                sortableVm = new SortableVm(
-                    currentSortableItemVms: SortableItemVmsGen.Invoke(),
-                    nextSortableItemVms:null,
-                    stageVmStep:StageVmStep.Left,
-                    animationPct: 0);
-            }
-
-            var switchBlockSets = _stagedSorterDef.ToSwitchBlockSets(StageLayout).ToList();
-
-            MaxSwitchUseInSorter.Value = 1;
-
-            var stageVms = switchBlockSets.ToStageVms(
-                stageVmStyle: StageVmStyle.Standard(false, MaxSwitchUseInSorter),
-                alternatingBrush: StageVmStyleExt.AlternatingBrush,
-                order: _stagedSorterDef.sorterDef.order,
-                sortableVm: sortableVm);
-
-            SorterDisplayVm = new SorterDisplayVm(
-                    order: _stagedSorterDef.sorterDef.order,
-                    stageVms: stageVms
+                SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(
+                    stageLayout: StageLayout,
+                    sortableItemVmsGen: SortableItemVmsGen,
+                    maxSwitchUseInSorter: MaxSwitchUseInSorter
                 );
+            }
         }
 
         public IEnumerable<StageLayout> StageLayouts
@@ -144,8 +114,11 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _stageLayout, value);
-                _sorterDisplayVm = null;
-                ResetSorterDisplayVm();
+                SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(
+                        stageLayout: StageLayout,
+                        sortableItemVmsGen: SortableItemVmsGen,
+                        maxSwitchUseInSorter: MaxSwitchUseInSorter
+                    );
             }
         }
 
@@ -165,7 +138,6 @@ namespace archean.ViewModel.Pages
                         break;
                     case UpdateMode.Tic:
                         SorterDisplayVm = SorterDisplayVm.Tic();
-
                         break;
                     case UpdateMode.Step:
                         SortableItemVm[] sortableItemVms = null;
@@ -173,11 +145,10 @@ namespace archean.ViewModel.Pages
                         {
                             sortableItemVms = SortableItemVmsGen.Invoke();
                         }
-                        SorterDisplayVm = SorterDisplayVm.Step(sortableItemVms);
+                        SorterDisplayVm = SorterDisplayVm.Step(sortableItemVms.InitSortableVm(SorterDisplayVm.GetSortableVmStyle()));
                         break;
                     case UpdateMode.Reset:
-                        SorterDisplayVm = SorterDisplayVm.ResetSorterDisplayVm(
-                                stagedSorterDef: StagedSorterDef,
+                        SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(
                                 stageLayout: StageLayout,
                                 sortableItemVmsGen: SortableItemVmsGen,
                                 maxSwitchUseInSorter: MaxSwitchUseInSorter

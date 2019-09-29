@@ -5,6 +5,7 @@ using System.Windows.Media;
 
 namespace archean.controls.ViewModel.Sorter2
 {
+
     public class StageVmStyle
     {
         public Brush KeyLineBrush { get; set; }
@@ -12,15 +13,13 @@ namespace archean.controls.ViewModel.Sorter2
         public Brush SwitchBrushInUse { get; set; }
         public Func<int, Brush> SwitchBrushWasUsed { get; set; }
         public double SwitchLineWidth { get; set; }
-        public double StageRightMargin { get; set; }
-        public double SwitchHSpacing { get; set; }
         public double KeyLineThickness { get; set; }
-        public double KeyLineHeight { get; set; }
-        public double VPadding { get; set; }
         public Brush BackgroundBrush { get; set; }
-
+        public SortableVmStyle SortableVmStyle { get; set; }
         public static StageVmStyle Standard(
+                            int order,
                             bool oddStep,
+                            int sectionCount,
                             SwitchUseWrap maxSwitchUseInSorter)
         {
             return new StageVmStyle
@@ -30,12 +29,9 @@ namespace archean.controls.ViewModel.Sorter2
                 SwitchBrushInUse = Brushes.Pink,
                 SwitchBrushWasUsed = maxSwitchUseInSorter.ToSwitchBrushFunc(),
                 SwitchLineWidth = 1.0,
-                SwitchHSpacing = 3.25,
-                StageRightMargin = 3.25,
                 KeyLineThickness = 1.0,
-                KeyLineHeight = 4.0,
-                VPadding = 1.0,
-                BackgroundBrush = oddStep ? Brushes.Lavender : Brushes.White
+                BackgroundBrush = oddStep ? Brushes.Lavender : Brushes.White,
+                SortableVmStyle = SortableVmStyle.Standard(order, sectionCount)
             };
         }
 
@@ -64,6 +60,21 @@ namespace archean.controls.ViewModel.Sorter2
 
         public static Brush AlternatingBrush => new SolidColorBrush(Color.FromScRgb(0.3f, 0, 1.0f, 0));
 
+        public static StageVmStyle ChangeSectionCount(this StageVmStyle stageVmStyle, int sectionCount)
+        {
+            return new StageVmStyle
+            {
+                KeyLineBrush = stageVmStyle.KeyLineBrush,
+                SwitchBrushNotUsed = stageVmStyle.SwitchBrushNotUsed,
+                SwitchBrushInUse = stageVmStyle.SwitchBrushInUse,
+                SwitchBrushWasUsed = stageVmStyle.SwitchBrushWasUsed,
+                SwitchLineWidth = stageVmStyle.SwitchLineWidth,
+                KeyLineThickness = stageVmStyle.KeyLineThickness,
+                BackgroundBrush = stageVmStyle.BackgroundBrush,
+                SortableVmStyle = stageVmStyle.SortableVmStyle.ChangeSectionCount(sectionCount)
+            };
+        }
+
         public static Func<int, Brush> ToSwitchBrushFunc0(this SwitchUseWrap maxUseCount)
         {
             return useCount =>
@@ -79,19 +90,11 @@ namespace archean.controls.ViewModel.Sorter2
                 SwitchBrushInUse = stageVmStyle.SwitchBrushInUse,
                 SwitchBrushWasUsed = stageVmStyle.SwitchBrushWasUsed,
                 SwitchLineWidth = stageVmStyle.SwitchLineWidth,
-                SwitchHSpacing = stageVmStyle.SwitchHSpacing,
-                StageRightMargin = stageVmStyle.StageRightMargin,
                 KeyLineThickness = stageVmStyle.KeyLineThickness,
-                KeyLineHeight = stageVmStyle.KeyLineHeight,
-                VPadding = stageVmStyle.VPadding,
-                BackgroundBrush = newBrush
+                BackgroundBrush = newBrush,
+                SortableVmStyle = stageVmStyle.SortableVmStyle
             };
         }
-    }
-
-    public class SwitchUseWrap
-    {
-        public int Value { get; set; }
     }
 
 }

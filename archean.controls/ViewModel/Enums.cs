@@ -43,9 +43,9 @@
                 case AnimationSpeed.Slow:
                     return 1000.0;
                 case AnimationSpeed.Medium:
-                    return 100.0;
+                    return 50.0;
                 case AnimationSpeed.Fast:
-                    return 10.0;
+                    return 2.0;
                 default:
                     return -1.0;
             }

@@ -63,8 +63,6 @@ namespace archean.controls.ViewModel.Sorter2
         public int HiKey { get; }
         public int LowKey { get; }
         public int StageIndex { get; }
-
-        // ISwitch impl
         public int low => LowKey;
         public int hi => HiKey;
     }
@@ -94,12 +92,6 @@ namespace archean.controls.ViewModel.Sorter2
                         useCount: 0);
                 }
             }
-        }
-
-        public static IEnumerable<KeyPairVm> ToRandomKeyPairVms(this StageVmStyle stageVmStyle, int keyCount, int stageIndex)
-        {
-            var switchblocks = core.Sorting.StageLayout.LayoutRandomStage(keyCount, new System.Random()).ToArray();
-            return switchblocks.ToKeyPairVms(stageIndex, stageVmStyle);
         }
 
         public static KeyPairVm ToInactive(this KeyPairVm keyPairVm)

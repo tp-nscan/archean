@@ -198,6 +198,8 @@ namespace archean.controls.ViewModel.Sorter2
         public static SortableVm ToLeftStep(this SortableVm sortableVms)
         {
             return new SortableVm(
+                order: sortableVms.Order,
+                sortableVmStyle: sortableVms.SortableVmStyle,
                 currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToLeftSortableVm()).ToArray(),
                 nextSortableItemVms: null,
                 stageVmStep: StageVmStep.Left,
@@ -207,6 +209,8 @@ namespace archean.controls.ViewModel.Sorter2
         public static SortableVm ToPreSortStep(this SortableVm sortableVms, IEnumerable<KeyPairVm> keyPairVms)
         {
             return new SortableVm(
+                order: sortableVms.Order,
+                sortableVmStyle: sortableVms.SortableVmStyle,
                 currentSortableItemVms: sortableVms.CurrentSortableItemVms.NullToEnumerable().Select(svm => svm.ToPresortSortableVm(keyPairVms)).ToArray(),
                 nextSortableItemVms: null,
                 stageVmStep: StageVmStep.Presort,
@@ -216,6 +220,8 @@ namespace archean.controls.ViewModel.Sorter2
         public static SortableVm ToPostSortStep(this SortableVm sortableVms, IEnumerable<KeyPairVm> keyPairVms)
         {
             return new SortableVm(
+                order: sortableVms.Order,
+                sortableVmStyle: sortableVms.SortableVmStyle,
                 currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms)).ToArray(),
                 nextSortableItemVms: null,
                 stageVmStep: StageVmStep.PostSort,
@@ -226,6 +232,8 @@ namespace archean.controls.ViewModel.Sorter2
         public static SortableVm ToRightStep(this SortableVm sortableVms)
         {
             return new SortableVm(
+                order: sortableVms.Order,
+                sortableVmStyle: sortableVms.SortableVmStyle,
                 currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToRightSortableVm()).ToArray(),
                 nextSortableItemVms: null,
                 stageVmStep: StageVmStep.Right,
@@ -235,6 +243,8 @@ namespace archean.controls.ViewModel.Sorter2
         public static SortableVm ToMissingStep(this SortableVm sortableVms)
         {
             return new SortableVm(
+                order: sortableVms.Order,
+                sortableVmStyle: sortableVms.SortableVmStyle,
                 currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToMissingSortableVm()).ToArray(),
                 nextSortableItemVms: null,
                 stageVmStep: StageVmStep.None,

@@ -80,13 +80,16 @@
     <Compile Include="Utils\StringFormats.cs" />
     <Compile Include="ViewModel\Enums.cs" />
     <Compile Include="ViewModel\Sorter2\KeyPairVm.cs" />
+    <Compile Include="ViewModel\Sorter2\RenderUtils.cs" />
     <Compile Include="ViewModel\Sorter2\SortableItemVm.cs" />
     <Compile Include="ViewModel\Sorter2\SortableVm.cs" />
+    <Compile Include="ViewModel\Sorter2\SortableVmStyle.cs" />
     <Compile Include="ViewModel\Sorter2\SorterDisplayVm.cs" />
     <Compile Include="ViewModel\Sorter2\StageVm.cs" />
     <Compile Include="ViewModel\Sorter2\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter2\StageVmStep.cs" />
     <Compile Include="ViewModel\Sorter2\StageVmStyle.cs" />
+    <Compile Include="ViewModel\Sorter2\SwitchUseWrap.cs" />
     <Compile Include="ViewModel\Sorter\KeyPairVm.cs" />
     <Compile Include="ViewModel\Sorter\SortableItemVm.cs" />
     <Compile Include="ViewModel\Sorter\SorterDisplayVm.cs" />
@@ -94,6 +97,12 @@
     <Compile Include="ViewModel\Sorter\StageVmRender.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStep.cs" />
     <Compile Include="ViewModel\Sorter\StageVmStyle.cs" />
+    <Compile Include="View\Sorter2\SortableControl.xaml.cs">
+      <DependentUpon>SortableControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Sorter2\SortableGenStackControl.xaml.cs">
+      <DependentUpon>SortableGenStackControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Sorter2\SorterDisplayControl.xaml.cs">
       <DependentUpon>SorterDisplayControl.xaml</DependentUpon>
     </Compile>
@@ -121,6 +130,14 @@
     <Compile Include="View\Utils\AnimationControl.xaml.cs">
       <DependentUpon>AnimationControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\Sorter2\SortableControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Sorter2\SortableGenStackControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\Sorter2\SorterDisplayControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

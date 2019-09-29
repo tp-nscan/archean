@@ -7,89 +7,98 @@ namespace archean.controls.ViewModel.Sorter2
 {
     public static class StageVmRender
     {
-        public static double RenderWidth(this StageVm vm, double widthInVm, double stageRenderWidth)
+        public static double RenderWidth(this SortableVmStyle vms, double widthInVm, double stageRenderWidth)
         {
-            return (stageRenderWidth * widthInVm) / vm.VmWidth;
+            return (stageRenderWidth * widthInVm) / vms.VmWidth(vms.SectionCount);
         }
 
-        public static double RenderHeight(this StageVm vm, double heightInVm, double stageRenderHeight)
+        public static double KeyRenderYc(this SortableVmStyle sortableVmStyle, int keyDex, double stageRenderHeight)
         {
-            return (stageRenderHeight * heightInVm) / vm.VmHeight;
+            var vmHeight = sortableVmStyle.VPadding +
+                          (sortableVmStyle.Order - keyDex) * sortableVmStyle.KeyHeight;
+
+            return RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+                                                 childVmHeight: vmHeight,
+                                                 parentRenderHeight: stageRenderHeight);
         }
 
-        public static double KeyRenderYc(this StageVm vm, int keyDex, double stageRenderHeight)
+        public static double KeyRenderYh(this StageVmStyle stageVmStyle, int keyDex, double stageRenderHeight)
         {
-            var vmHeight = vm.StageVmStyle.VPadding + 
-                          (vm.Order - keyDex) * vm.StageVmStyle.KeyLineHeight;
-            return vm.RenderHeight(vmHeight, stageRenderHeight);
+            var vmHeight = stageVmStyle.SortableVmStyle.VPadding +
+                          (stageVmStyle.SortableVmStyle.Order - keyDex) * stageVmStyle.SortableVmStyle.KeyHeight -
+                          stageVmStyle.KeyLineThickness / 2;
+
+            return RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.VmHeight(stageVmStyle.SortableVmStyle.Order),
+                                                 childVmHeight: vmHeight,
+                                                 parentRenderHeight: stageRenderHeight);
         }
 
-        public static double KeyRenderYh(this StageVm vm, int keyDex, double stageRenderHeight)
+        public static double KeyRenderYl(this StageVmStyle stageVmStyle, int keyDex, double stageRenderHeight)
         {
-            var vmHeight = vm.StageVmStyle.VPadding + 
-                          (vm.Order - keyDex) * vm.StageVmStyle.KeyLineHeight - 
-                          vm.StageVmStyle.KeyLineThickness / 2;
-            return vm.RenderHeight(vmHeight, stageRenderHeight);
+            var vmHeight = stageVmStyle.SortableVmStyle.VPadding +
+                          (stageVmStyle.SortableVmStyle.Order - keyDex) * stageVmStyle.SortableVmStyle.KeyHeight +
+                           stageVmStyle.KeyLineThickness / 2;
+
+            return RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.VmHeight(stageVmStyle.SortableVmStyle.Order),
+                                                 childVmHeight: vmHeight,
+                                                 parentRenderHeight: stageRenderHeight);
         }
 
-        public static double KeyRenderYl(this StageVm vm, int keyDex, double stageRenderHeight)
+        public static double SectionRenderX(this SortableVmStyle sortableVmStyle, int sectionDex, double stageRenderWidth)
         {
-            var vmHeight = vm.StageVmStyle.VPadding + 
-                          (vm.Order - keyDex) * vm.StageVmStyle.KeyLineHeight + 
-                           vm.StageVmStyle.KeyLineThickness / 2;
-            return vm.RenderHeight(vmHeight, stageRenderHeight);
+            var vmX = (sectionDex + 0.5) * (sortableVmStyle.SectionWidth);
+            return sortableVmStyle.RenderWidth(vmX, stageRenderWidth);
         }
 
-        public static double SectionRenderX(this StageVm vm, int sectionDex, double stageRenderWidth)
+        public static Pen SwitchLinePen(this StageVmStyle stageVmStyle, KeyPairVm keyPairVm, double stageRenderWidth)
         {
-            var vmX = (sectionDex + 0.5) * (vm.StageVmStyle.SwitchHSpacing);
-            return vm.RenderWidth(vmX, stageRenderWidth);
-        }
-
-        public static Pen SwitchLinePen(this StageVm stageVm, KeyPairVm keyPairVm, double stageRenderWidth)
-        {
-            var brushWidth = stageVm.RenderWidth(stageVm.StageVmStyle.SwitchLineWidth, stageRenderWidth);
+            var brushWidth = stageVmStyle.SortableVmStyle.RenderWidth(stageVmStyle.SwitchLineWidth, stageRenderWidth);
             return new Pen(keyPairVm.Brush, brushWidth);
         }
 
-        public static Pen KeyLinePen(this StageVm stageVm, double stageRenderHeight)
+        public static Pen KeyLinePen(this StageVmStyle stageVmStyle, double stageRenderHeight)
         {
-            var brushHeight = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness, stageRenderHeight);
-            return new Pen(stageVm.StageVmStyle.KeyLineBrush, brushHeight);
+            var brushHeight = 
+                RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.VmHeight(stageVmStyle.SortableVmStyle.Order),
+                                              childVmHeight: stageVmStyle.KeyLineThickness,
+                                              parentRenderHeight: stageRenderHeight);
+
+            return new Pen(stageVmStyle.KeyLineBrush, brushHeight);
         }
 
-        public static void DrawSwitch(this DrawingContext dc, StageVm stageVm, KeyPairVm keyPairVm, 
-                                        double stageRenderWidth, double stageRenderHeight)
+        public static void DrawSwitch(this DrawingContext dc, StageVmStyle stageVmStyle,
+                                      int order, KeyPairVm keyPairVm, 
+                                      double stageRenderWidth, double stageRenderHeight)
         {
-            var pen = stageVm.SwitchLinePen(keyPairVm, stageRenderWidth);
-            var renderX = stageVm.SectionRenderX(keyPairVm.StageSection, stageRenderWidth);
-            var renderYLow = stageVm.KeyRenderYl(keyPairVm.LowKey, stageRenderHeight);
-            var renderYHigh = stageVm.KeyRenderYh(keyPairVm.HiKey, stageRenderHeight);
+            var pen = stageVmStyle.SwitchLinePen(keyPairVm, stageRenderWidth);
+            var renderX = stageVmStyle.SortableVmStyle.SectionRenderX(keyPairVm.StageSection, stageRenderWidth);
+            var renderYLow = stageVmStyle.KeyRenderYl(keyPairVm.LowKey, stageRenderHeight);
+            var renderYHigh = stageVmStyle.KeyRenderYh(keyPairVm.HiKey, stageRenderHeight);
             var pointLow = new Point(renderX, renderYLow);
             var pointHigh = new Point(renderX, renderYHigh);
             dc.DrawLine(pen, pointLow, pointHigh);
         }
 
-        public static void DrawKeyLine(this DrawingContext dc, StageVm stageVm, int keyDex,
+        public static void DrawKeyLine(this DrawingContext dc, StageVmStyle stageVmStyle, int keyDex,
                                                 double stageRenderWidth, double stageRenderHeight)
         {
-            var pen = stageVm.KeyLinePen(stageRenderHeight);
-            var renderY = stageVm.KeyRenderYc(keyDex, stageRenderHeight);
+            var pen = stageVmStyle.KeyLinePen(stageRenderHeight);
+            var renderY = stageVmStyle.SortableVmStyle.KeyRenderYc(keyDex, stageRenderHeight);
             var pointLeft = new Point(0, renderY);
             var pointRight = new Point(stageRenderWidth, renderY);
             dc.DrawLine(pen, pointLeft, pointRight);
         }
 
-        public static void DrawKeyLines(this DrawingContext dc, StageVm stageVm, 
+        public static void DrawKeyLines(this DrawingContext dc, StageVmStyle stageVmStyle,
                                         double stageRenderWidth, double stageRenderHeight)
         {
-            for(var keyDex=0; keyDex < stageVm.Order; keyDex++)
+            for(var keyDex=0; keyDex < stageVmStyle.SortableVmStyle.Order; keyDex++)
             {
-                dc.DrawKeyLine(stageVm, keyDex, stageRenderWidth, stageRenderHeight);
+                dc.DrawKeyLine(stageVmStyle, keyDex, stageRenderWidth, stageRenderHeight);
             }
         }
 
-        public static Point GetSortableItemPosition(this StageVm stageVm,
+        public static Point GetSortableItemPosition(this SortableVmStyle sortableVmStyle,
                                                      SortableItemVm sortableItemVm,
                                                      double stageRenderWidth, double stageRenderHeight)
         {
@@ -102,8 +111,12 @@ namespace archean.controls.ViewModel.Sorter2
                 return new Point(0, 0);
             }
 
-            var renderY = stageVm.KeyRenderYc(sortableItemVm.KeyLinePos, stageRenderHeight);
-            var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
+            var renderY = sortableVmStyle.KeyRenderYc(sortableItemVm.KeyLinePos, stageRenderHeight);
+
+            var radius =
+                    RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+                                                  childVmHeight: sortableVmStyle.Radius,
+                                                  parentRenderHeight: stageRenderHeight);
 
             var renderX = 0.0;
             switch (sortableItemVm.StagePos)
@@ -112,7 +125,8 @@ namespace archean.controls.ViewModel.Sorter2
                     renderX = radius * -1.2;
                     break;
                 case StagePos.Center:
-                    renderX = stageVm.SectionRenderX(sortableItemVm.StageSection, stageRenderWidth);
+                    renderX = sortableVmStyle
+                                     .SectionRenderX(sortableItemVm.StageSection, stageRenderWidth);
                     break;
                 case StagePos.Right:
                     renderX = stageRenderWidth - radius * 1.2;
@@ -133,52 +147,58 @@ namespace archean.controls.ViewModel.Sorter2
             }
         }
 
-
-        public static void DrawSortableValue(this StageVm stageVm, DrawingContext dc,
-                                                  SortableItemVm sortableVm,
-                                                  double stageRenderWidth, double stageRenderHeight)
+        public static void DrawSortableValue(this DrawingContext dc, 
+                                                  SortableVmStyle sortableVmStyle,
+                                                  SortableItemVm sortableItemVm,
+                                                  double stageRenderWidth, 
+                                                  double stageRenderHeight)
         {
             if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
             {
                 return;
             }
-            if (sortableVm.StagePos == StagePos.Missing)
+            if (sortableItemVm.StagePos == StagePos.Missing)
             {
                 return;
             }
 
-            var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
+            var radius =
+                RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+                                              childVmHeight: sortableVmStyle.Radius,
+                                              parentRenderHeight: stageRenderHeight);
 
-            var center = stageVm.GetSortableItemPosition(sortableVm, stageRenderWidth, stageRenderHeight);
-            dc.DrawEllipse(sortableVm.BackgroundBrush, SortableBorderPen, center, radius, radius);
+            var center = sortableVmStyle.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
+            dc.DrawEllipse(sortableItemVm.BackgroundBrush, SortableBorderPen, center, radius, radius);
 
-            if(sortableVm.ShowLabel)
+            if(sortableItemVm.ShowLabel)
             {
-                var txt = new FormattedText(sortableVm.Label.ToString(),
+                var txt = new FormattedText(sortableItemVm.Label.ToString(),
                                                CultureInfo.CurrentCulture,
                                                FlowDirection.LeftToRight,
                                                SortableItemVm.Typeface,
-                                               radius, sortableVm.ForegroundBrush, 1.0);
+                                               radius, sortableItemVm.ForegroundBrush, 1.0);
 
                 var upLeft = new Point(center.X - txt.Width / 2, center.Y - txt.Height / 2);
                 dc.DrawText(txt, upLeft);
             }
         }
 
-        public static void DrawSortableValues(this StageVm stageVm, DrawingContext dc, 
+        public static void DrawSortableValues(this DrawingContext dc, SortableVm sortableVm,  
                                                    double stageRenderWidth, double stageRenderHeight)
         {
-            if (stageVm.SortableVms?.CurrentSortableItemVms == null) return;
+            if (sortableVm?.CurrentSortableItemVms == null) return;
 
-            foreach (var sortableVm in stageVm.SortableVms.CurrentSortableItemVms)
+            foreach (var sortableItemVm in sortableVm.CurrentSortableItemVms)
             {
-                stageVm.DrawSortableValue(dc, sortableVm, stageRenderWidth, stageRenderHeight);
+                dc.DrawSortableValue(sortableVm.SortableVmStyle, sortableItemVm, stageRenderWidth, stageRenderHeight);
             }
         }
 
-        public static void DrawSortableValueAnimate(this StageVm stageVm,
+        public static void DrawSortableValueAnimate(
+                this DrawingContext dc,
+                double animationPct,
+                SortableVmStyle sortableVmStyle,
                 SortableItemVm sortableItemVmOld,
-                DrawingContext dc,
                 SortableItemVm sortableItemVm,
                 double stageRenderWidth,
                 double stageRenderHeight)
@@ -191,13 +211,15 @@ namespace archean.controls.ViewModel.Sorter2
             {
                 return;
             }
+            var radius =
+                RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+                                              childVmHeight: sortableVmStyle.Radius,
+                                              parentRenderHeight: stageRenderHeight);
 
-            var radius = stageVm.RenderHeight(stageVm.StageVmStyle.KeyLineThickness * 1.5, stageRenderHeight);
+            var centerO = sortableVmStyle.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
+            var centerN = sortableVmStyle.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
 
-            var centerO = stageVm.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
-            var centerN = stageVm.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
-
-            var center = centerO.Interpolate(centerN, stageVm.SortableVms.AnimationPct);
+            var center = centerO.Interpolate(centerN, animationPct);
 
             dc.DrawEllipse(sortableItemVm.BackgroundBrush, null, center, radius, radius);
 
@@ -214,23 +236,23 @@ namespace archean.controls.ViewModel.Sorter2
             }
         }
 
-
         public static void DrawSortableValuesAnimate(
-            this StageVm stageVm,
+            this SortableVm sortableVm,
             DrawingContext dc,
             double stageRenderWidth,
             double stageRenderHeight)
         {
-            if (stageVm.SortableVms?.CurrentSortableItemVms == null) return;
+            if (sortableVm?.CurrentSortableItemVms == null) return;
 
-            for (var i = 0; i < stageVm.SortableVms.CurrentSortableItemVms.Length; i++)
+            for (var i = 0; i < sortableVm.CurrentSortableItemVms.Length; i++)
             {
-                stageVm.DrawSortableValueAnimate(
-                    sortableItemVmOld: stageVm.SortableVms.CurrentSortableItemVms[i],
-                    dc: dc,
-                    sortableItemVm: stageVm.SortableVms.CurrentSortableItemVms[i],
-                    stageRenderWidth,
-                    stageRenderHeight);
+                dc.DrawSortableValueAnimate(
+                    animationPct: sortableVm.AnimationPct,
+                    sortableVmStyle: sortableVm.SortableVmStyle,
+                    sortableItemVmOld: sortableVm.CurrentSortableItemVms[i],
+                    sortableItemVm: sortableVm.CurrentSortableItemVms[i],
+                    stageRenderWidth: stageRenderWidth,
+                    stageRenderHeight: stageRenderHeight);
             }
         }
 

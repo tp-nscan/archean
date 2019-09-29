@@ -36,6 +36,19 @@ namespace archean.controls.ViewModel.Sorter2
 
     public static class SorterDisplayVmExt
     {
+        public static SortableVmStyle GetSortableVmStyle(this SorterDisplayVm sorterDisplayVm)
+        {
+            return sorterDisplayVm.StageVms
+                        .Where(svm=> svm.SortableVm != null)
+                        .Select(svm => svm.SortableVm.SortableVmStyle)
+                        .FirstOrDefault();
+        }
+
+        public static Tuple<StageVm, SortableVm> UpdateStageVm(this StageVm stageVm, SortableVm sortableVm)
+        {
+            return new Tuple<StageVm, SortableVm>(stageVm, sortableVm);
+        }
+
         public static IEnumerable<Func<Sorting.ISwitch[][], StageVm>> StageVmMaps(
                                             StageVmStyle stageVmStyle,
                                             Brush alternating,
@@ -137,19 +150,19 @@ namespace archean.controls.ViewModel.Sorter2
 
         public static SorterDisplayVm Step(
                     this SorterDisplayVm sorterDisplayVm,
-                    SortableItemVm[] sortableItemVms)
+                    SortableVm sortableVms = null)
         {
-
+            var newStages = sorterDisplayVm.StageVms.Step(sortableVms);
 
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
-                    stageVms: sorterDisplayVm.StageVms
+                    stageVms: newStages.Item1
                 );
         }
 
         public static SorterDisplayVm Tic(
             this SorterDisplayVm sorterDisplayVm,
-            SortableItemVm[] sortableItemVms = null)
+            SortableVm sortableVms = null)
         {
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
@@ -158,8 +171,7 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
         public static SorterDisplayVm ResetSorterDisplayVm(
-                this SorterDisplayVm sorterDisplayVm,
-                Sorting.StagedSorterDef stagedSorterDef,
+                this Sorting.StagedSorterDef stagedSorterDef,
                 StageLayout stageLayout,
                 Func<SortableItemVm[]> sortableItemVmsGen,
                 SwitchUseWrap maxSwitchUseInSorter
@@ -178,6 +190,8 @@ namespace archean.controls.ViewModel.Sorter2
             if (sortableItemVmsGen != null)
             {
                 sortableVm = new SortableVm(
+                    order: stagedSorterDef.sorterDef.order,
+                    sortableVmStyle: SortableVmStyle.Standard(stagedSorterDef.sorterDef.order, 0),
                     currentSortableItemVms: sortableItemVmsGen.Invoke(),
                     nextSortableItemVms: null,
                     stageVmStep: StageVmStep.Left,
@@ -189,7 +203,7 @@ namespace archean.controls.ViewModel.Sorter2
             maxSwitchUseInSorter.Value = 1;
 
             var stageVms = switchBlockSets.ToStageVms(
-                stageVmStyle: StageVmStyle.Standard(false, maxSwitchUseInSorter),
+                stageVmStyle: StageVmStyle.Standard(stagedSorterDef.sorterDef.order, false, 0, maxSwitchUseInSorter),
                 alternatingBrush: StageVmStyleExt.AlternatingBrush,
                 order: stagedSorterDef.sorterDef.order,
                 sortableVm: sortableVm);
