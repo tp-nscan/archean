@@ -46,7 +46,7 @@ namespace archean.controls.View.Sorter2
                 dc.DrawSwitch(StageVm.StageVmStyle, StageVm.Order, kvm, ActualWidth, ActualHeight);
             }
 
-            dc.DrawSortableValues(StageVm.SortableVm, ActualWidth, ActualHeight);
+            dc.DrawSortableValuesAnimate(StageVm.SortableVm, ActualWidth, ActualHeight);
         }
 
 

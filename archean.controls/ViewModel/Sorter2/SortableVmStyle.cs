@@ -27,27 +27,31 @@
 
     public static class SortableVmStyleExt
     {
-        public static double VmHeight(this SortableVmStyle sortableVmStyle, int order)
+        public static double StageVmHeight(this SortableVmStyle sortableVmStyle)
         {
             return 2 * sortableVmStyle.VPadding +
-                       sortableVmStyle.KeyHeight * order +
+                       sortableVmStyle.KeyHeight * sortableVmStyle.Order +
                        sortableVmStyle.KeyHeight;
         }
 
-        public static double VmWidth(this SortableVmStyle sortableVmStyle, int sectionCount)
+        public static double StageVmWidth(this SortableVmStyle sortableVmStyle)
         {
             return 2 * sortableVmStyle.RightMargin +
-                       sortableVmStyle.SectionWidth * sectionCount;
+                       sortableVmStyle.SectionWidth * sortableVmStyle.SectionCount;
         }
 
-        public static double WidthToHeight(this SortableVmStyle sortableVmStyle, int sectionCount, int order)
+        public static double StageWidthToHeight(this SortableVmStyle sortableVmStyle)
         {
-            var h = sortableVmStyle.VmHeight(order);
-            return (h > 0) ? sortableVmStyle.VmWidth(sectionCount) / h : 0.0;
+            var h = sortableVmStyle.StageVmHeight();
+            return (h > 0) ? sortableVmStyle.StageVmWidth() / h : 0.0;
         }
 
         public static SortableVmStyle ChangeSectionCount(this SortableVmStyle sortableVmStyle, int sectionCount)
         {
+            if(sortableVmStyle == null)
+            {
+                return null;
+            }
             return new SortableVmStyle
             {
                 KeyHeight = sortableVmStyle.KeyHeight,

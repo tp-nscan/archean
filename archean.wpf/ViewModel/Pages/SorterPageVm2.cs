@@ -137,7 +137,8 @@ namespace archean.ViewModel.Pages
                     case UpdateMode.Stop:
                         break;
                     case UpdateMode.Tic:
-                        SorterDisplayVm = SorterDisplayVm.Tic();
+                        SorterDisplayVm = SorterDisplayVm.Tic(
+                            (double)value.CurrentTic / (double)value.TicsPerStep);
                         break;
                     case UpdateMode.Step:
                         SortableItemVm[] sortableItemVms = null;
@@ -145,7 +146,8 @@ namespace archean.ViewModel.Pages
                         {
                             sortableItemVms = SortableItemVmsGen.Invoke();
                         }
-                        SorterDisplayVm = SorterDisplayVm.Step(sortableItemVms.InitSortableVm(SorterDisplayVm.GetSortableVmStyle()));
+                        SorterDisplayVm = SorterDisplayVm.Step(
+                            sortableItemVms.InitSortableVm(SorterDisplayVm.GetSortableVmStyle()));
                         break;
                     case UpdateMode.Reset:
                         SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(

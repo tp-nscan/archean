@@ -44,11 +44,6 @@ namespace archean.controls.ViewModel.Sorter2
                         .FirstOrDefault();
         }
 
-        public static Tuple<StageVm, SortableVm> UpdateStageVm(this StageVm stageVm, SortableVm sortableVm)
-        {
-            return new Tuple<StageVm, SortableVm>(stageVm, sortableVm);
-        }
-
         public static IEnumerable<Func<Sorting.ISwitch[][], StageVm>> StageVmMaps(
                                             StageVmStyle stageVmStyle,
                                             Brush alternating,
@@ -61,7 +56,7 @@ namespace archean.controls.ViewModel.Sorter2
                     stageIndex: indexInSorter++, 
                     stageVmStyle: stageVmStyle,
                     order: order, 
-                    sortableVms: sortableVm);
+                    sortableVm: sortableVm);
 
             while (true)
             {
@@ -70,13 +65,13 @@ namespace archean.controls.ViewModel.Sorter2
                             stageIndex: indexInSorter++,
                             stageVmStyle: stageVmStyle.ChangeBackground(alternating),
                             order: order,
-                            sortableVms: null);
+                            sortableVm: null);
                     yield return
                         switchblocks => switchblocks.SwitchBlocksToStageVm(
                             stageIndex: indexInSorter++,
                             stageVmStyle: stageVmStyle,
                             order: order,
-                            sortableVms: null);
+                            sortableVm: null);
             };
         }
 
@@ -94,31 +89,6 @@ namespace archean.controls.ViewModel.Sorter2
                 );
         }
 
-        public static IEnumerable<Sorting.ISwitch[][]> ToSwitchBlockSets(
-            this Sorting.StagedSorterDef stagedSorterDef,
-            StageLayout stageLayout)
-        {
-            IEnumerable<Sorting.ISwitch[][]> switchBlockSets = Enumerable.Empty<Sorting.Switch[][]>();
-
-            switch (stageLayout)
-            {
-                case StageLayout.Single:
-                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterSingle(stagedSorterDef);
-                    break;
-                case StageLayout.Loose:
-                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterLoose(stagedSorterDef);
-                    break;
-                case StageLayout.Tight:
-                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
-                    break;
-                default:
-                    throw new Exception($"{stageLayout} not handled");
-            }
-
-            return switchBlockSets;
-        }
-
-
         public static IEnumerable<StageVm> ResetSortables(
                                 this IEnumerable<StageVm> stageVms, 
                                 SortableVm sortableVm)
@@ -132,7 +102,7 @@ namespace archean.controls.ViewModel.Sorter2
                         stageVmStyle: stvm.StageVmStyle,
                         order: stvm.Order,
                         keyPairVms: stvm.KeyPairVms,
-                        sortableVms: sortableVm
+                        sortableVm: sortableVm
                     );
                 }
                 else
@@ -142,7 +112,7 @@ namespace archean.controls.ViewModel.Sorter2
                         stageVmStyle: stvm.StageVmStyle,
                         order: stvm.Order,
                         keyPairVms: stvm.KeyPairVms,
-                        sortableVms: null
+                        sortableVm: null
                     );
                 }
             }
@@ -152,21 +122,24 @@ namespace archean.controls.ViewModel.Sorter2
                     this SorterDisplayVm sorterDisplayVm,
                     SortableVm sortableVms = null)
         {
-            var newStages = sorterDisplayVm.StageVms.Step(sortableVms);
+            var newStages_sortableVm = sorterDisplayVm.StageVms.Step(sortableVms);
 
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
-                    stageVms: newStages.Item1
+                    stageVms: newStages_sortableVm
                 );
         }
 
         public static SorterDisplayVm Tic(
             this SorterDisplayVm sorterDisplayVm,
+            double animationPct,
             SortableVm sortableVms = null)
         {
+            var newStages_sortableVm = sorterDisplayVm.StageVms.Tic(sortableVms, animationPct);
+
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
-                    stageVms: sorterDisplayVm.StageVms
+                    stageVms: newStages_sortableVm
                 );
         }
 
@@ -193,12 +166,12 @@ namespace archean.controls.ViewModel.Sorter2
                     order: stagedSorterDef.sorterDef.order,
                     sortableVmStyle: SortableVmStyle.Standard(stagedSorterDef.sorterDef.order, 0),
                     currentSortableItemVms: sortableItemVmsGen.Invoke(),
-                    nextSortableItemVms: null,
+                    pastSortableItemVms: null,
                     stageVmStep: StageVmStep.Left,
                     animationPct: 0);
             }
 
-            var switchBlockSets = stagedSorterDef.ToSwitchBlockSets(stageLayout).ToList();
+            var switchBlockSets = stageLayout.ToPaddedSwitchBlockSets(stagedSorterDef, 0, 6).ToList();
 
             maxSwitchUseInSorter.Value = 1;
 
@@ -213,8 +186,6 @@ namespace archean.controls.ViewModel.Sorter2
                     stageVms: stageVms
                 );
         }
-
-
 
     }
 }

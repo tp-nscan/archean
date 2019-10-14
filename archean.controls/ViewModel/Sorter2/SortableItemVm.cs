@@ -64,7 +64,7 @@ namespace archean.controls.ViewModel.Sorter2
                 );
         }
 
-        public static SortableItemVm[] ToRedBlueSortableVms(this int[] positions, int order, bool showLabel)
+        public static SortableItemVm[] ToRedBlueSortableItemVms(this int[] positions, int order, bool showLabel)
         {
             var csB = ColorSets.ColorSpan(order, Colors.Blue, Colors.Red)
                                     .Select(c => new SolidColorBrush(c))
@@ -85,7 +85,7 @@ namespace archean.controls.ViewModel.Sorter2
                 ).ToArray();
         }
 
-        public static SortableItemVm[] ToBlackOrWhiteSortableVms(this int[] positions, int order, bool showLabel)
+        public static SortableItemVm[] ToBlackOrWhiteSortableItemVms(this int[] positions, int order, bool showLabel)
         {
             Func<int, SolidColorBrush> bkB = i => (i == 0) ? Brushes.White : Brushes.Black;
             Func<int, SolidColorBrush> fgB = i => (i == 0) ? Brushes.Black : Brushes.White;
@@ -105,17 +105,17 @@ namespace archean.controls.ViewModel.Sorter2
                 ).ToArray();
         }
 
-        public static SortableItemVm ToLeftSortableVm(this SortableItemVm sortableVm)
+        public static SortableItemVm ToLeftSortableItemVm(this SortableItemVm sortableItemVm)
         {
             return new SortableItemVm(
-                    backgroundBrush: sortableVm.BackgroundBrush,
-                    foregroundBrush: sortableVm.ForegroundBrush,
-                    showLabel: sortableVm.ShowLabel,
+                    backgroundBrush: sortableItemVm.BackgroundBrush,
+                    foregroundBrush: sortableItemVm.ForegroundBrush,
+                    showLabel: sortableItemVm.ShowLabel,
                     stageSection: -1,
                     stagePos: StagePos.Left,
-                    keyLinePos: sortableVm.KeyLinePos,
-                    label: sortableVm.Label,
-                    sortableValue: sortableVm.SortableValue
+                    keyLinePos: sortableItemVm.KeyLinePos,
+                    label: sortableItemVm.Label,
+                    sortableValue: sortableItemVm.SortableValue
                 );
         }
 
@@ -135,170 +135,79 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
 
-        public static SortableItemVm ToPresortSortableVm(this SortableItemVm sortableVm, IEnumerable<KeyPairVm> keyPairVms)
+        public static SortableItemVm ToPresortSortableItemVm(this SortableItemVm sortableItemVm, 
+            IEnumerable<KeyPairVm> keyPairVms)
         {
-            var tup = sortableVm.ToStageSection(keyPairVms);
+            var tup = sortableItemVm.ToStageSection(keyPairVms);
             return new SortableItemVm(
-                    backgroundBrush: sortableVm.BackgroundBrush,
-                    foregroundBrush: sortableVm.ForegroundBrush,
-                    showLabel: sortableVm.ShowLabel,
+                    backgroundBrush: sortableItemVm.BackgroundBrush,
+                    foregroundBrush: sortableItemVm.ForegroundBrush,
+                    showLabel: sortableItemVm.ShowLabel,
                     stageSection: tup.Item2,
                     stagePos: tup.Item1,
-                    keyLinePos: sortableVm.KeyLinePos,
-                    label: sortableVm.Label,
-                    sortableValue: sortableVm.SortableValue
+                    keyLinePos: sortableItemVm.KeyLinePos,
+                    label: sortableItemVm.Label,
+                    sortableValue: sortableItemVm.SortableValue
                 );
         }
 
 
-        public static SortableItemVm ToPostSortSortableVm(this SortableItemVm sortableVm, IEnumerable<KeyPairVm> keyPairVms)
+        public static SortableItemVm ToPostSortSortableItemVm(this SortableItemVm sortableItemVm, 
+            IEnumerable<KeyPairVm> keyPairVms)
         {
-            var tup = sortableVm.ToStageSection(keyPairVms);
+            var tup = sortableItemVm.ToStageSection(keyPairVms);
             return new SortableItemVm(
-                    backgroundBrush: sortableVm.BackgroundBrush,
-                    foregroundBrush: sortableVm.ForegroundBrush,
-                    showLabel: sortableVm.ShowLabel,
+                    backgroundBrush: sortableItemVm.BackgroundBrush,
+                    foregroundBrush: sortableItemVm.ForegroundBrush,
+                    showLabel: sortableItemVm.ShowLabel,
                     stageSection: tup.Item2,
                     stagePos: tup.Item1,
-                    keyLinePos: sortableVm.KeyLinePos,
-                    label: sortableVm.Label,
-                    sortableValue: sortableVm.SortableValue
+                    keyLinePos: sortableItemVm.KeyLinePos,
+                    label: sortableItemVm.Label,
+                    sortableValue: sortableItemVm.SortableValue
                 );
         }
 
-        public static SortableItemVm ToRightSortableVm(this SortableItemVm sortableVm)
+        public static SortableItemVm ToRightSortableItemVm(this SortableItemVm sortableItemVm)
         {
             return new SortableItemVm(
-                    backgroundBrush: sortableVm.BackgroundBrush,
-                    foregroundBrush: sortableVm.ForegroundBrush,
-                    showLabel: sortableVm.ShowLabel,
+                    backgroundBrush: sortableItemVm.BackgroundBrush,
+                    foregroundBrush: sortableItemVm.ForegroundBrush,
+                    showLabel: sortableItemVm.ShowLabel,
                     stageSection: 0,
                     stagePos: StagePos.Right,
-                    keyLinePos: sortableVm.KeyLinePos,
-                    label: sortableVm.Label,
-                    sortableValue: sortableVm.SortableValue
+                    keyLinePos: sortableItemVm.KeyLinePos,
+                    label: sortableItemVm.Label,
+                    sortableValue: sortableItemVm.SortableValue
                 );
         }
 
-        public static SortableItemVm ToMissingSortableVm(this SortableItemVm sortableVm)
+        public static SortableItemVm ToMissingSortableItemVm(this SortableItemVm sortableItemVm)
         {
             return new SortableItemVm(
-                    backgroundBrush: sortableVm.BackgroundBrush,
-                    foregroundBrush: sortableVm.ForegroundBrush,
-                    showLabel: sortableVm.ShowLabel,
+                    backgroundBrush: sortableItemVm.BackgroundBrush,
+                    foregroundBrush: sortableItemVm.ForegroundBrush,
+                    showLabel: sortableItemVm.ShowLabel,
                     stageSection: 0,
                     stagePos: StagePos.Missing,
-                    keyLinePos: sortableVm.KeyLinePos,
-                    label: sortableVm.Label,
-                    sortableValue: sortableVm.SortableValue
+                    keyLinePos: sortableItemVm.KeyLinePos,
+                    label: sortableItemVm.Label,
+                    sortableValue: sortableItemVm.SortableValue
                 );
         }
 
 
-        public static SortableVm ToLeftStep(this SortableVm sortableVms)
+        public static SortableItemVm[] RandomPermutationSortableItemVms(int keyCount, int seed, bool showLabels)
         {
-            return new SortableVm(
-                order: sortableVms.Order,
-                sortableVmStyle: sortableVms.SortableVmStyle,
-                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToLeftSortableVm()).ToArray(),
-                nextSortableItemVms: null,
-                stageVmStep: StageVmStep.Left,
-                animationPct:0);
+            return
+                MathLib.RandomPermutation(keyCount, seed).ToRedBlueSortableItemVms(keyCount, showLabels);
         }
 
-        public static SortableVm ToPreSortStep(this SortableVm sortableVms, IEnumerable<KeyPairVm> keyPairVms)
+        public static SortableItemVm[] Random_0_1_SortableItemVms(int keyCount, int seed, bool showLabels)
         {
-            return new SortableVm(
-                order: sortableVms.Order,
-                sortableVmStyle: sortableVms.SortableVmStyle,
-                currentSortableItemVms: sortableVms.CurrentSortableItemVms.NullToEnumerable().Select(svm => svm.ToPresortSortableVm(keyPairVms)).ToArray(),
-                nextSortableItemVms: null,
-                stageVmStep: StageVmStep.Presort,
-                animationPct: 0);
+            return
+                MathLib.Random_0_1_Array(keyCount, seed).ToBlackOrWhiteSortableItemVms(keyCount, showLabels);
         }
-
-        public static SortableVm ToPostSortStep(this SortableVm sortableVms, IEnumerable<KeyPairVm> keyPairVms)
-        {
-            return new SortableVm(
-                order: sortableVms.Order,
-                sortableVmStyle: sortableVms.SortableVmStyle,
-                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToPostSortSortableVm(keyPairVms)).ToArray(),
-                nextSortableItemVms: null,
-                stageVmStep: StageVmStep.PostSort,
-                animationPct: 0);
-
-        }
-
-        public static SortableVm ToRightStep(this SortableVm sortableVms)
-        {
-            return new SortableVm(
-                order: sortableVms.Order,
-                sortableVmStyle: sortableVms.SortableVmStyle,
-                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToRightSortableVm()).ToArray(),
-                nextSortableItemVms: null,
-                stageVmStep: StageVmStep.Right,
-                animationPct: 0);
-        }
-
-        public static SortableVm ToMissingStep(this SortableVm sortableVms)
-        {
-            return new SortableVm(
-                order: sortableVms.Order,
-                sortableVmStyle: sortableVms.SortableVmStyle,
-                currentSortableItemVms: sortableVms.CurrentSortableItemVms.Select(svm => svm.ToMissingSortableVm()).ToArray(),
-                nextSortableItemVms: null,
-                stageVmStep: StageVmStep.None,
-                animationPct: 0);
-        }
-
-        public static IEnumerable<SortableItemVm> UpdateSortableVms(this IEnumerable<SortableItemVm> sortableItemVms, IEnumerable<KeyPairVm> keyPairVms)
-        {
-            foreach (var sivm in sortableItemVms)
-            {
-                var kpvmLow = keyPairVms.FirstOrDefault(k => k.LowKey == sivm.KeyLinePos);
-                if(kpvmLow != null)
-                {
-                    var sHi = sortableItemVms.First(s => (s.KeyLinePos == kpvmLow.HiKey));
-                    if (sivm.SortableValue > sHi.SortableValue)
-                    {
-                        yield return new SortableItemVm(
-                            backgroundBrush: sivm.BackgroundBrush,
-                            foregroundBrush: sivm.ForegroundBrush,
-                            stageSection: sivm.StageSection,
-                            stagePos: sivm.StagePos,
-                            keyLinePos: sHi.KeyLinePos,
-                            showLabel: sivm.ShowLabel,
-                            label: sivm.Label,
-                            sortableValue: sivm.SortableValue);
-                    }
-                    else yield return sivm;
-                }
-                else
-                {
-                    var kpvmHi = keyPairVms.FirstOrDefault(k => k.HiKey == sivm.KeyLinePos);
-                    if (kpvmHi == null) yield return sivm;
-
-                    else
-                    {
-                        var sLow = sortableItemVms.First(s => (s.KeyLinePos == kpvmHi.LowKey));
-                        if (sivm.SortableValue < sLow.SortableValue)
-                        {
-                            yield return new SortableItemVm(
-                                backgroundBrush: sivm.BackgroundBrush,
-                                foregroundBrush: sivm.ForegroundBrush,
-                                stageSection: sivm.StageSection,
-                                stagePos: sivm.StagePos,
-                                keyLinePos: sLow.KeyLinePos,
-                                showLabel: sivm.ShowLabel,
-                                label: sivm.Label,
-                                sortableValue: sivm.SortableValue);
-                        }
-                        else yield return sivm;
-                    }
-                }
-            }
-        }
-
 
         public static IEnumerable<KeyPairVm> UpdateKeyPairVms(this IEnumerable<KeyPairVm> keyPairVms, IEnumerable<SortableItemVm> sortableItemVms)
         {

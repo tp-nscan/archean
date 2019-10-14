@@ -74,11 +74,11 @@ namespace archean.controls.View.Sorter2
             switch (sortableType)
             {
                 case SortableType.Integer:
-                    return () => StageVmProcs.RandomPermutationSortableItemVms(
+                    return () => SortableItemVmExt.RandomPermutationSortableItemVms(
                                         order,
                                         DateTime.Now.Millisecond, true);
                 case SortableType.Bool:
-                    return () => StageVmProcs.Random_0_1_SortableItemVms(
+                    return () => SortableItemVmExt.Random_0_1_SortableItemVms(
                                         order,
                                         DateTime.Now.Millisecond, true);
                 default:

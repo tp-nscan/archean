@@ -29,6 +29,10 @@ module Sorting =
 
 
     module Switch =
+
+        let ZeroSwitches =
+            seq { while true do yield new Switch(0, 0) :> ISwitch }
+
         let SwitchSeqFromIntArray (pArray:int[]) =
              seq { for i = 0 to pArray.Length - 1 do
                     let j = pArray.[i]
@@ -374,6 +378,10 @@ module Sorting =
                        |> List.rev
                        |> List.toArray
                        
+
+        let LayoutEmptyStages =
+            seq { while true do yield Array.Empty<ISwitch[]>()}
+
 
         let LayoutRandomStage (order:int) (rnd:Random) =
             let switches = Stage.MakeStagePackedSwitchSeq rnd order |> Seq.take (order / 2)

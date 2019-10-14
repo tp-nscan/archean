@@ -5,7 +5,7 @@
         Left,
         Presort,
         PostSort,
-        Right,
+       // Right,
         None
     }
 
@@ -20,9 +20,7 @@
                 case StageVmStep.Presort:
                     return StageVmStep.PostSort;
                 case StageVmStep.PostSort:
-                    return StageVmStep.Right;
-                case StageVmStep.Right:
-                    return StageVmStep.None;
+                    return StageVmStep.Left;
                 case StageVmStep.None:
                     return StageVmStep.None;
                 default:

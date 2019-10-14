@@ -1,4 +1,9 @@
-﻿namespace archean.controls.ViewModel
+﻿using archean.core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace archean.controls.ViewModel
 {
     public enum AnimationSpeed
     {
@@ -67,6 +72,51 @@
                     return -1.0;
             }
         }
+
+
+        public static IEnumerable<Sorting.ISwitch[][]> ToSwitchBlockSets(
+            this StageLayout stageLayout, 
+            Sorting.StagedSorterDef stagedSorterDef)
+        {
+            IEnumerable<Sorting.ISwitch[][]> switchBlockSets = Enumerable.Empty<Sorting.Switch[][]>();
+
+            switch (stageLayout)
+            {
+                case StageLayout.Single:
+                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterSingle(stagedSorterDef);
+                    break;
+                case StageLayout.Loose:
+                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterLoose(stagedSorterDef);
+                    break;
+                case StageLayout.Tight:
+                    switchBlockSets = Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
+                    break;
+                default:
+                    throw new Exception($"{stageLayout} not handled");
+            }
+
+            return switchBlockSets;
+        }
+
+        public static IEnumerable<Sorting.ISwitch[][]> ToPaddedSwitchBlockSets(
+                this StageLayout stageLayout,
+                Sorting.StagedSorterDef stagedSorterDef,
+                int frontPad, int backPad)
+        {
+            foreach (var swb in Sorting.StageLayout.LayoutEmptyStages.Take(frontPad))
+            {
+                yield return swb;
+            }
+            foreach (var swb in stageLayout.ToSwitchBlockSets(stagedSorterDef))
+            {
+                yield return swb;
+            }
+            foreach (var swb in Sorting.StageLayout.LayoutEmptyStages.Take(backPad))
+            {
+                yield return swb;
+            }
+        }
+
 
     }
 }

@@ -44,7 +44,6 @@ namespace archean.controls.ViewModel.Sorter2
         public static List<SolidColorBrush> SwitchBrushes =
             core.ColorSets.TwoColorSpan( Colors.Blue, Colors.Red, (int)colorSteps).Select(c => new SolidColorBrush(c)).ToList();
 
-
         public static Func<int, Brush> ToSwitchBrushFunc(this SwitchUseWrap maxUseCount)
         {
             return useCount =>
@@ -95,6 +94,7 @@ namespace archean.controls.ViewModel.Sorter2
                 SortableVmStyle = stageVmStyle.SortableVmStyle
             };
         }
+
     }
 
 }

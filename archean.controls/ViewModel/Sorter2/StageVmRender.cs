@@ -9,45 +9,45 @@ namespace archean.controls.ViewModel.Sorter2
     {
         public static double RenderWidth(this SortableVmStyle vms, double widthInVm, double stageRenderWidth)
         {
-            return (stageRenderWidth * widthInVm) / vms.VmWidth(vms.SectionCount);
+            return (stageRenderWidth * widthInVm) / vms.StageVmWidth();
         }
 
-        public static double KeyRenderYc(this SortableVmStyle sortableVmStyle, int keyDex, double stageRenderHeight)
+        public static double RenderXMidStageSection(this SortableVmStyle sortableVmStyle, int sectionDex, double stageRenderWidth)
+        {
+            var vmX = (sectionDex + 0.5) * (sortableVmStyle.SectionWidth);
+            return sortableVmStyle.RenderWidth(vmX, stageRenderWidth);
+        }
+
+        public static double RenderYKeyLineCenter(this SortableVmStyle sortableVmStyle, int keyDex, double stageRenderHeight)
         {
             var vmHeight = sortableVmStyle.VPadding +
                           (sortableVmStyle.Order - keyDex) * sortableVmStyle.KeyHeight;
 
-            return RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+            return RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.StageVmHeight(),
                                                  childVmHeight: vmHeight,
                                                  parentRenderHeight: stageRenderHeight);
         }
 
-        public static double KeyRenderYh(this StageVmStyle stageVmStyle, int keyDex, double stageRenderHeight)
+        public static double RenderYKeyLineTop(this StageVmStyle stageVmStyle, int keyDex, double stageRenderHeight)
         {
             var vmHeight = stageVmStyle.SortableVmStyle.VPadding +
                           (stageVmStyle.SortableVmStyle.Order - keyDex) * stageVmStyle.SortableVmStyle.KeyHeight -
                           stageVmStyle.KeyLineThickness / 2;
 
-            return RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.VmHeight(stageVmStyle.SortableVmStyle.Order),
+            return RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.StageVmHeight(),
                                                  childVmHeight: vmHeight,
                                                  parentRenderHeight: stageRenderHeight);
         }
 
-        public static double KeyRenderYl(this StageVmStyle stageVmStyle, int keyDex, double stageRenderHeight)
+        public static double RenderYKeyLineBottom(this StageVmStyle stageVmStyle, int keyDex, double stageRenderHeight)
         {
             var vmHeight = stageVmStyle.SortableVmStyle.VPadding +
                           (stageVmStyle.SortableVmStyle.Order - keyDex) * stageVmStyle.SortableVmStyle.KeyHeight +
                            stageVmStyle.KeyLineThickness / 2;
 
-            return RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.VmHeight(stageVmStyle.SortableVmStyle.Order),
+            return RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.StageVmHeight(),
                                                  childVmHeight: vmHeight,
                                                  parentRenderHeight: stageRenderHeight);
-        }
-
-        public static double SectionRenderX(this SortableVmStyle sortableVmStyle, int sectionDex, double stageRenderWidth)
-        {
-            var vmX = (sectionDex + 0.5) * (sortableVmStyle.SectionWidth);
-            return sortableVmStyle.RenderWidth(vmX, stageRenderWidth);
         }
 
         public static Pen SwitchLinePen(this StageVmStyle stageVmStyle, KeyPairVm keyPairVm, double stageRenderWidth)
@@ -59,7 +59,7 @@ namespace archean.controls.ViewModel.Sorter2
         public static Pen KeyLinePen(this StageVmStyle stageVmStyle, double stageRenderHeight)
         {
             var brushHeight = 
-                RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.VmHeight(stageVmStyle.SortableVmStyle.Order),
+                RenderUtils.ChildRenderHeight(parentVmHeight: stageVmStyle.SortableVmStyle.StageVmHeight(),
                                               childVmHeight: stageVmStyle.KeyLineThickness,
                                               parentRenderHeight: stageRenderHeight);
 
@@ -71,9 +71,9 @@ namespace archean.controls.ViewModel.Sorter2
                                       double stageRenderWidth, double stageRenderHeight)
         {
             var pen = stageVmStyle.SwitchLinePen(keyPairVm, stageRenderWidth);
-            var renderX = stageVmStyle.SortableVmStyle.SectionRenderX(keyPairVm.StageSection, stageRenderWidth);
-            var renderYLow = stageVmStyle.KeyRenderYl(keyPairVm.LowKey, stageRenderHeight);
-            var renderYHigh = stageVmStyle.KeyRenderYh(keyPairVm.HiKey, stageRenderHeight);
+            var renderX = stageVmStyle.SortableVmStyle.RenderXMidStageSection(keyPairVm.StageSection, stageRenderWidth);
+            var renderYLow = stageVmStyle.RenderYKeyLineBottom(keyPairVm.LowKey, stageRenderHeight);
+            var renderYHigh = stageVmStyle.RenderYKeyLineTop(keyPairVm.HiKey, stageRenderHeight);
             var pointLow = new Point(renderX, renderYLow);
             var pointHigh = new Point(renderX, renderYHigh);
             dc.DrawLine(pen, pointLow, pointHigh);
@@ -83,7 +83,7 @@ namespace archean.controls.ViewModel.Sorter2
                                                 double stageRenderWidth, double stageRenderHeight)
         {
             var pen = stageVmStyle.KeyLinePen(stageRenderHeight);
-            var renderY = stageVmStyle.SortableVmStyle.KeyRenderYc(keyDex, stageRenderHeight);
+            var renderY = stageVmStyle.SortableVmStyle.RenderYKeyLineCenter(keyDex, stageRenderHeight);
             var pointLeft = new Point(0, renderY);
             var pointRight = new Point(stageRenderWidth, renderY);
             dc.DrawLine(pen, pointLeft, pointRight);
@@ -102,21 +102,16 @@ namespace archean.controls.ViewModel.Sorter2
                                                      SortableItemVm sortableItemVm,
                                                      double stageRenderWidth, double stageRenderHeight)
         {
-            if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
-            {
-                return new Point(0, 0);
-            }
-            if (sortableItemVm.StagePos == StagePos.Missing)
-            {
-                return new Point(0, 0);
-            }
+            if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))   { return new Point(0, 0); }
+            if (sortableItemVm.StagePos == StagePos.Missing)  { return new Point(0, 0); }
 
-            var renderY = sortableVmStyle.KeyRenderYc(sortableItemVm.KeyLinePos, stageRenderHeight);
+            var renderY = sortableVmStyle.RenderYKeyLineCenter(sortableItemVm.KeyLinePos, stageRenderHeight);
 
             var radius =
-                    RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
-                                                  childVmHeight: sortableVmStyle.Radius,
-                                                  parentRenderHeight: stageRenderHeight);
+                    RenderUtils.ChildRenderHeight(
+                        parentVmHeight: sortableVmStyle.StageVmHeight(),
+                        childVmHeight: sortableVmStyle.Radius,
+                        parentRenderHeight: stageRenderHeight);
 
             var renderX = 0.0;
             switch (sortableItemVm.StagePos)
@@ -126,7 +121,8 @@ namespace archean.controls.ViewModel.Sorter2
                     break;
                 case StagePos.Center:
                     renderX = sortableVmStyle
-                                     .SectionRenderX(sortableItemVm.StageSection, stageRenderWidth);
+                                .RenderXMidStageSection(
+                                sortableItemVm.StageSection, stageRenderWidth);
                     break;
                 case StagePos.Right:
                     renderX = stageRenderWidth - radius * 1.2;
@@ -134,8 +130,8 @@ namespace archean.controls.ViewModel.Sorter2
                 default:
                     break;
             }
-            return new Point(renderX, renderY);
 
+            return new Point(renderX, renderY);
         }
 
         static Pen _sortableBorderPen;
@@ -153,33 +149,34 @@ namespace archean.controls.ViewModel.Sorter2
                                                   double stageRenderWidth, 
                                                   double stageRenderHeight)
         {
-            if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))
-            {
-                return;
-            }
-            if (sortableItemVm.StagePos == StagePos.Missing)
-            {
-                return;
-            }
+            if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0)) { return; }
+            if (sortableItemVm.StagePos == StagePos.Missing)  { return; }
 
-            var radius =
-                RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+            var radius =  RenderUtils.ChildRenderHeight(
+                                              parentVmHeight: sortableVmStyle.StageVmHeight(),
                                               childVmHeight: sortableVmStyle.Radius,
                                               parentRenderHeight: stageRenderHeight);
 
-            var center = sortableVmStyle.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
-            dc.DrawEllipse(sortableItemVm.BackgroundBrush, SortableBorderPen, center, radius, radius);
+            var sortableItemPosition = sortableVmStyle.GetSortableItemPosition(
+                                                sortableItemVm:sortableItemVm,
+                                                stageRenderWidth:stageRenderWidth,
+                                                stageRenderHeight:stageRenderHeight);
+
+            dc.DrawEllipse(sortableItemVm.BackgroundBrush, SortableBorderPen, sortableItemPosition, radius, radius);
 
             if(sortableItemVm.ShowLabel)
             {
                 var txt = new FormattedText(sortableItemVm.Label.ToString(),
-                                               CultureInfo.CurrentCulture,
-                                               FlowDirection.LeftToRight,
-                                               SortableItemVm.Typeface,
-                                               radius, sortableItemVm.ForegroundBrush, 1.0);
+                                            CultureInfo.CurrentCulture,
+                                            FlowDirection.LeftToRight,
+                                            SortableItemVm.Typeface,
+                                            radius, sortableItemVm.ForegroundBrush, 1.0);
 
-                var upLeft = new Point(center.X - txt.Width / 2, center.Y - txt.Height / 2);
-                dc.DrawText(txt, upLeft);
+                var textUpLeft = new Point(
+                                    x: sortableItemPosition.X - txt.Width / 2, 
+                                    y: sortableItemPosition.Y - txt.Height / 2);
+
+                dc.DrawText(txt, textUpLeft);
             }
         }
 
@@ -212,14 +209,14 @@ namespace archean.controls.ViewModel.Sorter2
                 return;
             }
             var radius =
-                RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.VmHeight(sortableVmStyle.Order),
+                RenderUtils.ChildRenderHeight(parentVmHeight: sortableVmStyle.StageVmHeight(),
                                               childVmHeight: sortableVmStyle.Radius,
                                               parentRenderHeight: stageRenderHeight);
 
             var centerO = sortableVmStyle.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
             var centerN = sortableVmStyle.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
 
-            var center = centerO.Interpolate(centerN, animationPct);
+            var center = centerN.Interpolate(centerO, animationPct);
 
             dc.DrawEllipse(sortableItemVm.BackgroundBrush, null, center, radius, radius);
 
@@ -237,19 +234,25 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
         public static void DrawSortableValuesAnimate(
-            this SortableVm sortableVm,
-            DrawingContext dc,
+            this DrawingContext dc, 
+            SortableVm sortableVm,
             double stageRenderWidth,
             double stageRenderHeight)
         {
             if (sortableVm?.CurrentSortableItemVms == null) return;
+
+            if (sortableVm?.PastSortableItemVms == null)
+            {
+                return;
+            }
+
 
             for (var i = 0; i < sortableVm.CurrentSortableItemVms.Length; i++)
             {
                 dc.DrawSortableValueAnimate(
                     animationPct: sortableVm.AnimationPct,
                     sortableVmStyle: sortableVm.SortableVmStyle,
-                    sortableItemVmOld: sortableVm.CurrentSortableItemVms[i],
+                    sortableItemVmOld: sortableVm.PastSortableItemVms[i],
                     sortableItemVm: sortableVm.CurrentSortableItemVms[i],
                     stageRenderWidth: stageRenderWidth,
                     stageRenderHeight: stageRenderHeight);
