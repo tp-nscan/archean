@@ -103,6 +103,17 @@ namespace archean.controls.ViewModel.Sorter2
 
             switch (stageVm.SortableVm.StageVmStep)
             {
+                case StageVmStep.Init:
+
+                    return new Tuple<StageVm, SortableVm>(
+                                 item1: new StageVm(
+                                              stageIndex: stageVm.StageIndex,
+                                              stageVmStyle: stageVm.StageVmStyle,
+                                              order: stageVm.Order,
+                                              keyPairVms: stageVm.KeyPairVms,
+                                              sortableVm: stageVm.SortableVm.ToLeftStep(stageVm.KeyPairVms.ToArray())),
+                                  item2: null);
+
                 case StageVmStep.Left:
 
                     return new Tuple<StageVm, SortableVm>(
@@ -114,26 +125,18 @@ namespace archean.controls.ViewModel.Sorter2
                                               sortableVm: stageVm.SortableVm.ToPreSortStep(stageVm.KeyPairVms.ToArray())),
                                   item2: null);
 
-                case StageVmStep.Presort:
 
-                    var newKeypairVms = stageVm.KeyPairVms.UpdateKeyPairVms(stageVm.SortableVm.CurrentSortableItemVms).ToArray();
-                    var newSortableVm = 
-                        new SortableVm(
-                                order: stageVm.Order,
-                                sortableVmStyle: stageVm.SortableVm.SortableVmStyle,
-                                currentSortableItemVms: stageVm.SortableVm.CurrentSortableItemVms.UpdateSortableVms(newKeypairVms).ToArray(),
-                                pastSortableItemVms: null,
-                                stageVmStep: stageVm.SortableVm.StageVmStep,
-                                animationPct: 0);
+                case StageVmStep.Presort:
 
                     return new Tuple<StageVm, SortableVm>(
                                   item1: new StageVm(
                                               stageIndex: stageVm.StageIndex,
                                               stageVmStyle: stageVm.StageVmStyle,
                                               order: stageVm.Order,
-                                              keyPairVms: newKeypairVms,
-                                              sortableVm: newSortableVm.ToPostSortStep(newKeypairVms)),
-                                  item2: null);
+                                              keyPairVms: stageVm.KeyPairVms.UpdateKeyPairVms(stageVm.SortableVm.PastSortableItemVms),
+                                              sortableVm: stageVm.SortableVm.ToPostSortStep()),
+                                  item2: stageVm.SortableVm.ToInitStep());
+
 
                 case StageVmStep.PostSort:
 
@@ -144,19 +147,8 @@ namespace archean.controls.ViewModel.Sorter2
                                               order: stageVm.Order,
                                               keyPairVms: stageVm.KeyPairVms,
                                               sortableVm: null),
-                                  item2: stageVm.SortableVm.ToLeftStep());
-
-
-                case StageVmStep.None:
-
-                    return new Tuple<StageVm, SortableVm>(
-                                  item1: new StageVm(
-                                              stageIndex: stageVm.StageIndex,
-                                              stageVmStyle: stageVm.StageVmStyle,
-                                              order: stageVm.Order,
-                                              keyPairVms: stageVm.KeyPairVms,
-                                              sortableVm: sortableVm),
                                   item2: null);
+
                 default:
                     throw new Exception($"{stageVm.SortableVm.StageVmStep} not handled");
             }

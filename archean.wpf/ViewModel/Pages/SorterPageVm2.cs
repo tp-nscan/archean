@@ -71,11 +71,7 @@ namespace archean.ViewModel.Pages
             set
             {
                 SetProperty(ref _sortableItemVmsGen, value);
-                SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(
-                    stageLayout: StageLayout,
-                    sortableItemVmsGen: SortableItemVmsGen,
-                    maxSwitchUseInSorter: MaxSwitchUseInSorter
-                );
+                ResetSorterDisplayVm();
             }
         }
 
@@ -88,6 +84,15 @@ namespace archean.ViewModel.Pages
             {
                 SetProperty(ref _stagedSorterDef, value);
                 Order = value.sorterDef.order;
+                ResetSorterDisplayVm();
+            }
+        }
+
+        void ResetSorterDisplayVm()
+        {
+            if ((StagedSorterDef != null) && (SortableItemVmsGen != null)
+                && (StageLayout != StageLayout.Undefined))
+            {
                 SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(
                     stageLayout: StageLayout,
                     sortableItemVmsGen: SortableItemVmsGen,
@@ -141,13 +146,21 @@ namespace archean.ViewModel.Pages
                             (double)value.CurrentTic / (double)value.TicsPerStep);
                         break;
                     case UpdateMode.Step:
-                        SortableItemVm[] sortableItemVms = null;
-                        if (SortableItemVmsGen != null)
+                        if (value.CurrentStep >= 0)
                         {
-                            sortableItemVms = SortableItemVmsGen.Invoke();
+                            SortableItemVm[] sortableItemVms = null;
+                            if (SortableItemVmsGen != null)
+                            {
+                                sortableItemVms = SortableItemVmsGen.Invoke();
+                            }
+                            SorterDisplayVm = SorterDisplayVm.Step(
+                                sortableItemVms.InitSortableVm(SorterDisplayVm.GetSortableVmStyle()));
+                            break;
                         }
-                        SorterDisplayVm = SorterDisplayVm.Step(
-                            sortableItemVms.InitSortableVm(SorterDisplayVm.GetSortableVmStyle()));
+                        else
+                        {
+                            SorterDisplayVm = SorterDisplayVm.Step();
+                        }
                         break;
                     case UpdateMode.Reset:
                         SorterDisplayVm = StagedSorterDef.ResetSorterDisplayVm(

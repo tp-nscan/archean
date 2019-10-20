@@ -98,9 +98,10 @@ namespace archean.controls.ViewModel.Sorter2
             }
         }
 
-        public static Point GetSortableItemPosition(this SortableVmStyle sortableVmStyle,
-                                                     SortableItemVm sortableItemVm,
-                                                     double stageRenderWidth, double stageRenderHeight)
+        public static Point GetSortableItemPosition(this SortableItemVm sortableItemVm, 
+                                                     SortableVmStyle sortableVmStyle,
+                                                     double stageRenderWidth,
+                                                     double stageRenderHeight)
         {
             if ((stageRenderHeight <= 0) || (stageRenderHeight <= 0))   { return new Point(0, 0); }
             if (sortableItemVm.StagePos == StagePos.Missing)  { return new Point(0, 0); }
@@ -157,8 +158,8 @@ namespace archean.controls.ViewModel.Sorter2
                                               childVmHeight: sortableVmStyle.Radius,
                                               parentRenderHeight: stageRenderHeight);
 
-            var sortableItemPosition = sortableVmStyle.GetSortableItemPosition(
-                                                sortableItemVm:sortableItemVm,
+            var sortableItemPosition = sortableItemVm.GetSortableItemPosition(
+                                                sortableVmStyle:sortableVmStyle,
                                                 stageRenderWidth:stageRenderWidth,
                                                 stageRenderHeight:stageRenderHeight);
 
@@ -213,10 +214,10 @@ namespace archean.controls.ViewModel.Sorter2
                                               childVmHeight: sortableVmStyle.Radius,
                                               parentRenderHeight: stageRenderHeight);
 
-            var centerO = sortableVmStyle.GetSortableItemPosition(sortableItemVmOld, stageRenderWidth, stageRenderHeight);
-            var centerN = sortableVmStyle.GetSortableItemPosition(sortableItemVm, stageRenderWidth, stageRenderHeight);
+            var centerO = sortableItemVmOld.GetSortableItemPosition(sortableVmStyle, stageRenderWidth, stageRenderHeight);
+            var centerN = sortableItemVm.GetSortableItemPosition(sortableVmStyle, stageRenderWidth, stageRenderHeight);
 
-            var center = centerN.Interpolate(centerO, animationPct);
+            var center = centerO.Interpolate(centerN, animationPct);
 
             dc.DrawEllipse(sortableItemVm.BackgroundBrush, null, center, radius, radius);
 
@@ -245,7 +246,6 @@ namespace archean.controls.ViewModel.Sorter2
             {
                 return;
             }
-
 
             for (var i = 0; i < sortableVm.CurrentSortableItemVms.Length; i++)
             {

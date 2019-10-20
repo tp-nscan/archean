@@ -121,15 +121,15 @@ namespace archean.controls.ViewModel.Sorter2
 
 
         public static Tuple<StagePos, int> ToStageSection(
-            this SortableItemVm sortableVm, IEnumerable<KeyPairVm> keyPairVms)
+            this SortableItemVm sortableItemVm, IEnumerable<KeyPairVm> keyPairVms)
         {
-            var swH = keyPairVms.FirstOrDefault(
-                kpv => (kpv.HiKey == sortableVm.KeyLinePos)
-                        || (kpv.LowKey == sortableVm.KeyLinePos)
+            var keyPairVm = keyPairVms.FirstOrDefault(
+                kpv => (kpv.HiKey == sortableItemVm.KeyLinePos)
+                        || (kpv.LowKey == sortableItemVm.KeyLinePos)
                 );
-            if (swH != null)
+            if (keyPairVm != null)
             {
-                return new Tuple<StagePos, int>(StagePos.Center, swH.StageSection);
+                return new Tuple<StagePos, int>(StagePos.Center, keyPairVm.StageSection);
             }
             return new Tuple<StagePos, int>(StagePos.Right, 0);
         }

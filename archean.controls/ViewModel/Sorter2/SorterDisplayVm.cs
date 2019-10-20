@@ -120,9 +120,9 @@ namespace archean.controls.ViewModel.Sorter2
 
         public static SorterDisplayVm Step(
                     this SorterDisplayVm sorterDisplayVm,
-                    SortableVm sortableVms = null)
+                    SortableVm sortableVm = null)
         {
-            var newStages_sortableVm = sorterDisplayVm.StageVms.Step(sortableVms);
+            var newStages_sortableVm = sorterDisplayVm.StageVms.Step(sortableVm);
 
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
@@ -133,9 +133,9 @@ namespace archean.controls.ViewModel.Sorter2
         public static SorterDisplayVm Tic(
             this SorterDisplayVm sorterDisplayVm,
             double animationPct,
-            SortableVm sortableVms = null)
+            SortableVm sortableVm = null)
         {
-            var newStages_sortableVm = sorterDisplayVm.StageVms.Tic(sortableVms, animationPct);
+            var newStages_sortableVm = sorterDisplayVm.StageVms.Tic(sortableVm, animationPct);
 
             return new SorterDisplayVm(
                     order: sorterDisplayVm.Order,
@@ -150,15 +150,6 @@ namespace archean.controls.ViewModel.Sorter2
                 SwitchUseWrap maxSwitchUseInSorter
             )
         {
-            if (stagedSorterDef == null)
-            {
-                return null;
-            }
-            if (stageLayout == StageLayout.Undefined)
-            {
-                return null;
-            }
-
             SortableVm sortableVm = null;
             if (sortableItemVmsGen != null)
             {
@@ -167,7 +158,7 @@ namespace archean.controls.ViewModel.Sorter2
                     sortableVmStyle: SortableVmStyle.Standard(stagedSorterDef.sorterDef.order, 0),
                     currentSortableItemVms: sortableItemVmsGen.Invoke(),
                     pastSortableItemVms: null,
-                    stageVmStep: StageVmStep.Left,
+                    stageVmStep: StageVmStep.Init,
                     animationPct: 0);
             }
 
