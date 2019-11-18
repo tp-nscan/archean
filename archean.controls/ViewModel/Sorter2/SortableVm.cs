@@ -189,7 +189,5 @@ namespace archean.controls.ViewModel.Sorter2
         }
 
 
-
-
     }
 }

@@ -71,8 +71,8 @@ namespace archean.ViewModel.Pages
                 );
         }
 
-        AnimationSpeed _animationSpeed = AnimationSpeed.Stopped;
-        public AnimationSpeed AnimationSpeed
+        TicsPerStep _animationSpeed = TicsPerStep.Stopped;
+        public TicsPerStep AnimationSpeed
         {
             get => _animationSpeed;
             set

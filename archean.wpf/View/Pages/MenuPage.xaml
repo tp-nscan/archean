@@ -91,6 +91,7 @@
         <Button x:Name="btnStageControl" Grid.Row="1" Click="BtnStageControl_Click">Stage Control</Button>
         <Button x:Name="btnSorterControl" Grid.Row="2" Click="BtnSorterControl_Click">Sorter Control</Button>
         <Button x:Name="btnSorter2Control" Grid.Row="3" Click="BtnSorter2Control_Click">Sorter2 Control</Button>
+        <Button x:Name="btnSorter3Control" Grid.Row="4" Click="BtnSorter3Control_Click">Sorter3 Control</Button>
         
     </Grid>
 </Page>

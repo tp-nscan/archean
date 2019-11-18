@@ -8,11 +8,11 @@ using System.Collections.Generic;
 
 namespace archean.ViewModel.Pages
 {
-    public class SorterPageVm2 : BindableBase
+    public class SorterPageVm3 : BindableBase
     {
         SwitchUseWrap MaxSwitchUseInSorter;
 
-        public SorterPageVm2()
+        public SorterPageVm3()
         {
             MaxSwitchUseInSorter = new SwitchUseWrap();
         }

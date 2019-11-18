@@ -133,7 +133,7 @@ namespace archean.controls.View.Sorter
 
             if ((stageControl.StageVm.SortableItemVms != null ) &&
                 (stageControl.StageVm.SortableItemVmsOld != null) &&
-                (stageControl.StageVm.StageVmStyle.AnimationSpeed != AnimationSpeed.Stopped))
+                (stageControl.StageVm.StageVmStyle.AnimationSpeed != ViewModel.TicsPerStep.Stopped))
             {
                 stageControl.StartTimer(stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateFrequency());
                 stageControl.TicsPerStep = stageControl.StageVm.StageVmStyle.AnimationSpeed.ToUpdateSteps();

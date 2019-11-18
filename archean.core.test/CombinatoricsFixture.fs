@@ -177,5 +177,5 @@ type CombinatoricsFixture () =
         let testArray = [|1; 2; 3; 4; 5; 6; 7; 8; 9|] 
         let testBreaks = [|0; 2; 5; 9|] 
 
-        let yak = BreakIntoSegments testArray testBreaks
+        let yak = BreakArrayIntoSegments testArray testBreaks
         Assert.AreEqual (yak.Length, 3)

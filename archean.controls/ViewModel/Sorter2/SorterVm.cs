@@ -8,9 +8,9 @@ using System.Windows.Media;
 
 namespace archean.controls.ViewModel.Sorter2
 {
-    public class SorterDisplayVm : BindableBase
+    public class SorterVm : BindableBase
     {
-        public SorterDisplayVm(
+        public SorterVm(
                         int order,
                         IEnumerable<StageVm> stageVms)
         {
@@ -36,7 +36,7 @@ namespace archean.controls.ViewModel.Sorter2
 
     public static class SorterDisplayVmExt
     {
-        public static SortableVmStyle GetSortableVmStyle(this SorterDisplayVm sorterDisplayVm)
+        public static SortableVmStyle GetSortableVmStyle(this SorterVm sorterDisplayVm)
         {
             return sorterDisplayVm.StageVms
                         .Where(svm=> svm.SortableVm != null)
@@ -118,32 +118,32 @@ namespace archean.controls.ViewModel.Sorter2
             }
         }
 
-        public static SorterDisplayVm Step(
-                    this SorterDisplayVm sorterDisplayVm,
+        public static SorterVm Step(
+                    this SorterVm sorterDisplayVm,
                     SortableVm sortableVm = null)
         {
             var newStages_sortableVm = sorterDisplayVm.StageVms.Step(sortableVm);
 
-            return new SorterDisplayVm(
+            return new SorterVm(
                     order: sorterDisplayVm.Order,
                     stageVms: newStages_sortableVm
                 );
         }
 
-        public static SorterDisplayVm Tic(
-            this SorterDisplayVm sorterDisplayVm,
+        public static SorterVm Tic(
+            this SorterVm sorterDisplayVm,
             double animationPct,
             SortableVm sortableVm = null)
         {
             var newStages_sortableVm = sorterDisplayVm.StageVms.Tic(sortableVm, animationPct);
 
-            return new SorterDisplayVm(
+            return new SorterVm(
                     order: sorterDisplayVm.Order,
                     stageVms: newStages_sortableVm
                 );
         }
 
-        public static SorterDisplayVm ResetSorterDisplayVm(
+        public static SorterVm ResetSorterDisplayVm(
                 this Sorting.StagedSorterDef stagedSorterDef,
                 StageLayout stageLayout,
                 Func<SortableItemVm[]> sortableItemVmsGen,
@@ -163,7 +163,6 @@ namespace archean.controls.ViewModel.Sorter2
             }
 
             var switchBlockSets = stageLayout.ToPaddedSwitchBlockSets(stagedSorterDef, 0, 6).ToList();
-
             maxSwitchUseInSorter.Value = 1;
 
             var stageVms = switchBlockSets.ToStageVms(
@@ -172,7 +171,7 @@ namespace archean.controls.ViewModel.Sorter2
                 order: stagedSorterDef.sorterDef.order,
                 sortableVm: sortableVm);
 
-            return new SorterDisplayVm(
+            return new SorterVm(
                     order: stagedSorterDef.sorterDef.order,
                     stageVms: stageVms
                 );

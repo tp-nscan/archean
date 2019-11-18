@@ -85,5 +85,13 @@ namespace archean.controls.Utils
                 ticsPerStep: animationState.TicsPerStep);
         }
 
+        public static AnimationState ChangeTicsPerStep(this AnimationState animationState, int ticsPerStep)
+        {
+            return new AnimationState(
+                updateMode: animationState.UpdateMode,
+                currentStep: animationState.CurrentStep,
+                currentTic: (animationState.CurrentTic * ticsPerStep) /(animationState.TicsPerStep + 1),
+                ticsPerStep: ticsPerStep);
+        }
     }
 }

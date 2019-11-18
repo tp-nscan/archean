@@ -197,28 +197,28 @@ namespace archean.controls.View.Sorter
 
         #region AnimationSpeed
 
-        public IEnumerable<AnimationSpeed> AnimationSpeeds
+        public IEnumerable<TicsPerStep> AnimationSpeeds
         {
             get
             {
-                return Enum.GetValues(typeof(AnimationSpeed)).Cast<AnimationSpeed>();
+                return Enum.GetValues(typeof(TicsPerStep)).Cast<TicsPerStep>();
             }
         }
 
-        public AnimationSpeed AnimationSpeed
+        public TicsPerStep AnimationSpeed
         {
-            get { return (AnimationSpeed)GetValue(AnimationSpeedProperty); }
+            get { return (TicsPerStep)GetValue(AnimationSpeedProperty); }
             set { SetValue(AnimationSpeedProperty, value); }
         }
 
         public static readonly DependencyProperty AnimationSpeedProperty =
-            DependencyProperty.Register("AnimationSpeed", typeof(AnimationSpeed), typeof(SorterRunControl),
-            new FrameworkPropertyMetadata(AnimationSpeed.Stopped, FrameworkPropertyMetadataOptions.None, OnAnimationSpeedPropertyChanged));
+            DependencyProperty.Register("AnimationSpeed", typeof(TicsPerStep), typeof(SorterRunControl),
+            new FrameworkPropertyMetadata(TicsPerStep.Stopped, FrameworkPropertyMetadataOptions.None, OnAnimationSpeedPropertyChanged));
 
         private static void OnAnimationSpeedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var sorterRunControl = (SorterRunControl)d;
-            var animationSpeed = (AnimationSpeed)e.NewValue;
+            var animationSpeed = (TicsPerStep)e.NewValue;
             if (sorterRunControl.SorterDisplayVm != null)
             {
             }

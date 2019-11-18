@@ -38,5 +38,12 @@ namespace archean.View.Pages
             nextPage.DataContext = new SorterPageVm2();
             NavigationService.Navigate(nextPage);
         }
+
+        private void BtnSorter3Control_Click(object sender, RoutedEventArgs e)
+        {
+            var nextPage = new SorterPage3();
+            nextPage.DataContext = new SorterPageVm2();
+            NavigationService.Navigate(nextPage);
+        }
     }
 }

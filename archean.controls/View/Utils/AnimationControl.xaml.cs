@@ -11,7 +11,7 @@ namespace archean.controls.View.Utils
 {
     public partial class AnimationControl
     {
-        const int TICSPERSTEP = 10;
+        const int TICSPERSTEP = 30;
 
         public AnimationControl()
         {
@@ -42,7 +42,7 @@ namespace archean.controls.View.Utils
         bool IsStepping { get; set; }
         private void DoStep()
         {
-            if(AnimationSpeed != AnimationSpeed.Stopped)
+            if(TicsPerStep != TicsPerStep.Stopped)
             {
                 IsStepping = true;
                 StartTimer();
@@ -263,37 +263,38 @@ namespace archean.controls.View.Utils
 
         #region AnimationSpeed
 
-        public IEnumerable<AnimationSpeed> AnimationSpeeds
+        public IEnumerable<TicsPerStep> AnimationSpeeds
         {
             get
             {
-                return Enum.GetValues(typeof(AnimationSpeed)).Cast<AnimationSpeed>();
+                return Enum.GetValues(typeof(TicsPerStep)).Cast<TicsPerStep>();
             }
         }
 
-        public AnimationSpeed AnimationSpeed
+        public TicsPerStep TicsPerStep
         {
-            get { return (AnimationSpeed)GetValue(AnimationSpeedProperty); }
+            get { return (TicsPerStep)GetValue(AnimationSpeedProperty); }
             set { SetValue(AnimationSpeedProperty, value); }
         }
 
         public static readonly DependencyProperty AnimationSpeedProperty =
-            DependencyProperty.Register("AnimationSpeed", typeof(AnimationSpeed), typeof(AnimationControl),
-            new FrameworkPropertyMetadata(AnimationSpeed.Stopped, OnAnimationSpeedPropertyChanged));
+            DependencyProperty.Register("TicsPerStep", typeof(TicsPerStep), typeof(AnimationControl),
+            new FrameworkPropertyMetadata(TicsPerStep.Stopped, OnAnimationSpeedPropertyChanged));
 
         private static void OnAnimationSpeedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var animationControl = (AnimationControl)d;
-            var newAnimationSpeed = (AnimationSpeed)e.NewValue;
+            var newAnimationSpeed = (TicsPerStep)e.NewValue;
 
             switch (newAnimationSpeed)
             {
-                case AnimationSpeed.Stopped:
+                case TicsPerStep.Stopped:
                     animationControl.DoStop();
                     break;
-                case AnimationSpeed.Slow:
-                case AnimationSpeed.Medium:
-                case AnimationSpeed.Fast:
+                case TicsPerStep.Slow:
+                case TicsPerStep.Medium:
+                case TicsPerStep.Fast:
+                    animationControl.AnimationState = animationControl.AnimationState.ChangeTicsPerStep(newAnimationSpeed.ToTicsPerStep());
                     animationControl.ResetTimer(newAnimationSpeed.ToUpdateFrequency(), true);
                     break;
                 default:

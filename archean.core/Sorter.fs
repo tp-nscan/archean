@@ -27,11 +27,11 @@ module Sorter =
                     (sortable:int[]) =
 
         switchIndexes
-            |> Seq.iter(fun i -> (RunSwitchOnSortable
+            |> Seq.iter(fun i -> RunSwitchOnSortable
                                     sorterDef.switches.[i] 
                                     switchTracker
                                     i
-                                    sortable))
+                                    sortable)
         sortable
 
 
@@ -47,7 +47,7 @@ module Sorter =
                 sortable
 
 
-    let RunSwitchSeqOnSortableSeq
+    let CondenseSortableSeqWithSwitchSeq
                  (sorterDef:SorterDef) 
                  (switchTracker:SwitchTracker) 
                  (switchIndexes:seq<int>)
@@ -60,21 +60,21 @@ module Sorter =
                     switchIndexes
                     weightedSortable
     
-        let sortedItemsList = sortableSeq
-                                |> Seq.map(rws)
+        let arrayOfCondensedSortables 
+                = sortableSeq   |> Seq.map(rws)
                                 |> Seq.countBy id
                                 |> Seq.map fst
                                 |> Seq.toArray
 
-        (switchTracker, sortedItemsList)
+        (switchTracker, arrayOfCondensedSortables)
 
 
-    let RunSorterOnSortableSeq 
+    let CondenseSortableSeqWithSorter 
                 (sorterDef:SorterDef) 
                 (switchTracker:SwitchTracker) 
                 (sortableSeq: seq<int[]>) = 
 
-        RunSwitchSeqOnSortableSeq
+        CondenseSortableSeqWithSwitchSeq
                     sorterDef
                     switchTracker
                     {0 .. (sorterDef.switches.Length - 1)}
@@ -121,7 +121,7 @@ module Sorter =
 
         let switchTracker = SwitchTracker.Make sorterDef.switches.Length
         let (switchTracker, sortedItemsList) =  
-            RunSorterOnSortableSeq
+            CondenseSortableSeqWithSorter
                     sorterDef
                     switchTracker
                     sortableSeq

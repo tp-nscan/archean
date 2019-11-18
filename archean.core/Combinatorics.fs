@@ -8,11 +8,12 @@ module Combinatorics =
         Seq.init len (fun n -> if (rnd.NextDouble() > pctOnes) then 0 else 1)
 
     // Splits the sourceArray into segments using segBounds
-    let BreakIntoSegments (sourceArray : array<'a>) 
-                          (segBounds : array<int>) =
+    let BreakArrayIntoSegments (sourceArray : array<'a>) 
+                               (segBounds : array<int>) =
         seq {1 .. (segBounds.Length - 1) }
         |> Seq.map(fun i -> sourceArray.[segBounds.[i - 1] .. (segBounds.[i] - 1)])
         |> Seq.toArray
+
 
     let FisherYatesShuffle (rnd : Random) (initialList : array<'a>) =
         let availableFlags = Array.init initialList.Length (fun i -> (i, true))

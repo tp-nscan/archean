@@ -227,7 +227,7 @@ namespace archean.controls.ViewModel.Sorter
 
         public static SorterDisplayVm ChangeAnimationSpeed(
                     this SorterDisplayVm sorterDisplayVm, 
-                    AnimationSpeed animationSpeed)
+                    TicsPerStep animationSpeed)
         {
             return new SorterDisplayVm(
                 order: sorterDisplayVm.Order,

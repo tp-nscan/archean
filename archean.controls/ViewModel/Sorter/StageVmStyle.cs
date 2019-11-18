@@ -7,7 +7,7 @@ namespace archean.controls.ViewModel.Sorter
 {
     public class StageVmStyle
     {
-        public AnimationSpeed AnimationSpeed { get; set; }
+        public TicsPerStep AnimationSpeed { get; set; }
         public Brush KeyLineBrush { get; set; }
         public Brush SwitchBrushNotUsed { get; set; }
         public Brush SwitchBrushInUse { get; set; }
@@ -22,7 +22,7 @@ namespace archean.controls.ViewModel.Sorter
 
         public static StageVmStyle Standard(
                             Brush backgroundBrush, 
-                            AnimationSpeed animationSpeed,
+                            TicsPerStep animationSpeed,
                             SwitchUseWrap maxSwitchUse)
         {
             return new StageVmStyle
@@ -48,7 +48,7 @@ namespace archean.controls.ViewModel.Sorter
     {
         public static StageVmStyle ChangeAnimationSpeed(
                 this StageVmStyle stageVmStyle,
-                AnimationSpeed animationSpeed)
+                TicsPerStep animationSpeed)
         {
             return new StageVmStyle
             {

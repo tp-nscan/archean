@@ -40,7 +40,7 @@ namespace archean.controls.DesignVms.Sorter
                 SwitchUseWrap max = new SwitchUseWrap();
 
                 return switchBlockSets.ToStageVms(
-                    stageVmStyle: StageVmStyle.Standard(Brushes.AliceBlue, AnimationSpeed.Stopped, max),
+                    stageVmStyle: StageVmStyle.Standard(Brushes.AliceBlue, TicsPerStep.Stopped, max),
                     alternatingBrush: new SolidColorBrush(Color.FromScRgb(0.3f, 0, 0, 0)),
                     order: order,
                     sortableItemVms: sortableItemVms);

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace archean.controls.ViewModel
 {
-    public enum AnimationSpeed
+    public enum TicsPerStep
     {
         Stopped,
         Slow,
@@ -39,34 +39,51 @@ namespace archean.controls.ViewModel
 
     public static class EnumExt
     {
-        public static double ToUpdateFrequency(this AnimationSpeed animationSpeed)
+        public static double ToUpdateFrequency(this TicsPerStep animationSpeed)
         {
             switch (animationSpeed)
             {
-                case AnimationSpeed.Stopped:
+                case TicsPerStep.Stopped:
                     return -1.0;
-                case AnimationSpeed.Slow:
-                    return 1000.0;
-                case AnimationSpeed.Medium:
+                case TicsPerStep.Slow:
                     return 50.0;
-                case AnimationSpeed.Fast:
-                    return 2.0;
+                case TicsPerStep.Medium:
+                    return 50.0;
+                case TicsPerStep.Fast:
+                    return 50.0;
                 default:
                     return -1.0;
             }
         }
 
-        public static double ToUpdateSteps(this AnimationSpeed animationSpeed)
+        public static int ToTicsPerStep(this TicsPerStep animationSpeed)
         {
             switch (animationSpeed)
             {
-                case AnimationSpeed.Stopped:
+                case TicsPerStep.Stopped:
+                    return -1;
+                case TicsPerStep.Slow:
+                    return 40;
+                case TicsPerStep.Medium:
+                    return 10;
+                case TicsPerStep.Fast:
+                    return 3;
+                default:
+                    return -1;
+            }
+        }
+
+        public static double ToUpdateSteps(this TicsPerStep animationSpeed)
+        {
+            switch (animationSpeed)
+            {
+                case TicsPerStep.Stopped:
                     return -1.0;
-                case AnimationSpeed.Slow:
+                case TicsPerStep.Slow:
                     return 125.0;
-                case AnimationSpeed.Medium:
+                case TicsPerStep.Medium:
                     return 25.0;
-                case AnimationSpeed.Fast:
+                case TicsPerStep.Fast:
                     return 5.0;
                 default:
                     return -1.0;
@@ -90,6 +107,9 @@ namespace archean.controls.ViewModel
                     break;
                 case StageLayout.Tight:
                     switchBlockSets = Sorting.StageLayout.LayoutStagedSorterTight(stagedSorterDef);
+                    break;
+                case StageLayout.Undefined:
+                    switchBlockSets = Enumerable.Empty<Sorting.ISwitch[][]>();
                     break;
                 default:
                     throw new Exception($"{stageLayout} not handled");

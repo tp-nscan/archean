@@ -68,14 +68,14 @@ type SorterFixture () =
 
              
         let switchTracker = SwitchTracker.Make fullSorterDef.switches.Length
-        let (_, sortableRes) = Sorter.RunSorterOnSortableSeq
+        let (_, sortableRes) = Sorter.CondenseSortableSeqWithSorter
                                     prefixSorterDef
                                     switchTracker
                                     (SortableIntArray.SortableSeqAllBinary order)
                 
         let SortableFunc = sortableRes |> Array.toSeq
         
-        let (switchTrack, sortableRes2) = RunSorterOnSortableSeq 
+        let (switchTrack, sortableRes2) = CondenseSortableSeqWithSorter 
                                                 fullSorterDef 
                                                 switchTracker 
                                                 (SortableFunc)

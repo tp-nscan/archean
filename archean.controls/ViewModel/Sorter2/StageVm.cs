@@ -68,20 +68,28 @@ namespace archean.controls.ViewModel.Sorter2
                  );
         }
 
-        public static List<StageVm> Step(this IEnumerable<StageVm> stageVms, SortableVm sortableVm)
+        public static List<StageVm> Step(this IEnumerable<StageVm> stageVms, 
+            SortableVm sortableVm)
         {
             var curSortableVm = sortableVm;
-            var lst = new List<StageVm>();
-            foreach (var stageVm in stageVms)
+
+            var stageVmList = stageVms.ToList();
+            var lstRet = new List<StageVm>();
+            //if (curSortableVm != null)
+            //{
+            //    curSortableVm = curSortableVm.ToLeftStep(stageVmList[0].KeyPairVms.ToArray());
+            //}
+            foreach (var stageVm in stageVmList)
             {
                 var res = stageVm.ToNextStep(curSortableVm);
-                lst.Add(res.Item1);
+                lstRet.Add(res.Item1);
                 curSortableVm = res.Item2;
             }
-            return lst;
+            return lstRet;
         }
 
-        public static Tuple<StageVm, SortableVm> ToNextStep(this StageVm stageVm, SortableVm sortableVm = null)
+        public static Tuple<StageVm, SortableVm> ToNextStep(this StageVm stageVm, 
+            SortableVm sortableVm = null)
         {
             if(stageVm.SortableVm == null)
             {
@@ -98,6 +106,25 @@ namespace archean.controls.ViewModel.Sorter2
                                 order: stageVm.Order,
                                 keyPairVms: stageVm.KeyPairVms,
                                 sortableVm: sortableVm.ChangeSectionCount(stageVm.StageVmStyle.SortableVmStyle.SectionCount)),
+                    item2: null);
+            }
+
+            if (stageVm.SortableVm.StageVmStep == StageVmStep.PostSort)
+            {
+                if (sortableVm == null)
+                {
+                    return new Tuple<StageVm, SortableVm>(
+                       item1: stageVm,
+                       item2: null);
+                }
+                return new Tuple<StageVm, SortableVm>(
+                    item1: new StageVm(
+                                stageIndex: stageVm.StageIndex,
+                                stageVmStyle: stageVm.StageVmStyle,
+                                order: stageVm.Order,
+                                keyPairVms: stageVm.KeyPairVms,
+                                sortableVm: sortableVm.ChangeSectionCount(stageVm.StageVmStyle.SortableVmStyle.SectionCount)
+                                                    ),
                     item2: null);
             }
 

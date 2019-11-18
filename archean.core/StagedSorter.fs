@@ -22,39 +22,75 @@ module StagedSorter =
                                            |> Seq.toArray
         }
 
-    let RunOnStage
+    let RunSorterStageOnSortable
                 (stagedSorterDef:StagedSorterDef) 
                 (switchTracker:SwitchTracker) 
                 (stageIndex:int) 
-                (weightedsortableSeq: seq<int[]>) =
+                (sortable: int[]) =
 
-            RunSwitchSeqOnSortableSeq
+            RunSwitchSeqOnSortable
+                            stagedSorterDef.sorterDef
+                            switchTracker 
+                            (StagedSorterDef.GetSwitchIndexesForStage stagedSorterDef stageIndex)
+                            sortable
+
+
+    let CondenseSortableSeqUsingStage
+                (stagedSorterDef:StagedSorterDef) 
+                (switchTracker:SwitchTracker) 
+                (stageIndex:int) 
+                (sortableSeq: seq<int[]>) =
+
+            CondenseSortableSeqWithSwitchSeq
                          stagedSorterDef.sorterDef
                          switchTracker 
                          (StagedSorterDef.GetSwitchIndexesForStage stagedSorterDef stageIndex)
-                         weightedsortableSeq
+                         sortableSeq
 
+
+    let ShowSortableProgressByStage
+                (stagedSorterDef:StagedSorterDef) 
+                (sortable:int[]) =
+                
+        let switchTracker = SwitchTracker.Make stagedSorterDef.sorterDef.switches.Length
+
+        let runStage ((sortable, sortableStageHist): int[] * int[] list) 
+                     (stageDex:int) =
+            let res = 
+                RunSorterStageOnSortable
+                    stagedSorterDef
+                    switchTracker
+                    stageDex
+                    (sortable |> Array.copy)
+            (res, res::sortableStageHist)
+
+        let res = {0 .. ( (StagedSorterDef.GetStageCount stagedSorterDef) - 1)}
+                  |> Seq.fold(fun acc i -> runStage acc i) (sortable, [])
+
+        (res, switchTracker)
+
+ 
 
     let GetStagePerfAndSwitchUsage (switchTracker:SwitchTracker)
                                    (stagedSorterDef:StagedSorterDef)
                                    (stageIndexToTest:int)
-                                   (weightedSortableSeq: seq<int[]>) =
+                                   (sortableSeq: seq<int[]>) =
 
             let SeqFuncFromArray (wa:int[][]) =
                 wa |> Array.map(fun a -> Array.copy a)
                    |> Array.toSeq
 
             let (_, weightedRes) = 
-                RunOnStage stagedSorterDef switchTracker stageIndexToTest weightedSortableSeq 
+                CondenseSortableSeqUsingStage stagedSorterDef switchTracker stageIndexToTest sortableSeq 
 
             let sortablesStage1 =  SeqFuncFromArray weightedRes
             let suffixStart = stagedSorterDef.stageIndexes.[stageIndexToTest + 1]
 
             let res = Sorter.UpdateSwitchUses
-                            stagedSorterDef.sorterDef
-                            switchTracker
-                            suffixStart
-                            sortablesStage1
+                                stagedSorterDef.sorterDef
+                                switchTracker
+                                suffixStart
+                                sortablesStage1
 
             match (snd res) with
             | Some switchUseArray -> (true, Some(weightedRes |> Array.length, switchUseArray))
@@ -66,16 +102,16 @@ module StagedSorter =
         let switchTracker = SwitchTracker.Make stagedSorterDef.sorterDef.switches.Length
         let startState = (sortableSeq |> Seq.toArray, [])
 
-        let runStage ((wss, counts): seq<int[]> * int list) 
+        let runStage ((wgtSortSeq, counts): seq<int[]> * int list) 
                      (stageDex:int) =
             let res = 
-                RunOnStage stagedSorterDef switchTracker stageDex wss
+                CondenseSortableSeqUsingStage stagedSorterDef switchTracker stageDex wgtSortSeq
                     |> snd
                     |> Seq.toArray
             (res, res.Length::counts)
 
         let (sortables, stageUseList) = 
-            {firstStage .. (stagedSorterDef.stageIndexes.Length - 2)}
+            {firstStage .. ( (StagedSorterDef.GetStageCount stagedSorterDef) - 1)}
                     |> Seq.fold(fun acc i -> runStage acc i) startState
 
         (switchTracker, stageUseList |> List.rev)

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace archean.controls.Utils
 {
@@ -28,6 +26,38 @@ namespace archean.controls.Utils
                 }
             }
         }
+
+        public static List<int> AccumulateTheBest<T>(this List<int> leaderBoard, Func<T, int> score, T testItem)
+        {
+            var testScore = score(testItem);
+            if (testScore < leaderBoard[leaderBoard.Count - 1])
+            {
+                return leaderBoard;
+            }
+
+            return leaderBoard.InsertSorted(testScore)
+                              .Take(leaderBoard.Count)
+                              .ToList();
+        }
+
+        public static IEnumerable<int> InsertSorted(this IEnumerable<int> items, int testItem)
+        {
+            bool notInsertedYet = true;
+            foreach (var item in items)
+            {
+                if ((testItem > item) && notInsertedYet)
+                {
+                    yield return testItem;
+                    notInsertedYet = false;
+                }
+                yield return item;
+            }
+            if (notInsertedYet)
+            {
+                yield return testItem;
+            }
+        }
+
     }
 
 

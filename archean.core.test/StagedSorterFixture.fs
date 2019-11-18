@@ -36,6 +36,24 @@ type StagedSorterFixture () =
 
       Assert.AreEqual(sd.Length, 10)
 
+    [<TestMethod>]
+    member this.TestShowSortableProgressByStage() =
+        let length = 229
+        let order = 10
+              
+        let rnd = new Random(49123)
+        let stagedSorter = (SorterDef.CreateRandomPackedStages order length rnd) 
+                            |> StagedSorterDef.ToStagedSorterDef
+
+        let randomSortable = (SortableIntArray.CreateRandom order rnd) |> Seq.head
+
+        let res = StagedSorter.ShowSortableProgressByStage
+                    stagedSorter
+                    (randomSortable |> SortableIntArray.value)
+                                  
+
+        Assert.IsTrue (true)
+
 
     [<TestMethod>]
     member this.EvalRefStagedSorter() =

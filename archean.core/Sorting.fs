@@ -109,10 +109,12 @@ module Sorting =
                     (x, true)
                 else (x, false)
 
+
         let CreateRandom (order:int) (rnd : Random) =
             Permutation.CreateRandom rnd order
             |> Seq.map(fun i -> { SortableIntArray.values = Permutation.value i })
              
+
         let SortableSeq (sortables:int[][]) =
             sortables
                 |> Array.map(fun a -> Array.copy a)
@@ -176,11 +178,14 @@ module Sorting =
                (ssd.stageIndexes.[statgeNum + 1] - 1) }
         
 
+        let GetStageCount (ssd:StagedSorterDef) = 
+            ssd.stageIndexes.Length - 1
+
+
         let GetStages (ssd:StagedSorterDef) = 
-            { 0 .. ssd.stageIndexes.Length - 2}
+            { 0 .. ((GetStageCount ssd) - 1)}
             |> Seq.map(fun i -> GetSwitchIndexesForStage ssd i
                                 |> Seq.map(fun i-> ssd.sorterDef.switches.[i]))
-
 
         // Retains the stage partitions of the prefix
         let AppendSwitches (switches:seq<ISwitch>) (stagedSorterDef:StagedSorterDef) =
@@ -211,7 +216,7 @@ module Sorting =
         let ToStageArrays (switchTracker:SwitchTracker) 
                           (stagedSorterDef:StagedSorterDef) =
 
-            Combinatorics.BreakIntoSegments 
+            Combinatorics.BreakArrayIntoSegments 
                 switchTracker.weights 
                 stagedSorterDef.stageIndexes
 
