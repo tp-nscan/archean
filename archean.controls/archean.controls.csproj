@@ -75,9 +75,13 @@
     <Compile Include="Utils\Converters\FEconverters.cs" />
     <Compile Include="Utils\Converters\MediaConverters.cs" />
     <Compile Include="Utils\Enumerables.cs" />
+    <Compile Include="Utils\GoldbachBuckets.cs" />
+    <Compile Include="Utils\GoldbachTermFinder.cs" />
     <Compile Include="Utils\GraphicsFuncs.cs" />
     <Compile Include="Utils\MathLib.cs" />
+    <Compile Include="Utils\PrimeNumbers.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
+    <Compile Include="Utils\Span.cs" />
     <Compile Include="Utils\StringFormats.cs" />
     <Compile Include="ViewModel\Enums.cs" />
     <Compile Include="ViewModel\Sorter2\KeyPairVm.cs" />

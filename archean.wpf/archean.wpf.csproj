@@ -84,6 +84,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModel\Pages\BenchmarkPageVm.cs" />
+    <Compile Include="ViewModel\Pages\GoldbachPageVm.cs" />
     <Compile Include="ViewModel\Pages\SorterPageVm3.cs" />
     <Compile Include="ViewModel\Pages\SorterPageVm2.cs" />
     <Compile Include="ViewModel\Pages\SorterPageVm.cs" />

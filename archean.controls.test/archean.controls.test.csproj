@@ -49,7 +49,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="SpanFixture.cs" />
+    <Compile Include="PrimeNumbersFixture.cs" />
+    <Compile Include="UtilsFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

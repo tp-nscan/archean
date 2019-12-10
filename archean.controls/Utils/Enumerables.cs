@@ -58,6 +58,13 @@ namespace archean.controls.Utils
             }
         }
 
+        public static IEnumerable<int> GetValueRange(this IEnumerable<int> source, int closedLowerBound, int openUpperBound)
+        {
+            return source.Where(i => (i >= closedLowerBound) && (i < openUpperBound));
+        }
+
+
+
     }
 
 
