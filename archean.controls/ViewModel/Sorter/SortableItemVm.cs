@@ -264,6 +264,9 @@ namespace archean.controls.ViewModel.Sorter
                 var sortableItemHi = sortableItemVms.FirstOrDefault(
                                         swm => (swm.KeyLinePos == kpvm.HiKey));
 
+                if (sortableItemsLow == null) continue;
+                if (sortableItemHi == null) continue;
+
                 if (sortableItemsLow.SortableValue > sortableItemHi.SortableValue)
                 {
                     var kpv = new KeyPairVm(
